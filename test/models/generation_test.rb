@@ -29,6 +29,22 @@ class GenerationTest < ActiveSupport::TestCase
     assert_not generation.valid?
   end
 
+  test "a prompt of exactly 2000 characters is valid" do
+    assert_predicate Generation.new(theme: themes(:zinc), prompt: "x" * 2000), :valid?
+  end
+
+  test "database rejects a generation that both completed and failed" do
+    assert_raises(ActiveRecord::StatementInvalid) do
+      generations(:completed).update_columns(failed_at: Time.current, error_code: "refusal")
+    end
+  end
+
+  test "database rejects a failure without an error code" do
+    assert_raises(ActiveRecord::StatementInvalid) do
+      generations(:pending).update_columns(failed_at: Time.current)
+    end
+  end
+
   test "belongs to a theme" do
     assert_equal themes(:slate), generations(:completed).theme
   end

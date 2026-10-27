@@ -13,6 +13,14 @@ class PaletteValidatorTest < ActiveSupport::TestCase
     assert_includes theme.errors[:base], "light (:root): missing --radius"
   end
 
+  test "reports a missing dark variable" do
+    theme = themes(:zinc)
+    theme.dark = theme.dark.except("primary")
+
+    assert_not theme.valid?
+    assert(theme.errors[:base].any? { |message| message.include?("missing primary") })
+  end
+
   test "reports a bare HSL triplet" do
     theme = themes(:zinc)
     theme.light = theme.light.merge("border" => "240 5.9% 90%")

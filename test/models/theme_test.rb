@@ -34,16 +34,23 @@ class ThemeTest < ActiveSupport::TestCase
     assert(theme.errors[:base].any? { |message| message.include?("could break theme.css") })
   end
 
-  test "slug must be unique and URL-safe" do
+  test "slug must be unique" do
     duplicate = themes(:zinc).dup
 
     assert_not duplicate.valid?
     assert_includes duplicate.errors[:slug], "has already been taken"
+  end
 
-    duplicate.slug = "Not Safe"
+  test "slug must be URL-safe" do
+    theme = themes(:zinc)
+    theme.slug = "Not Safe"
 
-    assert_not duplicate.valid?
-    assert_includes duplicate.errors[:slug], "is invalid"
+    assert_not theme.valid?
+    assert_includes theme.errors[:slug], "is invalid"
+  end
+
+  test "database rejects an unsafe slug" do
+    assert_raises(ActiveRecord::StatementInvalid) { themes(:zinc).update_columns(slug: "Not Safe") }
   end
 
   test "name is required" do
@@ -54,8 +61,11 @@ class ThemeTest < ActiveSupport::TestCase
   end
 
   test "destroying a theme destroys its generations" do
-    assert_difference -> { Generation.count }, -themes(:zinc).generations.count do
-      themes(:zinc).destroy
+    theme = themes(:zinc)
+
+    assert_operator theme.generations.count, :>, 0
+    assert_difference -> { Generation.count }, -theme.generations.count do
+      theme.destroy
     end
   end
 end
