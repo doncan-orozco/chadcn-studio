@@ -1,0 +1,17 @@
+pending:
+  theme: zinc
+  prompt: A calm theme for a bank
+  started_at:
+completed:
+  theme: slate
+  prompt: Warm sunset
+  inputs:
+    primary: oklch(0.7 0.15 50)
+  started_at: '2026-10-01 00:00:00'
+  completed_at: '2026-10-01 00:00:05'
+failed:
+  theme: blue
+  prompt: Neon
+  started_at: '2026-10-01 00:00:00'
+  failed_at: '2026-10-01 00:00:03'
+  error_code: refusal
