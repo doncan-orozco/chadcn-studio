@@ -1,0 +1,15 @@
+{
+  "case": "01-controller",
+  "description": "Custom verb action, state guard clause, write done in the controller instead of an operation, HTML built in the controller.",
+  "must_cite": [
+    "controller R1",
+    "controller R2",
+    "controller R8"
+  ],
+  "nice_to_cite": [
+    "controller R5",
+    "controller R7"
+  ],
+  "must_not_have_mandatory": [],
+  "notes": "Rule numbers follow .ai/skills/controller/SKILL.md (R1 strict REST, R2 no state guard clauses, R8 no HTML generation; R5 find once, R7 one operation per action)."
+}

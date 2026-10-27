@@ -1,0 +1,14 @@
+{
+  "case": "02-operation",
+  "description": "Hidden Current dependency, transaction around a single write, flash and redirect inside the operation, Success(record) instead of a payload hash.",
+  "must_cite": [
+    "operation-pattern R4",
+    "operation-pattern R6",
+    "operation-pattern R8"
+  ],
+  "nice_to_cite": [
+    "operation-pattern R2"
+  ],
+  "must_not_have_mandatory": [],
+  "notes": "Rule numbers follow .ai/skills/operation-pattern/SKILL.md (R4 no hidden dependencies, R6 transactions for multi-write only, R8 no boundary concerns; R2 result contract)."
+}

@@ -1,0 +1,8 @@
+{
+  "case": "04-stimulus",
+  "description": "Listener and timer never released, fetch-for-HTML into innerHTML, undeclared target, global querySelector.",
+  "must_cite": ["stimulus R1", "stimulus R2", "stimulus R4", "stimulus R7"],
+  "nice_to_cite": ["stimulus R5", "stimulus R6"],
+  "must_not_have_mandatory": [],
+  "notes": "Rule numbers follow papyro's stimulus skill at the time of the port (R1 behavior only, R2 clean up in disconnect, R4 declare the surface, R7 no innerHTML with data). The hardcoded \"Updated\" is not a finding here: the studio has no i18n. Re-check the numbers against .ai/skills/stimulus/SKILL.md once the studio skills are final."
+}

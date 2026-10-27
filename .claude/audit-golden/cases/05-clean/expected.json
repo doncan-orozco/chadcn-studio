@@ -1,0 +1,12 @@
+{
+  "case": "05-clean",
+  "description": "False-positive control: a sub-resource controller dispatching one operation and handling both branches, and an operation returning a payload hash with routable failure codes. ADVISORY findings are acceptable; no MANDATORY finding is expected on these skills.",
+  "must_cite": [],
+  "nice_to_cite": [],
+  "must_not_have_mandatory": [
+    "controller",
+    "operation-pattern",
+    "naming-conventions"
+  ],
+  "notes": "The operation uses the helper signatures the operation-pattern skill documents (fail_with_code!(model, code, message:), fail_with_model!(model)); re-verify against app/concepts/core/operation.rb once it exists in the studio. Plain English strings are correct here: the studio has no i18n."
+}

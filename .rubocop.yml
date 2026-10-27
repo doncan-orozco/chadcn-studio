@@ -1,0 +1,21 @@
+# Omakase Ruby styling for Rails
+inherit_gem: { rubocop-rails-omakase: rubocop.yml }
+
+plugins:
+  - rubocop-rails
+  - rubocop-performance
+  - rubocop-minitest
+  - rubocop-rake
+  - rubocop-capybara
+
+AllCops:
+  NewCops: enable
+  Exclude:
+    - ".claude/audit-golden/**/*"
+    - "tmp/**/*"
+    - "vendor/**/*"
+    - "node_modules/**/*"
+    - "db/*_schema.rb"
+
+Minitest/MultipleAssertions:
+  Enabled: false

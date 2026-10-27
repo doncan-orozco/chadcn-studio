@@ -1,0 +1,8 @@
+{
+  "case": "03-phlex-view",
+  "description": "Query and state branching in a view, Current in a view, hardcoded palette classes and a color literal, raw anchor with a hand-built path.",
+  "must_cite": ["phlex-view-pattern R1", "phlex-view-pattern R6", "phlex-view-pattern R9", "phlex-view-pattern R13"],
+  "nice_to_cite": ["design-system R1"],
+  "must_not_have_mandatory": [],
+  "notes": "Rule numbers follow papyro's phlex-view-pattern skill at the time of the port (R1 dumb views, R6 explicit data flow, R9 semantic tokens only, R13 links use route helpers). The PALETTE_LEAKS mechanical check must list the two palette classes and the color literal. Re-check the numbers against .ai/skills/phlex-view-pattern/SKILL.md and design-system/SKILL.md once the studio skills are final."
+}

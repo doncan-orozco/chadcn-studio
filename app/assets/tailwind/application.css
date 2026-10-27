@@ -1,0 +1,5 @@
+@import "tailwindcss";
+/* chadcn:start (managed by rails g chadcn:install) */
+@import "../builds/tailwind/chadcn";
+@import "./theme/theme.css";
+/* chadcn:end */

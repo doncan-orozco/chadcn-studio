@@ -1,0 +1,77 @@
+# Domain-Driven Stylesheet Organization
+
+> Merged from the former `frontend-style-ddd` skill.
+
+# Frontend Style DDD
+
+Use this skill when creating or editing styles in chadcn-
+
+## Non-Negotiable Rules
+
+- Do not add domain styles directly to `app/assets/tailwind/application.css`.
+- Keep `app/assets/tailwind/application.css` as an import manifest and shared bootstrap only.
+- Place style rules in bounded-context files under `app/assets/tailwind/domains/`.
+- Place cross-domain UI primitives under `app/assets/tailwind/components/`.
+- Place global theme tokens and base layer rules under `app/assets/tailwind/foundation/`.
+- Place shared animation/behavior utilities under `app/assets/tailwind/utilities/`.
+- Import files explicitly from the manifest in stable order.
+
+## Required Structure
+
+```text
+app/assets/tailwind/
+  application.css                   # manifest only
+  foundation/
+    base.css                        # non-theme global rules (smooth scroll, scroll margins)
+  theme/
+    theme.css                       # shadcn theme: the ONLY file edited to restyle (bin/rails theme:use|import|check)
+    tokens.css                      # @theme inline + base layer; generated mapping, do not edit
+    legacy-compat.css               # shims for frozen legacy components
+  components/
+    ui-scroll-area.css              # cross-domain component styles
+  domains/
+    themes/
+      reader.css                    # theme-specific typography/layout
+    
+      ...                           # editor-specific styles
+    users/
+      ...                           # user profile/account styles
+  utilities/
+    motion.css                      # shared keyframes/state utilities
+```
+
+## Placement Decision Tree
+
+1. Is this token/base reset/theme behavior?
+   Put it in `foundation/`.
+2. Is this reusable across many domains (UI primitive)?
+   Put it in `components/`.
+3. Is this tied to one bounded context (themes/users)?
+   Put it in `domains/<context>/`.
+4. Is this a reusable utility animation/state helper?
+   Put it in `utilities/`.
+
+## Workflow
+
+1. Identify domain ownership of the style change.
+2. Create or update the domain/component file (not the manifest).
+3. Add import in `app/assets/tailwind/application.css` if new file.
+4. Keep selectors scoped (for example, `.theme-prose`, `.editor-dashboard`).
+5. Run focused tests and visually verify affected page.
+
+## Anti-Patterns (Forbidden)
+
+- Appending all new CSS to `application.css`.
+- Mixing unrelated domains in one file.
+- Using global selectors for domain-specific UI.
+- Duplicating the same utility rules in multiple domain files.
+
+## Example
+
+- `Themes::Show` typography belongs in `domains/themes/reader.css`.
+- Shared custom scrollbar rules belong in `components/ui-scroll-area.css`.
+- Theme variables and dark mode belong in `theme/theme.css` (shadcn format; see `shadcn-port` theme-contract). `foundation/` keeps only non-theme globals.
+
+## Companion Skills
+
+- **[../phlex-view-pattern/SKILL.md](../SKILL.md)** — **PRIMARY view structure source**: Golden archetype for all Phlex views and components. Load this first for any work in `app/views/` or `app/components/`. This stylesheet skill defers to the view/component shape defined by phlex-view-pattern.
