@@ -21,7 +21,7 @@ class Themes::OklchTest < ActiveSupport::TestCase
   test "keeps the alpha of the dark border" do
     color = Themes::Oklch.parse("oklch(1 0 0 / 10%)")
 
-    assert_equal 10.0, color.alpha
+    assert_in_delta(10.0, color.alpha)
     assert_equal "oklch(1 0 0 / 10%)", color.to_s
   end
 
