@@ -20,9 +20,19 @@ class Themes::Operation::Derive < Core::Operation
 
   def judge(palette)
     report = Chadcn::Theme.validate(palette, strict: true)
-    return Success(report[:warnings]) if report[:errors].empty?
+    errors = report[:errors] + unjudged_pairs(palette)
+    return Success(report[:warnings]) if errors.empty?
 
-    Failure(code: :contrast, errors: report[:errors])
+    Failure(code: :contrast, errors: errors)
+  end
+
+  # A pair the gem cannot measure would pass the gate silently; it fails instead.
+  def unjudged_pairs(palette)
+    { "light" => palette.root, "dark" => palette.dark }.flat_map do |mode, variables|
+      Chadcn::Theme::CONTRAST_PAIRS.filter_map do |foreground, surface|
+        "#{mode}: --#{foreground} on --#{surface} cannot be judged" if Chadcn::Theme.contrast(variables[foreground], variables[surface]).nil?
+      end
+    end
   end
 
   def validate(inputs)

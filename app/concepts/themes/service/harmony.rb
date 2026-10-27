@@ -104,7 +104,7 @@ class Themes::Service::Harmony
     chroma = brand.chroma * RING_CHROMA
     base["ring"] = Themes::Oklch.new(RING_LIGHTNESS[mode], chroma, brand.hue)
     chart_offsets.each_with_index do |offset, index|
-      base["chart-#{index + 1}"] = Themes::Oklch.new(CHART_LIGHTNESS[mode], [ brand.chroma, CHART_CHROMA_MIN ].max, (brand.hue + offset) % 360)
+      base["chart-#{index + 1}"] = Themes::Oklch.new(CHART_LIGHTNESS[mode], [ brand.chroma, CHART_CHROMA_MIN ].max, ((brand.hue + offset) % 360) + 0.0)
     end
     base["destructive"] = DESTRUCTIVE[mode]
     %w[primary primary-foreground accent accent-foreground border ring].each { |name| base["sidebar-#{name}"] = base[name] }
@@ -112,7 +112,7 @@ class Themes::Service::Harmony
     base
   end
 
-  def neutral(lightness, chroma_floor = 0) = Themes::Oklch.new(lightness, [ tint * NEUTRAL_CHROMA_MAX, chroma_floor ].max, primary.hue)
+  def neutral(lightness, chroma_floor = 0) = Themes::Oklch.new(lightness, [ tint * NEUTRAL_CHROMA_MAX, chroma_floor ].max + 0.0, primary.hue)
 
   # The lighter or the darker text candidate, whichever reads better on the surface.
   def foreground_for(surface)

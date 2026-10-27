@@ -43,4 +43,13 @@ class Themes::Operation::DeriveTest < ActiveSupport::TestCase
     assert_equal :invalid, failure[:code]
     assert_includes failure[:errors].keys, :chart_offsets
   end
+
+  test "negative zero never reaches the palette" do
+    [ { primary: "oklch(0.55 0.2 250)", tint: "-0" }, { primary: "oklch(0.55 0.2 0)", chart_offsets: [ -360, 0, 0, 0, 0 ] } ].each do |inputs|
+      palette = Themes::Operation::Derive.new.call(inputs: inputs).value![:palette]
+
+      assert_valid_palette palette, inputs.inspect
+      (palette.root.values + palette.dark.values).each { |value| refute_match(/(?<![\w.])-0(?![\d.])/, value, inputs.inspect) }
+    end
+  end
 end

@@ -62,7 +62,10 @@ class Themes::Service::HarmonyTest < ActiveSupport::TestCase
 
     assert_valid_palette result.palette
     assert_operator result.repairs, :>, 0
-    assert_operator result.repairs, :<=, Themes::Service::Harmony::REPAIR_MAX_STEPS
+    # Two builds, each repairing every pair in both modes, plus the primary shift.
+    budget = 2 * Chadcn::Theme::CONTRAST_PAIRS.size * Themes::Service::Harmony::MODES.size * Themes::Service::Harmony::REPAIR_MAX_STEPS + 1
+
+    assert_operator result.repairs, :<=, budget
   end
 
   test "a malformed primary raises" do
