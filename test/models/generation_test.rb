@@ -20,10 +20,12 @@ class GenerationTest < ActiveSupport::TestCase
 
   test "prompt is required and capped" do
     generation = Generation.new(theme: themes(:zinc), prompt: "")
+
     assert_not generation.valid?
     assert_includes generation.errors[:prompt], "can't be blank"
 
     generation.prompt = "x" * 2001
+
     assert_not generation.valid?
   end
 

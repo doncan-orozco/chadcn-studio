@@ -36,10 +36,12 @@ class ThemeTest < ActiveSupport::TestCase
 
   test "slug must be unique and URL-safe" do
     duplicate = themes(:zinc).dup
+
     assert_not duplicate.valid?
     assert_includes duplicate.errors[:slug], "has already been taken"
 
     duplicate.slug = "Not Safe"
+
     assert_not duplicate.valid?
     assert_includes duplicate.errors[:slug], "is invalid"
   end
