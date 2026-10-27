@@ -1,9 +1,7 @@
 class PreviewsController < ApplicationController
   def show
-    page = params[:page]
-    return head :not_found unless Views::Previews::PAGES.include?(page)
+    view_class, presenter_class = Views::Previews::PAGES.fetch(params[:page]) { return head :not_found }
 
-    view = Views::Previews.const_get(page.camelize).new(Previews::Presenter.const_get(page.camelize).new)
-    render Components::Previews::Root.new(page: view)
+    render Components::Previews::Root.new(page: view_class.new(presenter_class.new))
   end
 end

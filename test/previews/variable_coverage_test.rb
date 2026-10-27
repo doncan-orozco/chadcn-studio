@@ -4,13 +4,22 @@ require "test_helper"
 class VariableCoverageTest < ActionDispatch::IntegrationTest
   UTILITY_PREFIXES = %w[bg text border ring fill stroke outline divide from to via].freeze
 
-  test "every Chadcn::Theme::REQUIRED variable has a utility class in the rendered preview pages" do
-    html = Views::Previews::PAGES.map { |page| get(preview_path(page)) && response.body }.join("\n")
+  test "every Chadcn::Theme::REQUIRED variable has a utility class inside the preview root of the pages" do
+    classes = Views::Previews::PAGES.each_key.flat_map { |page| preview_root_classes(page) }
 
     missing = Chadcn::Theme::REQUIRED.reject do |name|
-      html.match?(/(?:#{UTILITY_PREFIXES.join('|')})-#{Regexp.escape(name)}(?![\w-])/)
+      classes.any? { |klass| klass.match?(/\A(?:#{UTILITY_PREFIXES.join('|')})-#{Regexp.escape(name)}\z/) }
     end
 
     assert_empty missing, "no preview page uses: #{missing.join(', ')}"
+  end
+
+  private
+
+  # Class tokens of the nodes inside the preview root, variants (hover:, dark:) and /opacity stripped.
+  def preview_root_classes(page)
+    get preview_path(page)
+    root = Nokogiri::HTML5(response.body).at_css("[data-testid=preview-root]")
+    root.css("[class]").flat_map { |node| node["class"].split }.map { |token| token.split(":").last.sub(%r{/\d+\z}, "") }
   end
 end

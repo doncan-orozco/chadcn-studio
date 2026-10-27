@@ -4,5 +4,6 @@
 class Previews::Presenter::Auth
   def title = "Authentication"
   def product = "Acme"
+  def sign_in_title = "Sign in to #{product}"
   def sign_in_error = "Incorrect email or password."
 end

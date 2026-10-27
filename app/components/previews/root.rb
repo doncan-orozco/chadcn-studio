@@ -2,11 +2,14 @@
 
 # Wraps one preview page in the surface the theme variables apply to.
 class Components::Previews::Root < Components::Base
-  def initialize(page:)
+  CLASSES = "min-h-full bg-background text-foreground"
+
+  def initialize(page:, **attrs)
     @page = page
+    @attrs = attrs
   end
 
   def view_template
-    div(class: "min-h-full bg-background text-foreground", data: { testid: "preview-root" }) { render @page }
+    div(**mix({ class: CLASSES, data: { testid: "preview-root" } }, @attrs)) { render @page }
   end
 end

@@ -33,8 +33,8 @@ class Views::Previews::Form < Views::Base
       end
       render Chadcn::Field.new(data: { invalid: "true" }) do |field|
         field.label(html_for: "form-email") { "Email" }
-        field.render Chadcn::Input.new(id: "form-email", type: "email", default_value: "ada.example.com", aria: { invalid: "true" })
-        field.error { @presenter.email_error }
+        field.render Chadcn::Input.new(id: "form-email", type: "email", default_value: @presenter.email_value, aria: { invalid: "true", describedby: "form-email-error" })
+        field.error(id: "form-email-error") { @presenter.email_error }
       end
       render Chadcn::Field.new do |field|
         field.label(html_for: "form-bio") { "Bio" }
@@ -53,18 +53,18 @@ class Views::Previews::Form < Views::Base
       end
       render Chadcn::Field.new do |field|
         field.label { "Volume" }
-        field.render Chadcn::Slider.new(default_value: @presenter.volume)
+        field.render Chadcn::Slider.new(default_value: @presenter.volume, aria: { label: "Volume" })
       end
     end
   end
 
   def role
     render Chadcn::Field.new do |field|
-      field.label { "Role" }
+      field.label(html_for: "form-role") { "Role" }
       field.render Chadcn::Select.new(name: "role", default_value: "designer") do |select|
-        select.trigger(class: "w-full") { select.value(placeholder: "Pick a role") }
+        select.trigger(id: "form-role", class: "w-full") { select.value(placeholder: "Pick a role") }
         select.content do
-          @presenter.roles.each { |value, label| select.item(value:) { label } }
+          @presenter.roles.each { |role| select.item(value: role.value) { role.label } }
         end
       end
     end
@@ -72,12 +72,12 @@ class Views::Previews::Form < Views::Base
 
   def plan
     render Chadcn::Field.new do |field|
-      field.label { "Plan" }
-      field.render Chadcn::RadioGroup.new(name: "plan", default_value: "pro") do |group|
+      field.label(id: "form-plan-label") { "Plan" }
+      field.render Chadcn::RadioGroup.new(name: "plan", default_value: "pro", aria: { labelledby: "form-plan-label" }) do |group|
         @presenter.plans.each do |plan|
           div(class: "flex items-center gap-3") do
             group.item(value: plan.value, id: "plan-#{plan.value}")
-            render Chadcn::Label.new(html_for: "plan-#{plan.value}") { "#{plan.label}: #{plan.description}" }
+            render Chadcn::Label.new(html_for: "plan-#{plan.value}") { plan.summary }
           end
         end
       end

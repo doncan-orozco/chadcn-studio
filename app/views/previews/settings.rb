@@ -6,22 +6,31 @@ class Views::Previews::Settings < Views::Base
   end
 
   def view_template
-    div(class: "mx-auto flex max-w-4xl flex-col gap-6 p-6 md:flex-row") do
-      nav(aria: { label: "Settings" }, class: "flex gap-1 md:w-48 md:flex-col") do
-        @presenter.sections.each do |key, label|
-          active = key == @presenter.active_section
-          a(href: root_path, aria: { current: (active ? "page" : nil) },
-            class: "rounded-md px-3 py-2 text-sm hover:bg-accent hover:text-accent-foreground #{active ? 'bg-accent text-accent-foreground' : 'text-muted-foreground'}") { label }
+    div(class: "mx-auto max-w-4xl space-y-6 p-6") do
+      h1(class: "text-2xl font-semibold tracking-tight") { @presenter.title }
+      div(class: "flex flex-col gap-6 md:flex-row") do
+        sections_nav
+        div(class: "min-w-0 flex-1 space-y-6") do
+          profile
+          notifications
         end
-      end
-      div(class: "min-w-0 flex-1 space-y-6") do
-        profile
-        notifications
       end
     end
   end
 
   private
+
+  def sections_nav
+    nav(aria: { label: "Settings" }, class: "flex gap-1 md:w-48 md:flex-col") do
+      @presenter.sections.each do |section|
+        render Chadcn::Button.new(
+          as_child: :a, variant: "ghost", href: preview_path("settings"),
+          aria: { current: ("page" if section.active) },
+          class: section.active ? "justify-start bg-accent text-accent-foreground" : "justify-start text-muted-foreground"
+        ) { section.label }
+      end
+    end
+  end
 
   def profile
     render Chadcn::Card.new do |card|
@@ -50,10 +59,10 @@ class Views::Previews::Settings < Views::Base
     render Chadcn::Card.new do |card|
       card.header { card.title { "Notifications" } }
       card.content(class: "space-y-4") do
-        @presenter.notifications.each do |key, label, enabled|
-          div(class: "flex items-center justify-between") do
-            render Chadcn::Label.new(html_for: "notify-#{key}") { label }
-            render Chadcn::Switch.new(id: "notify-#{key}", default_checked: enabled)
+        @presenter.notifications.each do |notification|
+          render Chadcn::Field.new(orientation: "horizontal") do |field|
+            field.label(html_for: "notify-#{notification.key}") { notification.label }
+            field.render Chadcn::Switch.new(id: "notify-#{notification.key}", default_checked: notification.enabled)
           end
         end
       end

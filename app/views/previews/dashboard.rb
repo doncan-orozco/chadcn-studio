@@ -40,12 +40,7 @@ class Views::Previews::Dashboard < Views::Base
       end
       card.content(class: "space-y-3") do
         @presenter.series.each do |series|
-          div(class: "space-y-1") do
-            span(class: "text-sm") { series.name }
-            div(class: "h-3 rounded-full bg-muted") do
-              div(class: "h-3 rounded-full #{@presenter.chart_class(series)}", style: @presenter.share_style(series))
-            end
-          end
+          render Components::Previews::TrafficBar.new(name: series.name, share: series.share, index: series.chart_index)
         end
       end
     end
@@ -63,16 +58,16 @@ class Views::Previews::Dashboard < Views::Base
             tabs.trigger(value: "all") { "All" }
             tabs.trigger(value: "paid") { "Paid" }
           end
-          tabs.content(value: "all") { table(@presenter.orders) }
-          tabs.content(value: "paid") { table(@presenter.orders.select { |order| order.status == "Paid" }) }
+          tabs.content(value: "all") { orders_table(@presenter.orders) }
+          tabs.content(value: "paid") { orders_table(@presenter.paid_orders) }
         end
       end
     end
   end
 
-  def table(orders)
+  def orders_table(orders)
     render Chadcn::Table.new do |t|
-      t.header { t.row { %w[Customer Status Amount].each { |name| t.head { name } } } }
+      t.header { t.row { %w[Customer Status Amount].each { |name| t.head(class: ("text-right" if name == "Amount")) { name } } } }
       t.body do
         orders.each do |order|
           t.row do

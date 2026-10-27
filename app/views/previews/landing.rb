@@ -47,13 +47,17 @@ class Views::Previews::Landing < Views::Base
         render Chadcn::Card.new(class: tier.featured ? "border-primary" : nil) do |card|
           card.header do
             card.title { tier.name }
+            render Chadcn::Badge.new { "Most popular" } if tier.featured
             card.description { tier.blurb }
           end
           card.content(class: "space-y-3") do
-            div(class: "text-3xl font-bold") { plain tier.price; span(class: "text-sm font-normal text-muted-foreground") { " /month" } }
+            div(class: "text-3xl font-bold") do
+              plain tier.price
+              span(class: "text-sm font-normal text-muted-foreground") { " /month" }
+            end
             ul(class: "space-y-1 text-sm text-muted-foreground") { tier.perks.each { |perk| li { perk } } }
           end
-          card.footer { render Chadcn::Button.new(variant: tier.featured ? "default" : "outline", class: "w-full") { "Choose #{tier.name}" } }
+          card.footer { render Chadcn::Button.new(variant: tier.featured ? "default" : "outline", class: "w-full") { tier.cta_label } }
         end
       end
     end
