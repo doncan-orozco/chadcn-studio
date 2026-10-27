@@ -2,7 +2,12 @@
 
 # The app shell: a header with the theme toggle, an optional sidebar (an HTML string from the page) and the main area.
 class Components::Shell::Frame < Components::Base
+  # `sidebar` is pre-rendered, escaped HTML (`content_for(:sidebar)`); a plain String would be trusted blindly, so it is refused.
   def initialize(sidebar: nil)
+    unless sidebar.nil? || sidebar.html_safe?
+      raise ArgumentError, "sidebar must be an html_safe buffer (use content_for(:sidebar)), got #{sidebar.class}"
+    end
+
     @sidebar = sidebar
   end
 

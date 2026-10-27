@@ -16,7 +16,8 @@ class Views::Layouts::Application < Views::Base
         meta(name: "viewport", content: "width=device-width,initial-scale=1")
         csrf_meta_tags
         csp_meta_tag
-        raw safe(content_for(:head).to_s)
+        head_content = content_for(:head)
+        raw safe(head_content) if head_content.present? && head_content.html_safe?
         link(rel: "icon", href: "/icon.png", type: "image/png")
         link(rel: "icon", href: "/icon.svg", type: "image/svg+xml")
         link(rel: "apple-touch-icon", href: "/icon.png")

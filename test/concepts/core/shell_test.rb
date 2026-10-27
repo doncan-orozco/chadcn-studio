@@ -1,6 +1,6 @@
 require "test_helper"
 
-class PagesControllerTest < ActionDispatch::IntegrationTest
+class Core::ShellTest < ActionDispatch::IntegrationTest
   test "root renders the shell with the theme toggle and the toaster" do
     get root_path
 
@@ -9,6 +9,12 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid=theme-toggle] [data-action='chadcn--theme#setDark']"
     assert_select "section[aria-live=polite]"
     assert_select "[data-testid=sidebar]", count: 0
+  end
+
+  test "the frame renders an html_safe sidebar and refuses a plain string" do
+    assert_nothing_raised { Components::Shell::Frame.new(sidebar: ActiveSupport::SafeBuffer.new("<nav></nav>")) }
+    assert_nothing_raised { Components::Shell::Frame.new }
+    assert_raises(ArgumentError) { Components::Shell::Frame.new(sidebar: "<script>alert(1)</script>") }
   end
 
   test "every v1 route is declared" do

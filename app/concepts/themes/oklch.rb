@@ -1,5 +1,6 @@
 # frozen_string_literal: true
 
+# Equality and hash compare the 3-decimal shadcn spelling.
 # A color in oklch: L 0..1, C 0..0.4, H 0..360, optional alpha 0..100 (percent). `to_s` is the shadcn spelling.
 class Themes::Oklch
   class Invalid < ArgumentError; end
