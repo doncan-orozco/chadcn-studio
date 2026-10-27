@@ -4,10 +4,11 @@ class Themes::Operation::DeriveTest < ActiveSupport::TestCase
   include PaletteAssertions
 
   test "derives a valid palette and persists nothing" do
-    assert_no_difference -> { Theme.count } do
+    assert_no_difference [ -> { Theme.count }, -> { Generation.count } ] do
       payload = Themes::Operation::Derive.new.call(inputs: { "primary" => "oklch(0.55 0.2 250)", "tint" => 0.5 }).value!
 
       assert_valid_palette payload[:palette]
+      assert_equal %i[inputs palette repairs warnings], payload.keys.sort
       assert_equal "oklch(0.55 0.2 250)", payload[:palette].root["primary"]
     end
   end
@@ -25,5 +26,21 @@ class Themes::Operation::DeriveTest < ActiveSupport::TestCase
 
     assert_equal :contrast, failure[:code]
     assert_match(/--foreground on --background/, failure[:errors].join)
+  end
+
+  test "an alpha or upper-case override cannot dodge the strict gate" do
+    [ { "light" => { "foreground" => "oklch(0.95 0 0 / 50%)" } }, { "light" => { "foreground" => "OKLCH(0.95 0 0)" } } ].each do |overrides|
+      outcome = Themes::Operation::Derive.new.call(inputs: { primary: "oklch(0.55 0.2 250)", overrides: overrides })
+
+      assert_predicate outcome, :failure?, overrides.inspect
+      assert_includes %i[invalid contrast], outcome.failure[:code]
+    end
+  end
+
+  test "a non-finite chart offset fails with :invalid" do
+    failure = Themes::Operation::Derive.new.call(inputs: { primary: "oklch(0.55 0.2 250)", chart_offsets: %w[0 0 0 0 1e400] }).failure
+
+    assert_equal :invalid, failure[:code]
+    assert_includes failure[:errors].keys, :chart_offsets
   end
 end

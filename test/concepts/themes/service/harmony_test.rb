@@ -51,10 +51,22 @@ class Themes::Service::HarmonyTest < ActiveSupport::TestCase
     assert_equal low, palette.root["foreground"]
   end
 
+  test "a hex light override does not raise" do
+    palette = Themes::Service::Harmony.call(BLUE.merge(overrides: { "light" => { "background" => "#fafafa", "card" => "#ffffff" } }))
+
+    assert_equal "#fafafa", palette.root["background"]
+  end
+
   test "mid lightness primaries are repaired until the pair passes" do
-    result = Themes::Service::Harmony.derive(primary: "oklch(0.62 0.2 150)")
+    result = Themes::Service::Harmony.derive(primary: "oklch(0.55 0.1 150)")
 
     assert_valid_palette result.palette
+    assert_operator result.repairs, :>, 0
+    assert_operator result.repairs, :<=, Themes::Service::Harmony::REPAIR_MAX_STEPS
+  end
+
+  test "a malformed primary raises" do
+    assert_raises(Themes::Oklch::Invalid) { Themes::Service::Harmony.call(primary: "blue") }
   end
 
   test "radius and chart offsets are inputs" do
@@ -66,5 +78,11 @@ class Themes::Service::HarmonyTest < ActiveSupport::TestCase
 
   test "string keys from a JSON column work too" do
     assert_equal Themes::Service::Harmony.call(BLUE), Themes::Service::Harmony.call(BLUE.stringify_keys)
+  end
+
+  test "override values are normalised to the canonical spelling" do
+    palette = Themes::Service::Harmony.call(BLUE.merge(overrides: { "dark" => { "ring" => "OKLCH(0.80000 0.1 10)" } }))
+
+    assert_equal "oklch(0.8 0.1 10)", palette.dark["ring"]
   end
 end

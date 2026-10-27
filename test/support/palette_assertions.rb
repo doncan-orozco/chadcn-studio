@@ -6,7 +6,7 @@ module PaletteAssertions
     report = Chadcn::Theme.validate(palette, strict: true)
 
     assert_empty report[:errors], message
-    assert_equal Chadcn::Theme::REQUIRED.sort, (palette.dark.keys).sort, "dark must hold exactly the required variables"
+    assert_equal Chadcn::Theme::REQUIRED.sort, palette.dark.keys.sort, "dark must hold exactly the required variables"
     assert_equal (Chadcn::Theme::REQUIRED + Chadcn::Theme::ROOT_ONLY).sort, palette.root.keys.sort
   end
 end

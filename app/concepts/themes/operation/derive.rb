@@ -10,14 +10,20 @@ class Themes::Operation::Derive < Core::Operation
 
   def call(inputs:)
     values = step validate(inputs)
-    result = @service.derive(values)
-    report = Chadcn::Theme.validate(result.palette, strict: true)
-    step Failure(code: :contrast, errors: report[:errors]) if report[:errors].any?
+    derivation = @service.derive(values)
+    warnings = step judge(derivation.palette)
 
-    { palette: result.palette, inputs: values, repairs: result.repairs, warnings: report[:warnings] }
+    { palette: derivation.palette, inputs: values, repairs: derivation.repairs, warnings: warnings }
   end
 
   private
+
+  def judge(palette)
+    report = Chadcn::Theme.validate(palette, strict: true)
+    return Success(report[:warnings]) if report[:errors].empty?
+
+    Failure(code: :contrast, errors: report[:errors])
+  end
 
   def validate(inputs)
     outcome = @contract.call(inputs.to_h)

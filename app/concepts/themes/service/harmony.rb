@@ -29,7 +29,7 @@ class Themes::Service::Harmony
   DEFAULTS = { primary: "oklch(0.21 0.006 285.885)", tint: 0.4, radius: "0.625rem", chart_offsets: CHART_HUE_OFFSETS }.freeze
   MODES = { "light" => :root, "dark" => :dark }.freeze
 
-  Result = Data.define(:palette, :repairs)
+  Derivation = Data.define(:palette, :repairs)
 
   def self.call(inputs) = derive(inputs).palette
 
@@ -46,65 +46,65 @@ class Themes::Service::Harmony
 
   def derive
     palette = build(@primary)
-    repairs = repair!(palette)
+    repairs = repair(palette)
 
     if primary_pair_failing?(palette)
       palette = build(shifted_primary)
-      repairs += 1 + repair!(palette)
+      repairs += 1 + repair(palette)
     end
 
-    Result.new(palette: palette, repairs: repairs)
+    Derivation.new(palette: palette, repairs: repairs)
   end
 
   private
 
-  attr_reader :tint, :radius, :chart_offsets, :overrides
+  attr_reader :primary, :tint, :radius, :chart_offsets, :overrides
 
-  def build(primary)
+  def build(brand)
     palette = Chadcn::Theme::Palette.new(
-      root: stringify(light_variables(primary)).merge("radius" => radius),
-      dark: stringify(dark_variables(primary))
+      root: stringify(light_variables(brand)).merge("radius" => radius),
+      dark: stringify(dark_variables(brand))
     )
     MODES.each { |mode, side| palette.public_send(side).merge!(overrides.fetch(mode)) }
 
     palette
   end
 
-  def light_variables(primary)
+  def light_variables(brand)
     white = Themes::Oklch.new(1, 0, 0)
     foreground = neutral(LIGHT_STEPS["foreground"])
     base = {
       "background" => white, "card" => white, "popover" => white,
       "foreground" => foreground, "card-foreground" => foreground, "popover-foreground" => foreground,
-      "primary" => primary, "primary-foreground" => foreground_for(primary, mode: :light)
+      "primary" => brand, "primary-foreground" => foreground_for(brand)
     }
     %w[sidebar secondary muted accent border input].each { |name| base[name] = neutral(LIGHT_STEPS[name]) }
     base["sidebar-foreground"] = foreground
     %w[secondary accent].each { |name| base["#{name}-foreground"] = neutral(LIGHT_STEPS["#{name}-foreground"]) }
     base["muted-foreground"] = neutral(LIGHT_STEPS["muted-foreground"], MUTED_FOREGROUND_CHROMA_MIN[:light])
 
-    shared_variables(base, primary, :light)
+    shared_variables(base, brand, :light)
   end
 
-  def dark_variables(primary)
+  def dark_variables(brand)
     lifted = Themes::Oklch.new(
-      [ primary.lightness + DARK_PRIMARY_LIFT, DARK_PRIMARY_LIGHTNESS_MAX ].min, primary.chroma * DARK_PRIMARY_CHROMA, primary.hue
+      [ brand.lightness + DARK_PRIMARY_LIFT, DARK_PRIMARY_LIGHTNESS_MAX ].min, brand.chroma * DARK_PRIMARY_CHROMA, brand.hue
     )
-    base = { "primary" => lifted, "primary-foreground" => foreground_for(lifted, mode: :dark) }
+    base = { "primary" => lifted, "primary-foreground" => foreground_for(lifted) }
     (DARK_STEPS.keys - %w[muted-foreground]).each { |name| base[name] = neutral(DARK_STEPS[name]) }
     %w[card popover sidebar].each { |name| base["#{name}-foreground"] = neutral(DARK_STEPS["foreground"]) }
     base["muted-foreground"] = neutral(DARK_STEPS["muted-foreground"], MUTED_FOREGROUND_CHROMA_MIN[:dark])
     DARK_ALPHA.each { |name, value| base[name] = value }
 
-    shared_variables(base, primary, :dark)
+    shared_variables(base, brand, :dark)
   end
 
   # ring, charts, the sidebar mirror and destructive follow the same rule in both modes.
-  def shared_variables(base, primary, mode)
-    chroma = primary.chroma * RING_CHROMA
-    base["ring"] = Themes::Oklch.new(RING_LIGHTNESS[mode], chroma, primary.hue)
+  def shared_variables(base, brand, mode)
+    chroma = brand.chroma * RING_CHROMA
+    base["ring"] = Themes::Oklch.new(RING_LIGHTNESS[mode], chroma, brand.hue)
     chart_offsets.each_with_index do |offset, index|
-      base["chart-#{index + 1}"] = Themes::Oklch.new(CHART_LIGHTNESS[mode], [ primary.chroma, CHART_CHROMA_MIN ].max, (primary.hue + offset) % 360)
+      base["chart-#{index + 1}"] = Themes::Oklch.new(CHART_LIGHTNESS[mode], [ brand.chroma, CHART_CHROMA_MIN ].max, (brand.hue + offset) % 360)
     end
     base["destructive"] = DESTRUCTIVE[mode]
     %w[primary primary-foreground accent accent-foreground border ring].each { |name| base["sidebar-#{name}"] = base[name] }
@@ -112,10 +112,10 @@ class Themes::Service::Harmony
     base
   end
 
-  def neutral(lightness, chroma_floor = 0) = Themes::Oklch.new(lightness, [ tint * NEUTRAL_CHROMA_MAX, chroma_floor ].max, @primary.hue)
+  def neutral(lightness, chroma_floor = 0) = Themes::Oklch.new(lightness, [ tint * NEUTRAL_CHROMA_MAX, chroma_floor ].max, primary.hue)
 
   # The lighter or the darker text candidate, whichever reads better on the surface.
-  def foreground_for(surface, mode:)
+  def foreground_for(surface)
     candidates = [ Themes::Oklch.new(FOREGROUND_LIGHTNESS[:light], 0, 0), neutral(FOREGROUND_LIGHTNESS[:dark]) ]
     candidates.max_by { |candidate| Chadcn::Theme.contrast(candidate.to_s, surface.to_s) || 0 }
   end
@@ -124,23 +124,24 @@ class Themes::Service::Harmony
 
   # ---- repair -----------------------------------------------------------------------------------
 
-  # Nudges failing, non-overridden foregrounds toward readability, in place. Returns the number of steps taken.
-  def repair!(palette)
+  # Nudges failing, non-overridden foregrounds toward readability. MUTATES the palette in place; returns the steps taken.
+  def repair(palette)
     MODES.sum do |mode, side|
       variables = palette.public_send(side)
       Chadcn::Theme::CONTRAST_PAIRS.sum do |foreground, surface|
         next 0 if overrides.fetch(mode).key?(foreground)
 
-        repair_pair!(variables, foreground, surface)
+        nudge_pair(variables, foreground, surface)
       end
     end
   end
 
-  def repair_pair!(variables, foreground, surface)
+  # MUTATES variables in place. A non-oklch pair (e.g. a hex override) is not repairable: stop with the steps so far.
+  def nudge_pair(variables, foreground, surface)
     steps = 0
     while failing?(variables[foreground], variables[surface]) && steps < REPAIR_MAX_STEPS
-      color = Themes::Oklch.parse(variables[foreground])
-      direction = color.lightness > Themes::Oklch.parse(variables[surface]).lightness ? 1 : -1
+      color, surface_color = Themes::Oklch.parse(variables[foreground]), Themes::Oklch.parse(variables[surface])
+      direction = color.lightness > surface_color.lightness ? 1 : -1
       moved = color.lighten(direction * REPAIR_STEP)
       break if moved == color
 
@@ -148,6 +149,8 @@ class Themes::Service::Harmony
       steps += 1
     end
 
+    steps
+  rescue Themes::Oklch::Invalid
     steps
   end
 
@@ -161,14 +164,20 @@ class Themes::Service::Harmony
   end
 
   def shifted_primary
-    shift = @primary.lightness >= 0.5 ? PRIMARY_REPAIR_SHIFT : -PRIMARY_REPAIR_SHIFT
-    @primary.lighten(shift)
+    shift = primary.lightness >= 0.5 ? PRIMARY_REPAIR_SHIFT : -PRIMARY_REPAIR_SHIFT
+    primary.lighten(shift)
   end
 
   # ---- overrides --------------------------------------------------------------------------------
 
   def normalize_overrides(raw)
     raw = (raw || {}).to_h.stringify_keys
-    MODES.keys.index_with { |mode| (raw[mode] || {}).to_h.to_h { |name, value| [ name.to_s, value.to_s ] } }
+    MODES.keys.index_with { |mode| (raw[mode] || {}).to_h.to_h { |name, value| [ name.to_s, canonical(value) ] } }
+  end
+
+  def canonical(value)
+    Themes::Oklch.parse(value).to_s
+  rescue Themes::Oklch::Invalid
+    value.to_s
   end
 end
