@@ -47,6 +47,7 @@ class Themes::OklchTest < ActiveSupport::TestCase
   test "rejects non-numeric input and malformed strings" do
     assert_raises(Themes::Oklch::Invalid) { Themes::Oklch.new("light", 0, 0) }
     assert_raises(Themes::Oklch::Invalid) { Themes::Oklch.new(nil, 0, 0) }
+    assert_raises(Themes::Oklch::Invalid) { Themes::Oklch.new("0x1A", 0, 0) }
     [ "#ffffff", "oklch(a b c)", "oklch(0.5 0.1)", "hsl(0 0% 0%)", "" ].each do |value|
       assert_raises(Themes::Oklch::Invalid, value) { Themes::Oklch.parse(value) }
     end

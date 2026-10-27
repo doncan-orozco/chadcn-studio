@@ -6,7 +6,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-testid=shell]"
-    assert_select "[data-testid=theme-toggle][data-action='chadcn--theme#toggle']"
+    assert_select "[data-testid=theme-toggle] [data-action='chadcn--theme#setDark']"
     assert_select "section[aria-live=polite]"
     assert_select "[data-testid=sidebar]", count: 0
   end

@@ -8,8 +8,8 @@ class Core::Operation < Dry::Operation
   def model_errors(model) = model.errors.messages
 
   # Injects a hash of errors (from a contract) into an ActiveModel instance.
-  def inject_errors!(model, errors_hash)
-    errors_hash.each do |field, messages|
+  def inject_errors!(model, errors)
+    errors.each do |field, messages|
       Array(messages).each { |message| model.errors.add(field, message) }
     end
 

@@ -2,10 +2,10 @@
 
 class ApplicationQuery
   def self.pipeline(*steps)
-    @pipeline_steps = steps.flatten
+    @pipeline_steps = steps.flatten.freeze
   end
 
-  def self.pipeline_steps = @pipeline_steps ||= []
+  def self.pipeline_steps = (@pipeline_steps ||= []).freeze
 
   def self.base_scope(&block)
     @base_scope_proc = block

@@ -14,8 +14,8 @@ class Components::Shell::Frame < Components::Base
       end
 
       div(class: "flex flex-1") do
-        aside(class: "w-72 shrink-0 border-r bg-sidebar text-sidebar-foreground", data: { testid: "sidebar" }) { raw safe(@sidebar) } if @sidebar
-        main(class: "min-w-0 flex-1", &)
+        aside(class: "w-72 shrink-0 border-r bg-sidebar text-sidebar-foreground", aria: { label: "Sidebar" }, data: { testid: "sidebar" }) { raw safe(@sidebar) } if @sidebar
+        main(id: "main-content", class: "min-w-0 flex-1", &)
       end
     end
   end

@@ -11,6 +11,8 @@ class Themes::Oklch
   HUE = (0.0..360.0)
   ALPHA = (0.0..100.0)
 
+  private_constant :NUMBER, :PATTERN
+
   attr_reader :lightness, :chroma, :hue, :alpha
 
   def self.parse(value)
@@ -46,7 +48,7 @@ class Themes::Oklch
 
   def number!(name, value, range)
     number = begin
-      Float(value)
+      value.is_a?(String) && !value.match?(/\A#{NUMBER}\z/o) ? raise(ArgumentError) : Float(value)
     rescue ArgumentError, TypeError
       raise Invalid, "#{name} #{value.inspect} is not a number"
     end
