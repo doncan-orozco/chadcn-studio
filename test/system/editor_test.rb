@@ -9,6 +9,7 @@ class EditorTest < ApplicationSystemTestCase
   setup do
     @theme = themes(:zinc)
     visit edit_theme_path(@theme)
+
     assert_selector :testid, "preview-root"
   end
 
@@ -27,6 +28,7 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "oklch(0.21 0.006 285.885)", property("--sidebar-primary"), "the dependent variables wait for the server"
 
     mouse.up
+
     assert_selector "#summary-brand", text: moved_primary
     derived = wait_for_style_change(moved)
 
@@ -113,11 +115,13 @@ class EditorTest < ApplicationSystemTestCase
 
   def open_group(key)
     find(:testid, "group-#{key}").click
+
     assert_selector :testid, "group-#{key}-panel"
   end
 
   def close_group
     find("[data-chadcn--dialog-part=close]", match: :first, visible: :visible).click
+
     assert_no_selector "[data-state=open][data-slot=dialog-content]"
   end
 

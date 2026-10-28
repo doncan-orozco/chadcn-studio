@@ -11,7 +11,7 @@ class Components::Editor::Derived < Components::Base
   end
 
   def view_template
-    replace("editor-errors") {}
+    replace("editor-errors") { plain "" }
     replace("editor-palette") { render Components::Editor::PaletteSource.new(palette: @editor.palette_json) }
     @editor.groups.each { |group| group_streams(group) }
     replace("brand-controls") { render Components::Editor::BrandControls.new(group: @editor.group("brand")) } if @controls

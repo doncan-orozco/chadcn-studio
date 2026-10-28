@@ -57,7 +57,7 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     assert_equal "theme[inputs][overrides][light][ring]", ring.field_name
     assert_equal "oklch(0.705 0.015 286.067)", ring.derived
     refute_predicate light.find { |field| field.name == "--chart-1" }, :overridden?
-    assert_equal [ "--destructive" ] & light.map(&:name), []
+    refute_includes light.map(&:name), "--destructive"
     assert_equal "1 overridden", group.summary
     refute_includes group.overrides("dark").map(&:name), "--radius"
   end
