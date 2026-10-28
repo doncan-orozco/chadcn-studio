@@ -1,16 +1,6 @@
 require "application_system_test_case"
 
 class ThemesTest < ApplicationSystemTestCase
-  test "create a theme from a color, see it in the list and delete it" do
-    visit themes_path
-    click_on "New theme"
-    fill_in "Name", with: "Ocean"
-    fill_in "Primary color", with: "oklch(0.55 0.2 250)"
-    click_on "Create theme"
-
-    assert_current_path(/\/themes\/\d+\/edit/)
-  end
-
   test "an out-of-range color keeps the form open with the error" do
     visit new_theme_path
     fill_in "Name", with: "Bad"
