@@ -26,5 +26,6 @@ class Themes::Presenter::Card < Core::Presenter::Base
   def created_label = "Created #{created_at.to_date.to_fs(:long)}"
   def status_label = published? ? "Published" : "Draft"
   def badge_variant = published? ? "default" : "secondary"
+  def swatches_label = "#{name} color swatches"
   def edit_label = "Edit #{name}"
 end

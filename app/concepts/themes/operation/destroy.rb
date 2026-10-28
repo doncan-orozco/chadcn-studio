@@ -2,7 +2,7 @@
 
 class Themes::Operation::Destroy < Core::Operation
   def call(model:)
-    model.destroy!
+    model.destroy or fail_with_model!(model, code: :not_destroyed)
 
     { model: model }
   end

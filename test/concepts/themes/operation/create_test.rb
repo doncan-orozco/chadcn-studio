@@ -49,4 +49,27 @@ class Themes::Operation::CreateTest < ActiveSupport::TestCase
 
     assert_equal [ :name ], failure[:model].errors.attribute_names
   end
+
+  test "a lost slug race takes the next free suffix" do
+    Themes::Operation::Create.new.call(name: "Race", primary: "oklch(0.55 0.2 250)").value!
+    operation = Themes::Operation::Create.new
+    probes = 0
+    operation.define_singleton_method(:unique_slug) { |name| (probes += 1) == 1 ? "race" : super(name) }
+
+    assert_equal "race-2", operation.call(name: "Race", primary: "oklch(0.55 0.2 250)").value![:model].slug
+  end
+
+  test "a missing primary fails with :invalid" do
+    failure = Themes::Operation::Create.new.call(name: "Half").failure
+
+    assert_equal :invalid, failure[:code]
+    assert_predicate failure[:model].errors[:primary], :any?
+  end
+
+  test "the seeds are idempotent" do
+    Theme.destroy_all
+    2.times { load Rails.root.join("db/seeds.rb") }
+
+    assert_equal %w[forest ocean sunset], Theme.order(:slug).pluck(:slug)
+  end
 end

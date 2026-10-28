@@ -17,6 +17,10 @@ class Themes::Presenter::CardTest < ActiveSupport::TestCase
     assert_empty(card.swatches.reject { |swatch| swatch.style.match?(/\Abackground-color: oklch\([\d. ]+\)\z/) })
   end
 
+  test "swatches label names the theme" do
+    assert_equal "Blue color swatches", @card.swatches_label
+  end
+
   test "badge variant and edit label" do
     assert_equal "secondary", @card.badge_variant
     assert_equal "default", Themes::Presenter::Card.new(themes(:slate)).badge_variant

@@ -36,16 +36,20 @@ class ThemesController < ApplicationController
   end
 
   def destroy
-    Themes::Operation::Destroy.new.call(model: theme)
+    result = Themes::Operation::Destroy.new.call(model: theme)
 
-    redirect_to themes_path, notice: "Theme deleted", status: :see_other
+    if result.success?
+      redirect_to themes_path, notice: "Theme deleted", status: :see_other
+    else
+      redirect_to theme_path(result.failure[:model]), alert: "Theme could not be deleted", status: :see_other
+    end
   end
 
   private
 
   def theme = Theme.find(params[:id])
 
-  def create_params = params.expect(theme: %i[name primary]).to_h.symbolize_keys
+  def create_params = params.expect(theme: %i[name primary]).to_h.symbolize_keys.slice(:name, :primary)
 
   def update_params = params.expect(theme: [ :name, { inputs: %i[primary tint radius] } ])
 end

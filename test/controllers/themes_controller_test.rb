@@ -40,6 +40,13 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "input[name='theme[name]'][value=Bad]"
   end
 
+  test "POST /themes without a primary re-renders the form with 422" do
+    assert_no_difference("Theme.count") { post themes_path, params: { theme: { name: "Half" } } }
+
+    assert_response :unprocessable_entity
+    assert_select "[id='theme-primary-error']"
+  end
+
   test "GET /themes/:id shows the palette, light and dark" do
     get theme_path(themes(:zinc))
 
