@@ -14,6 +14,7 @@ export default class extends Controller {
   disconnect() {
     cancelAnimationFrame(this.frame)
     this.frame = null
+    this.pending = null
     this.palette = null
   }
 
@@ -32,13 +33,19 @@ export default class extends Controller {
     this.pending = event.params.channel
     this.frame ||= requestAnimationFrame(() => {
       this.frame = null
-      this.#preview(this.pending)
+      this.#flush()
     })
   }
 
-  // `chadcn--slider:value-commit` and field `change`: the inputs are final, ask the server to derive.
+  // `chadcn--slider:value-commit` and field `change`: the inputs are final, ask the server to derive. A keyboard step
+  // announces the commit before the slider has written its new value, so the request waits for the next frame.
   commit() {
-    this.formTarget.requestSubmit(this.deriveTarget)
+    cancelAnimationFrame(this.frame)
+    this.frame = requestAnimationFrame(() => {
+      this.frame = null
+      this.#flush()
+      this.formTarget.requestSubmit(this.deriveTarget)
+    })
   }
 
   // Enter in an override field confirms it (the field's `change` posts) instead of submitting the Save form.
@@ -58,9 +65,11 @@ export default class extends Controller {
     this.formTarget.requestSubmit(this.refreshTarget)
   }
 
-  #preview(channel) {
-    if (channel === "radius") return this.#previewRadius()
-    this.#previewPrimary()
+  #flush() {
+    const channel = this.pending
+    this.pending = null
+    if (channel === "radius") this.#previewRadius()
+    else if (channel) this.#previewPrimary()
   }
 
   #previewPrimary() {
