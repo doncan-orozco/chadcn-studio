@@ -96,6 +96,20 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "Renamed", @theme.reload.name
   end
 
+  test "Save persists an advanced override" do
+    open_group "advanced"
+    fill_in "override-light-ring", with: "oklch(0.6 0.1 30)"
+    find_field("override-light-ring").send_keys(:enter)
+
+    assert_selector :testid, "overridden", count: 1
+    close_group
+    click_on "Save"
+
+    assert_text "Theme saved"
+    assert_equal({ "light" => { "ring" => "oklch(0.6 0.1 30)" } }, @theme.reload.inputs["overrides"])
+    assert_equal "oklch(0.6 0.1 30)", @theme.light["ring"]
+  end
+
   test "a rejected Save re-renders the editor with the errors" do
     page.execute_script("document.querySelector('[name=\"theme[inputs][primary]\"]').value = 'oklch(2 0.2 250)'")
     click_on "Save"
