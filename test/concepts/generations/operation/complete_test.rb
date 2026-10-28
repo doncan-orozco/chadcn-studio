@@ -15,6 +15,7 @@ class Generations::Operation::CompleteTest < ActiveSupport::TestCase
     result = Generations::Operation::Complete.new(client: client).call(model: @generation)
 
     assert_predicate result, :success?
+    assert_equal @generation, result.value![:model]
     assert_equal [ "A calm theme for a bank" ], client.prompts
     assert_predicate @generation.reload, :completed?
     assert_equal FakeGenerationClient::INPUTS, @generation.inputs
@@ -37,10 +38,20 @@ class Generations::Operation::CompleteTest < ActiveSupport::TestCase
     assert_failure FakeGenerationClient.truncated, "unavailable"
   end
 
-  test "inputs the contract rejects fail with :invalid" do
+  test "a primary outside the oklch ranges fails with :invalid" do
     assert_failure FakeGenerationClient.answering({ "primary" => { "l" => 3, "c" => 0.2, "h" => 10 } }), "invalid"
-    assert_failure FakeGenerationClient.answering({ "primary" => "red" }), "invalid", generation: @generation.theme.generations.create!(prompt: "again")
-    assert_failure FakeGenerationClient.answering({ "tint" => 0.1 }), "invalid", generation: generations(:completed).tap { |g| g.update_columns(completed_at: nil) }
+  end
+
+  test "a primary that is not an object fails with :invalid" do
+    assert_failure FakeGenerationClient.answering({ "primary" => "red" }), "invalid"
+  end
+
+  test "an answer without a primary fails with :invalid" do
+    assert_failure FakeGenerationClient.answering({ "tint" => 0.1 }), "invalid"
+  end
+
+  test "a schema-shaped answer the inputs contract rejects fails with :invalid and the theme stays as it is" do
+    assert_failure FakeGenerationClient.answering(FakeGenerationClient::INPUTS.merge("tint" => 1.5)), "invalid"
   end
 
   test "components that are not numbers fail with :invalid and the failure is logged" do
@@ -64,14 +75,16 @@ class Generations::Operation::CompleteTest < ActiveSupport::TestCase
     result = Generations::Operation::Complete.new(client: client, derive: contrast).call(model: @generation)
 
     assert_equal :contrast, result.failure[:code]
+    assert_equal @generation, result.failure[:model]
     assert_equal "contrast", @generation.reload.error_code
     assert_equal 1, client.prompts.size
   end
 
   test "a generation that already finished is not run again" do
     client = FakeGenerationClient.new
-    Generations::Operation::Complete.new(client: client).call(model: generations(:completed))
+    result = Generations::Operation::Complete.new(client: client).call(model: generations(:completed))
 
+    assert_equal generations(:completed), result.value![:model]
     assert_empty client.prompts
   end
 
@@ -83,6 +96,7 @@ class Generations::Operation::CompleteTest < ActiveSupport::TestCase
       result = Generations::Operation::Complete.new(client: client).call(model: @generation)
 
       assert_equal :unavailable, result.failure[:code]
+      assert_equal @generation, result.failure[:model]
     end
 
     assert_empty client.prompts
@@ -104,6 +118,7 @@ class Generations::Operation::CompleteTest < ActiveSupport::TestCase
     result = Generations::Operation::Complete.new(client: client).call(model: generation)
 
     assert_equal code.to_sym, result.failure[:code]
+    assert_equal generation, result.failure[:model]
     assert_equal code, generation.reload.error_code
     assert_predicate generation, :failed?
     assert_equal before, generation.theme.reload.light
