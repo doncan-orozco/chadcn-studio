@@ -5,9 +5,9 @@
 class Exports::Presenter::Css < Core::Presenter::Base
   CONTENT_TYPE = "text/css"
 
-  def initialize(theme, url:)
+  def initialize(theme, base_url:)
     super(theme)
-    @url = url
+    @base_url = base_url
   end
 
   def body
@@ -19,12 +19,14 @@ class Exports::Presenter::Css < Core::Presenter::Base
     ].join("\n")
   end
 
+  def url = "#{@base_url}#{path}"
+  def path = helpers.theme_export_path(slug, format: "css")
   def filename = "#{slug}.css"
   def content_type = CONTENT_TYPE
-  def import_command = "bin/rails theme:import[#{@url}]"
+  def import_command = "bin/rails theme:import[#{url}]"
 
   private
 
   # One line without comment delimiters, so a theme name cannot close the comment and inject CSS.
-  def comment_text = "chadcn-studio #{name} #{@url}".gsub(/\s+/, " ").gsub("*/", "* /").gsub("/*", "/ *").strip[0, 200]
+  def comment_text = "chadcn-studio #{name} #{url}".gsub(/\s+/, " ").gsub("*/", "* /").gsub("/*", "/ *").strip[0, 200]
 end

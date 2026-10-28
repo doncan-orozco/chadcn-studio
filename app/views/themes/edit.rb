@@ -21,9 +21,10 @@ class Views::Themes::Edit < Views::Base
   private
 
   def sharing
+    sharing = Exports::Presenter::Sharing.new(@presenter, base_url: view_context.request.base_url)
     div(class: "flex items-center gap-2 border-b px-3 py-2") do
-      render Components::Editor::PublishToggle.new(theme: @presenter.__getobj__)
-      render Components::Editor::ExportDialog.new(theme: @presenter.__getobj__)
+      render Components::Editor::PublishToggle.new(presenter: sharing)
+      render Components::Editor::ExportDialog.new(presenter: sharing)
     end
   end
 end
