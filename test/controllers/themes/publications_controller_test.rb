@@ -13,6 +13,7 @@ class Themes::PublicationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to edit_theme_path(themes(:slate))
     get theme_export_path("slate", format: "css")
+
     assert_response :not_found
   end
 

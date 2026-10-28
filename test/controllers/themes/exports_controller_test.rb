@@ -22,17 +22,21 @@ class Themes::ExportsControllerTest < ActionDispatch::IntegrationTest
 
   test "an unpublished theme is 404 in both formats" do
     get theme_export_path("zinc", format: "css")
+
     assert_response :not_found
 
     get theme_export_path("zinc", format: "json")
+
     assert_response :not_found
   end
 
   test "an unknown slug or a missing format is 404" do
     get theme_export_path("nope", format: "css")
+
     assert_response :not_found
 
     get "/t/slate"
+
     assert_response :not_found
   end
 end

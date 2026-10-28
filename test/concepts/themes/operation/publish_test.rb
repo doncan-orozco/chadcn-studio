@@ -4,7 +4,7 @@ class Themes::Operation::PublishTest < ActiveSupport::TestCase
   test "sets published_at" do
     theme = themes(:zinc)
 
-    assert Themes::Operation::Publish.new.call(model: theme).success?
+    assert_predicate Themes::Operation::Publish.new.call(model: theme), :success?
     assert_predicate theme.reload, :published?
   end
 
