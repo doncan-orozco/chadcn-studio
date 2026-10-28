@@ -1,15 +1,22 @@
 class Themes::GenerationsController < ApplicationController
+  rate_limit to: 5, within: 1.minute, only: :create, with: -> { throttled }
+
   def create
     result = Generations::Operation::Request.new.call(theme: Theme.find(params[:theme_id]), prompt: prompt)
 
     if result.success?
       render_status Generations::Presenter::Status.new(result.value![:model])
     else
-      render_status Generations::Presenter::Status.new(result.failure[:model], failure: :prompt), status: :unprocessable_entity
+      failure = result.failure[:code] == :busy ? :busy : :prompt
+      render_status Generations::Presenter::Status.new(result.failure[:model], failure: failure), status: :unprocessable_entity
     end
   end
 
   private
+
+  def throttled
+    render_status Generations::Presenter::Status.new(Generation.new, failure: :throttled), status: :too_many_requests
+  end
 
   def prompt = params.expect(generation: :prompt)[:prompt]
 

@@ -39,7 +39,23 @@ class Generations::Operation::CompleteTest < ActiveSupport::TestCase
 
   test "inputs the contract rejects fail with :invalid" do
     assert_failure FakeGenerationClient.answering({ "primary" => { "l" => 3, "c" => 0.2, "h" => 10 } }), "invalid"
+    assert_failure FakeGenerationClient.answering({ "primary" => "red" }), "invalid", generation: @generation.theme.generations.create!(prompt: "again")
     assert_failure FakeGenerationClient.answering({ "tint" => 0.1 }), "invalid", generation: generations(:completed).tap { |g| g.update_columns(completed_at: nil) }
+  end
+
+  test "components that are not numbers fail with :invalid and the failure is logged" do
+    io = StringIO.new
+    original = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+
+    assert_failure FakeGenerationClient.answering({ "primary" => { "l" => "x", "c" => 0.1, "h" => 1 } }), "invalid"
+    assert_includes io.string, "generation #{@generation.id}: invalid answer not shaped like the schema"
+  ensure
+    Rails.logger = original
+  end
+
+  test "an answer that is not an object fails with :invalid" do
+    assert_failure FakeGenerationClient.answering([ 1 ]), "invalid"
   end
 
   test "a palette that fails strict validation fails with :contrast and does not ask the model again" do

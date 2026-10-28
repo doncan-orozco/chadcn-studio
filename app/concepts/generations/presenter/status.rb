@@ -2,12 +2,16 @@
 
 # What the editor says about one generation: pending, done (with the model's rationale) or failed with a reason a person can act on.
 class Generations::Presenter::Status < Core::Presenter::Base
+  PROMPT_LIMIT = 2000
+
   MESSAGES = {
     "refused" => "Claude declined this prompt. Try describing the theme differently.",
     "unavailable" => "Generation is unavailable right now. Try again in a moment.",
     "contrast" => "The generated colors do not meet the contrast bar. Try another prompt or adjust the theme by hand.",
     "invalid" => "Claude's answer was not a usable palette. Try another prompt.",
-    "prompt" => "Describe the theme in 1 to 2000 characters."
+    "busy" => "A theme is already being generated. Wait for it to finish.",
+    "throttled" => "Too many generations in a short time. Try again in a minute.",
+    "prompt" => "Describe the theme in 1 to #{PROMPT_LIMIT} characters."
   }.freeze
   private_constant :MESSAGES
 
@@ -17,8 +21,10 @@ class Generations::Presenter::Status < Core::Presenter::Base
     @failure = failure
   end
 
+  def failed? = @failure.present? || super || Generations::Service::Deadline.abandoned?(__getobj__)
+
   def state
-    return :failed if @failure || failed?
+    return :failed if failed?
     return :done if completed?
 
     :pending
@@ -32,5 +38,5 @@ class Generations::Presenter::Status < Core::Presenter::Base
     end
   end
 
-  def rationale = inputs.is_a?(Hash) ? inputs["rationale"].to_s : ""
+  def rationale = inputs.is_a?(Hash) ? inputs["rationale"].to_s[0, 280] : ""
 end

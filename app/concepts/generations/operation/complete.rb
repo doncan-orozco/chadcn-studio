@@ -26,21 +26,24 @@ class Generations::Operation::Complete < Core::Operation
   private
 
   def accepted(generation, result)
-    return Success(theme_inputs(result.inputs)) if result.ok?
+    if result.ok?
+      inputs = theme_inputs(result.inputs)
+      return inputs ? Success(inputs) : failed(generation, :invalid, detail: "answer not shaped like the schema")
+    end
 
     code = result.status == :refused ? :refused : :unavailable
-    Rails.logger.warn("generation #{generation.id}: #{result.status} #{result.refusal_category}")
-    failed(generation, code)
+    failed(generation, code, detail: [ result.status, result.refusal_category ].compact.join(" "))
   end
 
   def derived(generation, inputs)
     outcome = @derive.call(inputs: inputs)
     return outcome if outcome.success?
 
-    failed(generation, outcome.failure[:code] == :contrast ? :contrast : :invalid)
+    failed(generation, outcome.failure[:code] == :contrast ? :contrast : :invalid, detail: outcome.failure[:errors].inspect)
   end
 
-  def failed(generation, code)
+  def failed(generation, code, detail:)
+    Rails.logger.warn("generation #{generation.id}: #{code} #{detail}")
     @fail.call(model: generation, code: code)
     Failure(model: generation, code: code)
   end
@@ -54,16 +57,18 @@ class Generations::Operation::Complete < Core::Operation
     Generations::Service::Broadcast.theme_changed(generation)
   end
 
-  # The model's answer, as the inputs the editor form posts.
+  # The model's answer, as the inputs the editor form posts; nil when its JSON is not shaped like the schema.
   def theme_inputs(raw)
-    primary = raw.fetch("primary")
+    return unless raw.is_a?(Hash) && raw["primary"].is_a?(Hash)
+
+    primary = raw["primary"]
     {
       primary: Themes::Oklch.new(primary.fetch("l"), primary.fetch("c"), primary.fetch("h")).to_s,
       tint: raw["tint"],
       radius: "#{raw['radius_rem']}rem",
       chart_offsets: raw["chart_offsets"]
     }.compact
-  rescue KeyError, Themes::Oklch::Invalid, TypeError
-    { primary: "" }
+  rescue KeyError, Themes::Oklch::Invalid
+    nil
   end
 end

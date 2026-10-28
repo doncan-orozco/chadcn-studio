@@ -22,7 +22,7 @@ class Views::Themes::Edit < Views::Base
   private
 
   def generation
-    div(class: "border-b px-3 py-2") { render Components::Editor::GenerationPanel.new(panel: Generations::Presenter::Panel.new(@presenter.__getobj__)) }
+    div(class: "border-b px-3 py-2") { render Components::Editor::GenerationPanel.new(panel: Generations::Presenter::Panel.for(@presenter.__getobj__)) }
   end
 
   def sharing

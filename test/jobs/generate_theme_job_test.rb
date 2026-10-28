@@ -34,6 +34,21 @@ class GenerateThemeJobTest < ActiveJob::TestCase
     assert_equal "unavailable", generation.reload.error_code
   end
 
+  test "an unexpected error fails the generation as :unavailable, is logged and re-raised" do
+    GenerateThemeJob.client = FakeGenerationClient.new(error: RuntimeError.new("boom"))
+    generation = generations(:pending)
+    io = StringIO.new
+    original = Rails.logger
+    Rails.logger = ActiveSupport::Logger.new(io)
+
+    assert_raises(RuntimeError) { GenerateThemeJob.perform_now(generation.id) }
+
+    assert_equal "unavailable", generation.reload.error_code
+    assert_includes io.string, "generation #{generation.id}: RuntimeError: boom"
+  ensure
+    Rails.logger = original
+  end
+
   test "uses the generation queue" do
     assert_equal "generation", GenerateThemeJob.new.queue_name
   end

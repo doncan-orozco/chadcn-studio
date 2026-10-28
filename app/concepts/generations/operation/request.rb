@@ -9,9 +9,21 @@ class Generations::Operation::Request < Core::Operation
 
   def call(theme:, prompt:)
     generation = theme.generations.build(prompt: prompt.to_s.strip)
+    latest = Generations::Query::Latest.call({ theme_id: theme.id }).first
+    fail_with_model!(generation, code: :busy) if latest&.pending? && !Generations::Service::Deadline.abandoned?(latest)
     generation.save or fail_with_model!(generation, code: :invalid)
-    @enqueue.call(generation.id)
+    enqueue(generation)
 
     { model: generation }
+  end
+
+  private
+
+  def enqueue(generation)
+    @enqueue.call(generation.id)
+  rescue StandardError => e
+    Rails.logger.error("generation #{generation.id}: enqueue failed: #{e.class}")
+    Generations::Operation::Fail.new.call(model: generation, code: :unavailable)
+    raise
   end
 end

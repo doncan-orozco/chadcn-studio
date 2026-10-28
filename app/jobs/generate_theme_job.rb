@@ -16,5 +16,11 @@ class GenerateThemeJob < ApplicationJob
   def perform(generation_id)
     generation = Generation.find(generation_id)
     Generations::Operation::Complete.new(client: self.class.client || Generations::Service::Client.new).call(model: generation)
+  rescue Generations::Transient, ActiveRecord::RecordNotFound
+    raise
+  rescue StandardError => error
+    Rails.logger.error("generation #{generation_id}: #{error.class}: #{error.message}")
+    Generations::Operation::Fail.new.call(model: generation, code: :unavailable) if generation
+    raise
   end
 end

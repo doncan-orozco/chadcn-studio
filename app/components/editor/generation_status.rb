@@ -8,7 +8,7 @@ class Components::Editor::GenerationStatus < Components::Base
   end
 
   def view_template
-    div(id: "generation_status", role: "status", class: classes, data: { testid: "generation-status", state: @status&.state }) do
+    div(id: "generation_status", role: @status&.failed? ? "alert" : "status", class: classes, data: { testid: "generation-status", state: @status&.state }) do
       plain @status.message if @status
     end
   end
@@ -17,6 +17,6 @@ class Components::Editor::GenerationStatus < Components::Base
 
   def classes
     base = "min-h-5 text-sm empty:hidden"
-    @status&.state == :failed ? "#{base} text-destructive" : "#{base} text-muted-foreground"
+    @status&.failed? ? "#{base} text-destructive" : "#{base} text-muted-foreground"
   end
 end

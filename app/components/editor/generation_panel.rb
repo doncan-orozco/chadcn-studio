@@ -16,10 +16,23 @@ class Components::Editor::GenerationPanel < Components::Base
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
       div(class: "grid gap-1") do
         render Chadcn::Label.new(html_for: "generation-prompt") { "Describe a theme" }
-        render Chadcn::Input.new(id: "generation-prompt", name: "generation[prompt]", maxlength: 2000, required: true, placeholder: "warm editorial, terracotta, soft corners", class: "w-80")
+        render Chadcn::Input.new(**prompt_attributes)
       end
       render Chadcn::Button.new(type: "submit", variant: "outline", data: { testid: "generate" }) { "Generate" }
     end
-    render Components::Editor::GenerationStatus.new(status: @panel.status)
+    render Components::Editor::GenerationStatus.new(status: status)
+  end
+
+  private
+
+  def status = @panel.status
+
+  def prompt_attributes
+    attributes = {
+      id: "generation-prompt", name: @panel.prompt_param, maxlength: @panel.prompt_limit, required: true,
+      placeholder: @panel.prompt_placeholder, class: "w-80", aria: { describedby: "generation_status" }
+    }
+    attributes[:aria][:invalid] = "true" if status&.failed?
+    attributes
   end
 end
