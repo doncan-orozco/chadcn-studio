@@ -14,13 +14,14 @@ describe the look to Claude, then export a shadcn-format theme and import it int
    and the rest keep following the rule. Save stores it.
 3. **Generate.** The prompt panel asks Claude (`claude-opus-5-5`) for a theme from a description. It returns only a few palette
    inputs; the same derivation and validation run before anything is saved. Status arrives by Turbo Stream.
-4. **Export.** Publish the theme to get a public URL, or download it from the Export dialog:
-   - `GET /t/<slug>.css`: the shadcn `theme.css` colors section
+4. **Export.** Publish the theme from the editor; the Export dialog then offers the downloads and the import command
+   (a draft has neither). Both are public, published themes only:
+   - `GET /t/<slug>.css`: the shadcn `theme.css` colors section (what the importer reads)
    - `GET /t/<slug>.json`: name, slug, inputs and both palettes
-5. **Import** into a chadcn app:
+5. **Import** into a chadcn app (https URLs only):
 
    ```bash
-   bin/rails theme:import[https://<host>/t/<slug>.css]
+   bin/rails chadcn:theme:import[https://<host>/t/<slug>.css]   # or the alias: bin/rails theme:import[...]
    ```
 
 The components gallery (`/gallery`) renders every component of `Chadcn::Catalog` with the current theme.

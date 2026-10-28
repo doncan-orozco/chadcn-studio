@@ -30,7 +30,9 @@ Light muted-foreground is 0.54, not zinc's 0.552: 0.552 on the muted surface mea
 ## Operations
 
 `Themes::Operation::{Create, Update, Destroy, Derive, Publish, Unpublish}` and `Generations::Operation::{Request, Complete, Fail}`.
-Failures carry a code: `:invalid` or `:contrast` (derivation), plus `:refused`, `:unavailable` for generation.
+Failures carry a code. Derivation: `:invalid` (contract) or `:contrast`. Generation (`Generations::Operation::Fail::CODES`):
+`:refused`, `:unavailable` (also a truncated or malformed answer, an abandoned run, exhausted retries), `:contrast`, `:invalid`;
+`Request` fails `:busy` while a non-abandoned generation is pending. `Destroy` fails `:not_destroyed`; `Publish`/`Unpublish` `:invalid`.
 
 ## Routes
 
@@ -48,28 +50,31 @@ Failures carry a code: `:invalid` or `:contrast` (derivation), plus `:refused`, 
 
 ## Editor
 
-Groups: brand, surfaces, radius, charts, sidebar, dark, advanced. The Stimulus `editor--preview` controller only sets CSS variables
-on the preview root and toggles `.dark`; `editor--color` uses a vendored `culori`. Save permits `inputs.primary|tint|radius|overrides`.
+Groups: brand, surfaces, radius, charts, sidebar, dark, advanced. The Stimulus `editor--preview` controller sets CSS variables on
+the preview root, toggles `.dark`, and submits the form to `POST /derivations` (Turbo Stream) for the server-derived palette; it
+derives nothing itself. `editor--color` uses a vendored `culori`. Save permits `name` and `inputs.primary|tint|radius|overrides`;
+`chart_offsets` is set only by generation (the Charts group shows the derived colors, it does not edit offsets).
 Known follow-up: blank-override pruning is duplicated in `DerivationsController` and `Themes::Operation::Update`.
 
 ## Exports
 
 - `theme.css`: `Chadcn::Theme::COLORS_START`, a `/* source: chadcn-studio <name> <url> */` line, `Chadcn::Theme.render_colors`, `COLORS_END`.
-  Served as an attachment named `<slug>.css`. The comment text is single-line and stripped of comment delimiters.
+  Served as an attachment named `<slug>.css`. The comment text is one line, capped at 200 characters, with `/*` and `*/` defused.
 - `theme.json`: pretty JSON with `name`, `slug`, `inputs`, `light`, `dark`.
 - Only published themes are served (404 otherwise), and the palette is re-validated at serve time (`Exports::Service::Servable`).
-- Import command shown in the editor: `bin/rails theme:import[<base url>/t/<slug>.css]`; a round-trip test imports the served file.
+- Import command shown in the editor: `bin/rails theme:import[<base url>/t/<slug>.css]` (alias of `chadcn:theme:import`); a round-trip test imports the served file.
 
 ## Generation
 
 `Generations::Service::Client` is the only file naming `Anthropic::`; model `claude-opus-5-5`; it returns a `Result` (`ok`, `refused`,
-`truncated`, `unavailable`) and re-raises rate-limit and connection errors as `Generations::Transient` for the job's retry. `GenerateThemeJob`
+`truncated`, `unavailable`) and re-raises rate-limit and connection errors as `Generations::Transient` for the job's retry. `POST /themes/:theme_id/generations` is rate-limited to 5 per minute (429). `GenerateThemeJob`
 (queue `generation`) calls `Operation::Complete`: client, then `Themes::Operation::Derive`, then theme and generation saved in one
-transaction, then a Turbo Stream status broadcast. A pending generation older than 30 minutes (`Generations::Service::Deadline`) counts as
-abandoned and `Complete` refuses it. Tests stub the client with `test/support/fake_generation_client.rb`.
+transaction, then a Turbo Stream status replace plus a page refresh. A pending generation older than 30 minutes (`Generations::Service::Deadline`) counts as
+abandoned: `Complete` fails it as `:unavailable` and `Request` no longer treats it as busy. Tests stub the client with `test/support/fake_generation_client.rb`.
 
 ## Open at release
 
 - One live smoke call with a real `ANTHROPIC_API_KEY` is still pending.
 - Production hosting, the secret and the public base URL are item 15 (human).
-- The public URL uses `request.base_url`, so it is correct only behind a proxy that forwards the host.
+- The public URL uses `request.base_url`, so it is correct only behind a proxy that forwards the host and scheme; the gem imports
+  https URLs only, so the command shown on a plain-http host (local dev) does not import.
