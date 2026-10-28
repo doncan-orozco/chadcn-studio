@@ -30,9 +30,12 @@ Light muted-foreground is 0.54, not zinc's 0.552: 0.552 on the muted surface mea
 ## Operations
 
 `Themes::Operation::{Create, Update, Destroy, Derive, Publish, Unpublish}` and `Generations::Operation::{Request, Complete, Fail}`.
-Failures carry a code. Derivation: `:invalid` (contract) or `:contrast`. Generation (`Generations::Operation::Fail::CODES`):
-`:refused`, `:unavailable` (also a truncated or malformed answer, an abandoned run, exhausted retries), `:contrast`, `:invalid`;
-`Request` fails `:busy` while a non-abandoned generation is pending. `Destroy` fails `:not_destroyed`; `Publish`/`Unpublish` `:invalid`.
+Failures carry a code. `Derive`: `:invalid` (contract) or `:contrast`; `Create` and `Update` pass those on and fail `:invalid`
+when the record does not save. Generation (`Generations::Operation::Fail::CODES`): `:refused` (refusal stop reason), `:invalid`
+(an answer not shaped like the schema, or inputs the contract rejects), `:contrast`, and `:unavailable` for the rest: an API
+error, a truncated or unparseable answer, an abandoned run, exhausted retries, a failed enqueue or an unexpected job error.
+`Request` fails `:busy` while a non-abandoned generation is pending and `:invalid` for a blank prompt or one over 2000
+characters. `Destroy` fails `:not_destroyed`; `Publish`/`Unpublish` `:invalid`.
 
 ## Routes
 
