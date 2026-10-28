@@ -13,7 +13,7 @@ class Components::Editor::GroupDialog < Components::Base
 
   def view_template
     render Chadcn::Sidebar::MenuItem.new do
-      render Chadcn::Dialog.new(id: @group.panel_id, modal: false, data: { editor_group: @group.key }) do
+      render Chadcn::Dialog.new(id: @group.panel_id, modal: false) do
         render Chadcn::Dialog::Trigger.new(as_child: Chadcn::Sidebar::MenuButton.new(size: "lg", data: { testid: @group.panel_id })) { entry }
         render Chadcn::Dialog::Portal.new(force_mount: true, container: CONTAINER) { panel }
       end
@@ -45,13 +45,13 @@ class Components::Editor::GroupDialog < Components::Base
     when "surfaces" then surfaces
     when "radius" then radius
     when "dark" then render Components::Editor::ModeSwitch.new
-    when "advanced" then div(id: "advanced-overrides") { render Components::Editor::AdvancedOverrides.new(group: @group) }
+    when "advanced" then div(id: @group.controls_id) { render Components::Editor::AdvancedOverrides.new(group: @group) }
     else rows
     end
   end
 
   def brand
-    div(id: "brand-controls") { render Components::Editor::BrandControls.new(group: @group) }
+    div(id: @group.controls_id) { render Components::Editor::BrandControls.new(group: @group) }
     rows
   end
 

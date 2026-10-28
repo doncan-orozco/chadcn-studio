@@ -5,22 +5,27 @@ import { Controller } from "@hotwired/stimulus"
 // everything else (foregrounds, ring, charts...) arrives from the server as a whole palette after the slider is released.
 // Wrapper of the editor: the preview root is a target, the toolbar form posts the inputs to /derivations.
 const DECIMALS = 3
-const number = (value) => Number(Number(value).toFixed(DECIMALS)).toString()
+const formatNumber = (value) => Number(Number(value).toFixed(DECIMALS)).toString()
 
 export default class extends Controller {
   static targets = ["root", "palette", "primaryField", "radiusField", "lightness", "chroma", "hue", "radius", "form", "derive", "refresh"]
   static values = { mode: { type: String, default: "light" } }
 
   disconnect() {
-    cancelAnimationFrame(this.frame)
-    this.frame = null
-    this.pending = null
+    cancelAnimationFrame(this.animationFrame)
+    this.animationFrame = null
+    this.pendingChannel = null
     this.palette = null
+    this.applied = null
   }
 
   // The palette source (server-rendered, replaced by the derivation stream) holds both modes' variables.
   paletteTargetConnected(element) {
-    this.palette = { light: JSON.parse(element.dataset.light), dark: JSON.parse(element.dataset.dark) }
+    try {
+      this.palette = { light: JSON.parse(element.dataset.light), dark: JSON.parse(element.dataset.dark) }
+    } catch {
+      return
+    }
     this.#apply()
   }
 
@@ -30,9 +35,9 @@ export default class extends Controller {
 
   // `chadcn--slider:value-change`: the slider moved, nothing is requested.
   slide(event) {
-    this.pending = event.params.channel
-    this.frame ||= requestAnimationFrame(() => {
-      this.frame = null
+    this.pendingChannel = event.params.channel
+    this.animationFrame ||= requestAnimationFrame(() => {
+      this.animationFrame = null
       this.#flush()
     })
   }
@@ -40,17 +45,18 @@ export default class extends Controller {
   // `chadcn--slider:value-commit` and field `change`: the inputs are final, ask the server to derive. A keyboard step
   // announces the commit before the slider has written its new value, so the request waits for the next frame.
   commit() {
-    cancelAnimationFrame(this.frame)
-    this.frame = requestAnimationFrame(() => {
-      this.frame = null
+    cancelAnimationFrame(this.animationFrame)
+    this.animationFrame = requestAnimationFrame(() => {
+      this.animationFrame = null
       this.#flush()
+      this.dispatch("change", { detail: { mode: this.modeValue } })
       this.formTarget.requestSubmit(this.deriveTarget)
     })
   }
 
   // Enter in an override field confirms it (the field's `change` posts) instead of submitting the Save form.
   confirm(event) {
-    event.target.blur()
+    event.target.dispatchEvent(new Event("change", { bubbles: true }))
   }
 
   // `chadcn--switch:checked-change`: the dark switch of the editor toggles the preview root only.
@@ -62,26 +68,27 @@ export default class extends Controller {
   pick(event) {
     this.primaryFieldTarget.value = event.detail.primary
     this.#setVariable("--primary", event.detail.primary)
+    this.dispatch("change", { detail: { mode: this.modeValue } })
     this.formTarget.requestSubmit(this.refreshTarget)
   }
 
   #flush() {
-    const channel = this.pending
-    this.pending = null
+    const channel = this.pendingChannel
+    this.pendingChannel = null
     if (channel === "radius") this.#previewRadius()
     else if (channel) this.#previewPrimary()
   }
 
   #previewPrimary() {
     if (!this.hasLightnessTarget || !this.hasChromaTarget || !this.hasHueTarget) return
-    const color = `oklch(${number(this.#sliderValue(this.lightnessTarget))} ${number(this.#sliderValue(this.chromaTarget))} ${number(this.#sliderValue(this.hueTarget))})`
+    const color = `oklch(${formatNumber(this.#sliderValue(this.lightnessTarget))} ${formatNumber(this.#sliderValue(this.chromaTarget))} ${formatNumber(this.#sliderValue(this.hueTarget))})`
     this.primaryFieldTarget.value = color
     this.#setVariable("--primary", color)
   }
 
   #previewRadius() {
     if (!this.hasRadiusTarget) return
-    const radius = `${number(this.#sliderValue(this.radiusTarget))}rem`
+    const radius = `${formatNumber(this.#sliderValue(this.radiusTarget))}rem`
     this.radiusFieldTarget.value = radius
     this.#setVariable("--radius", radius)
   }
@@ -94,7 +101,10 @@ export default class extends Controller {
     if (!this.palette || !this.hasRootTarget) return
     const dark = this.modeValue === "dark"
     this.rootTarget.classList.toggle("dark", dark)
-    Object.entries(this.palette[dark ? "dark" : "light"]).forEach(([name, value]) => this.#setVariable(name, value))
+    const variables = this.palette[dark ? "dark" : "light"]
+    ;(this.applied || []).filter((name) => !(name in variables)).forEach((name) => this.rootTarget.style.removeProperty(name))
+    Object.entries(variables).forEach(([name, value]) => this.#setVariable(name, value))
+    this.applied = Object.keys(variables)
   }
 
   #setVariable(name, value) {

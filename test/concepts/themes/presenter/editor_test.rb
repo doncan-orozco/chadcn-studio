@@ -11,7 +11,7 @@ class Themes::Presenter::EditorTest < ActiveSupport::TestCase
   test "offers the six preview pages, each a renderable view" do
     assert_equal Views::Previews::PAGES.keys, @editor.pages.map(&:key)
     assert_equal "dashboard", @editor.first_page
-    assert(@editor.pages.all? { |page| page.view.respond_to?(:call) })
+    assert(@editor.pages.all? { |page| page.view_class.new(page.presenter).respond_to?(:call) })
   end
 
   test "variables are CSS custom properties of valid colors and the radius" do
@@ -65,5 +65,6 @@ class Themes::Presenter::EditorTest < ActiveSupport::TestCase
     assert_equal "0.625rem", @editor.radius
     assert_equal "/themes/#{themes(:zinc).id}", @editor.save_path
     assert_equal "/derivations", @editor.derivations_path
+    assert_equal "/derivations?controls=1", @editor.refresh_path
   end
 end

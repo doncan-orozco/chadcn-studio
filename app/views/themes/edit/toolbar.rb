@@ -37,6 +37,6 @@ class Views::Themes::Edit::Toolbar < Views::Base
   # one posting to /derivations and one asking for the brand controls to be redrawn at the new color.
   def derivation_submitters
     render Chadcn::Button.new(type: "submit", formaction: @presenter.derivations_path, tabindex: -1, aria: { hidden: "true" }, class: "hidden", data: { editor__preview_target: "derive" })
-    render Chadcn::Button.new(type: "submit", formaction: "#{@presenter.derivations_path}?controls=1", tabindex: -1, aria: { hidden: "true" }, class: "hidden", data: { editor__preview_target: "refresh" })
+    render Chadcn::Button.new(type: "submit", formaction: @presenter.refresh_path, tabindex: -1, aria: { hidden: "true" }, class: "hidden", data: { editor__preview_target: "refresh" })
   end
 end

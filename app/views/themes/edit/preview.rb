@@ -14,7 +14,7 @@ class Views::Themes::Edit::Preview < Views::Base
           @presenter.pages.each { |page| tabs.trigger(value: page.key, data: { testid: "page-#{page.key}" }) { page.label } }
         end
         render Components::Editor::PreviewRoot.new(variables: @presenter.variables("light"), class: "rounded-lg border") do
-          @presenter.pages.each { |page| tabs.content(value: page.key) { render page.view } }
+          @presenter.pages.each { |page| tabs.content(value: page.key) { render page.view_class.new(page.presenter) } }
         end
       end
     end

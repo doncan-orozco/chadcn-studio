@@ -65,4 +65,9 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
   test "without overrides the advanced summary says so" do
     assert_equal "No overrides", Themes::Presenter::Group.new(@theme, key: "advanced").summary
   end
+
+  test "controls ids are the stream targets of the brand and advanced panels" do
+    assert_equal "brand-controls", Themes::Presenter::Group.new(@theme, key: "brand").controls_id
+    assert_equal "advanced-overrides", Themes::Presenter::Group.new(@theme, key: "advanced").controls_id
+  end
 end

@@ -5,7 +5,7 @@ class Themes::Presenter::Editor < Core::Presenter::Base
   RADIUS = /\A\d+(?:\.\d+)?rem\z/
   private_constant :RADIUS
 
-  Page = Data.define(:key, :label, :view)
+  Page = Data.define(:key, :label, :view_class, :presenter)
 
   # A derivation that is not saved yet, shown with the same groups and variables as a saved theme.
   def self.derived(payload)
@@ -24,7 +24,7 @@ class Themes::Presenter::Editor < Core::Presenter::Base
 
   def pages
     @pages ||= Views::Previews::PAGES.map do |key, (view_class, presenter_class)|
-      Page.new(key: key, label: key.humanize, view: view_class.new(presenter_class.new))
+      Page.new(key: key, label: key.humanize, view_class: view_class, presenter: presenter_class.new)
     end
   end
 
@@ -52,12 +52,13 @@ class Themes::Presenter::Editor < Core::Presenter::Base
 
   def failed? = failures.any?
 
-  def primary = groups.first.primary
-  def tint = groups.first.tint
+  def primary = group("brand").primary
+  def tint = group("brand").tint
   def radius = light["radius"].to_s
 
   def save_path = helpers.theme_path(__getobj__)
   def derivations_path = helpers.derivations_path
+  def refresh_path = helpers.derivations_path(controls: 1)
   def title = "Edit #{name}"
 
   private
