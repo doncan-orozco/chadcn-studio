@@ -14,6 +14,8 @@ class Generations::Operation::Complete < Core::Operation
   def call(model:)
     return { model: model } unless model.pending?
 
+    step failed(model, :unavailable, detail: "abandoned") if Generations::Service::Deadline.abandoned?(model)
+
     model.update!(started_at: Time.current)
     result = @client.palette_inputs(prompt: model.prompt)
     inputs = step accepted(model, result)

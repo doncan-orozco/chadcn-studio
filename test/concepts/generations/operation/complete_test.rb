@@ -75,6 +75,21 @@ class Generations::Operation::CompleteTest < ActiveSupport::TestCase
     assert_empty client.prompts
   end
 
+  test "a generation the editor already gave up on is not run: no call to the model, the theme stays as it is" do
+    client = FakeGenerationClient.new
+    before = @theme.light
+
+    travel Generations::Service::Deadline::ABANDONED_AFTER + 1.minute do
+      result = Generations::Operation::Complete.new(client: client).call(model: @generation)
+
+      assert_equal :unavailable, result.failure[:code]
+    end
+
+    assert_empty client.prompts
+    assert_equal "unavailable", @generation.reload.error_code
+    assert_equal before, @theme.reload.light
+  end
+
   test "a transient error propagates so the job can retry" do
     client = FakeGenerationClient.new(error: Generations::Transient.new("rate"))
 
