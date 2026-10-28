@@ -11,14 +11,12 @@ class Themes::Presenter::Show < Core::Presenter::Base
   end
 
   def title = name
+  def edit_label = "Edit #{name}"
+  def delete_label = "Delete #{name}"
   def summary = "#{published? ? 'Published' : 'Draft'} theme, #{rows.size} variables."
 
   private
 
   # `radius` and any other non-color value has no swatch.
-  def swatch_style(value)
-    "background-color: #{Themes::Oklch.parse(value)}"
-  rescue Themes::Oklch::Invalid
-    nil
-  end
+  def swatch_style(value) = Themes::Presenter::Card.swatch_style(value)
 end

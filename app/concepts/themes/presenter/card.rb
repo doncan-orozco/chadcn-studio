@@ -6,12 +6,25 @@ class Themes::Presenter::Card < Core::Presenter::Base
 
   Swatch = Data.define(:name, :style)
 
+  # The one place a color becomes a `style` value: re-spelled from a parsed oklch, nil for anything that is not a color.
+  def self.swatch_style(value)
+    "background-color: #{Themes::Oklch.parse(value)}"
+  rescue Themes::Oklch::Invalid
+    nil
+  end
+
+  # A chip whose stored value is not a color is left out instead of failing the whole list.
   def swatches
-    @swatches ||= SWATCHES.map { |name| Swatch.new(name:, style: "background-color: #{Themes::Oklch.parse(light.fetch(name))}") }
+    @swatches ||= SWATCHES.filter_map do |name|
+      style = self.class.swatch_style(light[name])
+      Swatch.new(name:, style:) if style
+    end
   end
 
   def path = helpers.theme_path(__getobj__)
   def edit_path = helpers.edit_theme_path(__getobj__)
   def created_label = "Created #{created_at.to_date.to_fs(:long)}"
   def status_label = published? ? "Published" : "Draft"
+  def badge_variant = published? ? "default" : "secondary"
+  def edit_label = "Edit #{name}"
 end

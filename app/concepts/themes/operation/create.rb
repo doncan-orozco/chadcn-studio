@@ -15,7 +15,7 @@ class Themes::Operation::Create < Core::Operation
     theme = Theme.new(name: name.to_s.strip, inputs: { "primary" => primary.to_s.strip })
     derivation = derive(theme)
     theme.assign_attributes(light: derivation[:palette].root, dark: derivation[:palette].dark, inputs: derivation[:inputs], slug: unique_slug(theme.name))
-    step save(theme)
+    step persist(theme)
 
     { model: theme }
   end
@@ -32,7 +32,7 @@ class Themes::Operation::Create < Core::Operation
     fail_with_model!(theme, code: failure[:code])
   end
 
-  def save(theme)
+  def persist(theme)
     return Success(theme) if theme.save
 
     Failure(model: theme, errors: model_errors(theme), code: :invalid)

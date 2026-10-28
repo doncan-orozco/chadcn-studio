@@ -8,11 +8,19 @@ class Themes::Presenter::CardTest < ActiveSupport::TestCase
     assert_equal "background-color: oklch(0.488 0.243 264.376)", @card.swatches.first.style
   end
 
-  test "a stored value that is not a color never reaches a style attribute" do
+  test "a stored value that is not a color never reaches a style attribute and does not fail the list" do
     theme = themes(:blue)
     theme.light = theme.light.merge("primary" => "red; background: url(x)")
+    card = Themes::Presenter::Card.new(theme)
 
-    assert_raises(Themes::Oklch::Invalid) { Themes::Presenter::Card.new(theme).swatches }
+    refute_includes card.swatches.map(&:name), "primary"
+    assert_empty(card.swatches.reject { |swatch| swatch.style.match?(/\Abackground-color: oklch\([\d. ]+\)\z/) })
+  end
+
+  test "badge variant and edit label" do
+    assert_equal "secondary", @card.badge_variant
+    assert_equal "default", Themes::Presenter::Card.new(themes(:slate)).badge_variant
+    assert_equal "Edit Blue", @card.edit_label
   end
 
   test "paths, status and date" do

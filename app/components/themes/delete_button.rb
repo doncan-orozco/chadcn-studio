@@ -3,15 +3,16 @@
 class Components::Themes::DeleteButton < Components::Base
   include Phlex::Rails::Helpers::FormAuthenticityToken
 
-  def initialize(theme_id:)
+  def initialize(theme_id:, label: "Delete")
     @theme_id = theme_id
+    @label = label
   end
 
   def view_template
     form(action: theme_path(@theme_id), method: "post", class: "inline", data: { turbo_confirm: "Delete this theme?" }) do
       input(type: "hidden", name: "_method", value: "delete")
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
-      render Chadcn::Button.new(type: "submit", variant: "destructive") { "Delete" }
+      render Chadcn::Button.new(type: "submit", variant: "destructive", aria: { label: @label }) { "Delete" }
     end
   end
 end

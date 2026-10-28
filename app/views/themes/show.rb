@@ -23,8 +23,8 @@ class Views::Themes::Show < Views::Base
   def actions
     div(class: "flex items-center gap-2") do
       render Chadcn::Button.new(as_child: :a, href: themes_path, variant: "ghost") { "All themes" }
-      render Chadcn::Button.new(as_child: :a, href: edit_theme_path(@presenter.id), variant: "outline") { "Edit" }
-      render Components::Themes::DeleteButton.new(theme_id: @presenter.id)
+      render Chadcn::Button.new(as_child: :a, href: edit_theme_path(@presenter.id), variant: "outline", aria: { label: @presenter.edit_label }) { "Edit" }
+      render Components::Themes::DeleteButton.new(theme_id: @presenter.id, label: @presenter.delete_label)
     end
   end
 end
