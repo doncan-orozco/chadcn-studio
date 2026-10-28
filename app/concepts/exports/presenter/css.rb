@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # A theme as the shadcn `theme.css` colors section: what ui.shadcn.com/themes produces and `chadcn:theme:import` consumes.
-# `Theme#palette` validated on save (theme-science R12), so this only renders it.
+# The palette is re-validated by Exports::Service::Servable before this is built (theme-science R12).
 class Exports::Presenter::Css < Core::Presenter::Base
   CONTENT_TYPE = "text/css"
 

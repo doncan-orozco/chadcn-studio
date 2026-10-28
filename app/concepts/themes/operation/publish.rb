@@ -4,7 +4,10 @@
 class Themes::Operation::Publish < Core::Operation
   def call(model:)
     model.published_at ||= Time.current
-    model.save or fail_with_model!(model, code: :invalid)
+    unless model.save
+      model.restore_attributes(%i[published_at])
+      fail_with_model!(model, code: :invalid)
+    end
 
     { model: model }
   end

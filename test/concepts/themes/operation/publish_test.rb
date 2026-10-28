@@ -24,6 +24,7 @@ class Themes::Operation::PublishTest < ActiveSupport::TestCase
     result = Themes::Operation::Publish.new.call(model: theme)
 
     assert_equal :invalid, result.failure[:code]
+    assert_nil theme.published_at
     assert_not_predicate Theme.find(theme.id), :published?
   end
 end

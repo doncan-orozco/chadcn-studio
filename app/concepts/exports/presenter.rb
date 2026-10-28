@@ -4,8 +4,9 @@
 module Exports::Presenter
   FORMATS = { "css" => Css, "json" => Json }.freeze
 
-  # nil for a format that is not served.
+  # nil for a format that is not served or a stored palette `Chadcn::Theme` no longer accepts.
   def self.for(theme, format:, base_url:)
-    FORMATS[format.to_s]&.new(theme, base_url: base_url)
+    klass = FORMATS[format.to_s] or return
+    klass.new(theme, base_url: base_url) if Exports::Service::Servable.call(theme)
   end
 end

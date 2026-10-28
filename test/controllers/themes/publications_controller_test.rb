@@ -22,4 +22,13 @@ class Themes::PublicationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :not_found
   end
+
+  test "publishing an invalid theme renders the editor with 422 and stays a draft" do
+    themes(:zinc).update_column(:light, themes(:zinc).light.except("primary"))
+
+    post theme_publication_path(themes(:zinc))
+
+    assert_response :unprocessable_entity
+    assert_not_predicate themes(:zinc).reload, :published?
+  end
 end

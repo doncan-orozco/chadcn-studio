@@ -39,4 +39,12 @@ class Themes::ExportsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :not_found
   end
+
+  test "a published theme whose stored palette no longer validates is 404" do
+    themes(:slate).update_column(:light, themes(:slate).light.except("primary"))
+
+    get theme_export_path("slate", format: "css")
+
+    assert_response :not_found
+  end
 end
