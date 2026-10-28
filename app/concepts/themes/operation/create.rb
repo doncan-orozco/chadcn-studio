@@ -40,7 +40,9 @@ class Themes::Operation::Create < Core::Operation
 
   def unique_slug(name)
     base = name.parameterize.presence || FALLBACK_SLUG
-    candidates = [ base, *(2..).lazy.map { |number| "#{base}-#{number}" } ]
-    candidates.find { |slug| !Theme.exists?(slug: slug) }
+    return base unless Theme.exists?(slug: base)
+
+    suffix = (2..).find { |number| !Theme.exists?(slug: "#{base}-#{number}") }
+    "#{base}-#{suffix}"
   end
 end
