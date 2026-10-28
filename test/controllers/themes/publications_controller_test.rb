@@ -29,6 +29,17 @@ class Themes::PublicationsControllerTest < ActionDispatch::IntegrationTest
     post theme_publication_path(themes(:zinc))
 
     assert_response :unprocessable_entity
+    assert_select "[data-testid=editor-errors]", /primary/i
     assert_not_predicate themes(:zinc).reload, :published?
+  end
+
+  test "unpublishing an invalid theme renders the editor with 422 and stays published" do
+    themes(:slate).update_column(:light, themes(:slate).light.except("primary"))
+
+    delete theme_publication_path(themes(:slate))
+
+    assert_response :unprocessable_entity
+    assert_select "[data-testid=editor-errors]", /primary/i
+    assert_predicate themes(:slate).reload, :published?
   end
 end
