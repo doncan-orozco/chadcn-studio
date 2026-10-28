@@ -1,9 +1,12 @@
-# This file should ensure the existence of records required to run the application in every environment (production,
-# development, test). The code here should be idempotent so that it can be executed at any point in every environment.
-# The data can then be loaded with the bin/rails db:seed command (or created alongside the database with db:setup).
-#
-# Example:
-#
-#   ["Action", "Comedy", "Drama", "Horror"].each do |genre_name|
-#     MovieGenre.find_or_create_by!(name: genre_name)
-#   end
+# Three themes to open on a fresh checkout. Idempotent: a theme whose name exists is left alone.
+SEED_THEMES = {
+  "Ocean" => "oklch(0.55 0.2 250)",
+  "Forest" => "oklch(0.5 0.13 150)",
+  "Sunset" => "oklch(0.62 0.19 45)"
+}.freeze
+
+SEED_THEMES.each do |name, primary|
+  next if Theme.exists?(name: name)
+
+  Themes::Operation::Create.new.call(name: name, primary: primary).value!
+end
