@@ -65,6 +65,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
   def radius_rem = Float(light["radius"].to_s.delete_suffix("rem"), exception: false) || 0.0
 
   def variables = definition[:variables]
+  def modes = MODES
 
   def rows
     variables.map do |variable|
