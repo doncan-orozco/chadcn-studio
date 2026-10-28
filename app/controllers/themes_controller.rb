@@ -51,5 +51,5 @@ class ThemesController < ApplicationController
 
   def create_params = params.expect(theme: %i[name primary]).to_h.symbolize_keys.slice(:name, :primary)
 
-  def update_params = params.expect(theme: [ :name, { inputs: %i[primary tint radius] } ])
+  def update_params = params.expect(theme: [ :name, { inputs: [ :primary, :tint, :radius, { overrides: {} } ] } ])
 end
