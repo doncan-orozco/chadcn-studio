@@ -5,6 +5,11 @@ description: "Golden archetype for ActiveRecord models in chadcn-studio. Use whe
 
 # Application Active Record Model Pattern
 
+## Applies to
+- when: `app/models/**/*.rb`
+- when: `app/validators/**/*.rb`
+- system-review: never
+
 ## Quick Rules
 
 Cite as `models R<n>`. Detail and examples follow below / in references/.

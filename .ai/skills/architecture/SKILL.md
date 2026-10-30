@@ -7,6 +7,12 @@ description: "chadcn-studio app architecture: where code lives (`app/concepts/*/
 
 chadcn-studio is a single Rails 8.1 app (Ruby 4.0, SQLite with the Solid stack, Phlex views, Hotwire, Tailwind 4) whose design system is the `chadcn` gem. The product is a theme builder: preview pages rendered with the real `Chadcn::*` components, sidebar groups that edit theme variables, a harmony rule that derives a full shadcn theme from a few inputs, an LLM generation step, and exports in the gem's own theme format. The domain knowledge lives in `theme-science` and `llm-generation`; this skill says where code goes.
 
+## Applies to
+- when: always
+- levels: system
+- system-review: always
+- note: Whole-change skill (where files live across layers); never a per-file Room skill.
+
 ## Quick Rules
 
 Cite as `architecture R<n>`. Detail and examples follow below / in references/.

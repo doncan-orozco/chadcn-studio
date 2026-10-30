@@ -7,6 +7,15 @@ description: "Using the chadcn gem (shadcn/ui ported to Phlex: `Chadcn::*`, `cha
 
 The design system is the `chadcn` gem (doncan-orozco/chadcn, sibling checkout `../chadcn`, live through `bundle config set --local local.chadcn ../chadcn`): a 1:1 Phlex port of shadcn/ui (new-york-v4, Radix behavior in Stimulus). How a component is ported and verified is the gem's business (`shadcn-port`, `radix-stimulus` there). This skill is the day-to-day contract for **using** the components here, plus the two things only this app has: the preview pages and the gallery.
 
+## Applies to
+- when: `app/{views,components}/**/*.rb` matching `/Chadcn::|theme token|--primary|var\(--/`
+- when: `app/views/previews{.rb,/**/*.rb}`
+- when: `app/components/previews/**/*.rb`
+- when: `app/assets/tailwind/theme/**/*`
+- when: any file matching `/Chadcn::Catalog/`
+- system-review: never
+- note: `app/assets/tailwind/theme/**` is CSS (no methods or classes): the orchestrator reviews it at system level only.
+
 ## Quick Rules
 
 Cite as `design-system R<n>`.

@@ -7,6 +7,13 @@ description: "Generating theme inputs from a prompt with Claude through the offi
 
 The user types a prompt ("warm editorial, terracotta, soft corners") and the app asks Claude for the **inputs** of the harmony rule (`theme-science` R7), not for a theme: a primary color, a tint strength, a radius and optional chart offsets. Ruby derives the palette, validates it with `Chadcn::Theme`, repairs it, saves it and pushes it to the editor, where the user keeps editing by hand. One request per generation, no agent loop, no tools.
 
+## Applies to
+- when: `app/concepts/generations/**/*.rb`
+- when: any file matching `/Anthropic|anthropic|claude-|output_config|\bLLM\b|Generations::|GenerateThemeJob/`
+- companion: `jobs-and-mailers` when matching `/ApplicationJob|perform/`
+- system-review: when-touched
+- note: The bare word `prompt` is deliberately not a trigger: it names a column of `Generation` and would route the model, its migration and `db/schema.rb` here.
+
 ## Quick Rules
 
 Cite as `llm-generation R<n>`. Detail below and in references/call-shape.md.

@@ -5,6 +5,11 @@ description: "Golden archetype for read Query Objects in chadcn-studio. Use when
 
 # Application Query Object Pattern
 
+## Applies to
+- when: `app/concepts/*/query{.rb,/**/*.rb}`
+- when: `app/{controllers,concepts/*/presenter}/**/*.rb` matching `/Query|\.call\(.*filters/`
+- system-review: never
+
 ## Quick Rules
 
 Cite as `query-object-pattern R<n>`. Detail and examples follow below / in references/.

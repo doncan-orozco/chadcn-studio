@@ -7,6 +7,11 @@ description: "Golden archetype for write Operations and Contracts in chadcn-stud
 
 Use this skill whenever you create, edit, or review a mutation flow in `app/concepts/*/operation/`. It complements `../controller/SKILL.md` for the HTTP boundary and `references/layered-validation.md` for contract layering.
 
+## Applies to
+- when: `app/concepts/*/operation{.rb,/**/*.rb}`
+- when: `app/concepts/*/contract{.rb,/**/*.rb}`
+- system-review: never
+
 ## Quick Rules
 
 Cite as `operation-pattern R<n>`. Detail and examples follow below / in references/.

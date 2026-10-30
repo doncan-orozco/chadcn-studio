@@ -5,6 +5,11 @@ description: "Minitest testing for chadcn-studio, including system tests. Use wh
 
 # Testing (Minitest + dry-rb)
 
+## Applies to
+- when: `test/**/*`
+- levels: class, system
+- system-review: when-touched
+
 ## Quick Rules
 
 Cite as `testing R<n>`. Detail and examples follow below / in references/.

@@ -5,6 +5,13 @@ description: "WCAG 2.2 AA accessibility for chadcn-studio Phlex views and compon
 
 # Accessibility (WCAG 2.2 AA)
 
+## Applies to
+- when: `app/{views,components}/**/*.rb`
+- when: `app/javascript/**/*.js`
+- when: `test/**/*.rb` matching `/axe|accessib/i`
+- system-review: never
+- note: Usually arrives as a companion of `phlex-view-pattern` or `stimulus`; the path rules let the router also load it directly.
+
 ## Quick Rules
 
 Cite as `accessibility R<n>`. Detail and examples follow below / in references/.
