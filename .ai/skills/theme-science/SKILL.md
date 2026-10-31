@@ -7,6 +7,14 @@ description: "The domain of chadcn-studio: the shadcn theme variable set, oklch 
 
 A theme is the set of CSS custom properties shadcn v4 components read: 32 color variables in `:root` and again in `.dark`, plus `--radius` in `:root`. The gem's `Chadcn::Theme` knows the set (`REQUIRED`, `ROOT_ONLY`), parses it, renders it, and judges it (format, completeness, text contrast). This app adds one thing: a rule that produces a whole theme from a few choices, so a user picks a primary color and gets a coherent light and dark theme, then adjusts by hand.
 
+## Applies to
+- when: `app/concepts/themes/**/*.rb`
+- when: `app/assets/tailwind/theme/**/*`
+- when: any file matching `/oklch|palette|--primary|Chadcn::Theme|theme\.css|harmony|contrast/`
+- companion: `operation-pattern` when matching `/Core::Operation/`
+- system-review: when-touched
+- note: The theme CSS (`app/assets/tailwind/theme/**`) has no methods or classes: the orchestrator reviews it at system level only.
+
 ## Quick Rules
 
 Cite as `theme-science R<n>`. Detail in references/.

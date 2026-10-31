@@ -22,7 +22,6 @@ bin/ci                          # the Gate: rubocop, bundler-audit, importmap au
 bin/rubocop                     # omakase + rails/performance/minitest/rake/capybara
 bin/rails test                  # Minitest; bin/rails test test/path_test.rb:LINE for one
 bin/rails test:system           # Capybara + Cuprite
-bundle exec rake test:tooling   # tests of the repository tooling in .claude/scripts (never boots Rails)
 bin/rails chadcn:doctor         # the gem's integration checks
 bin/rails theme:list|use[x]|import[src]|check   # the gem's theme tasks on app/assets/tailwind/theme/theme.css
 ```
@@ -48,20 +47,27 @@ Run them with `env -u BUNDLE_GEMFILE` and a UTF-8 locale (`LANG=en_US.UTF-8`) if
 Read the relevant SKILL.md before working in an area; every skill starts with numbered Quick Rules that audits cite as `<skill> R<n>`.
 Domain: `theme-science`, `llm-generation`, `design-system`. Layers: `architecture`, `controller`, `operation-pattern`,
 `query-object-pattern`, `presenter-pattern`, `models`, `jobs-and-mailers`, `sqlite`. Front end: `phlex-view-pattern`, `stimulus`,
-`accessibility`. Everywhere: `naming-conventions`, `linting`, `testing`. Process: `epic-flow`. Long material sits in each skill's
-`references/`; implementation notes belong there, not in the repo root.
+`accessibility`. Everywhere: `naming-conventions`, `linting`, `testing`. Every skill opens with an `## Applies to` block that routes
+files to it (the workflow plugin reads it). Long material sits in each skill's `references/`; implementation notes belong there, not
+in the repo root.
 
-## Commands and agents (`.claude/`)
+## Workflow: the `flow` plugin (`papiroflexia`)
 
-- Epic flow (GitHub issues of this repository as the board, `.claude/scripts/epic/work_board.rb`): `/epic-plan <goal>` creates the items;
-  `/work --epic <slug>` is the worker loop (claim, worktree, stages, audit, PR; never merges); `/work-merge --epic <slug>` is the human-run
-  release manager, the only command that merges; `/work-status`, `/work-release`.
-- `/plan-feature <item> [--epic …] [--dry-run]`: Top-Down blueprint and greenfield scaffolds; writes `docs/features/<slug>/ARCHITECTURE.md`.
-- `/audit-feature [range] [--fix]`: Map-Reduce audit (Bricks -> Rooms/Stimulus -> Slices -> House) of the diff; `--fix` runs the
-  Actor-Critic loop (max 3 iterations). Output in `tmp/audit/<slug>/`. `/audit-golden` is its regression test (seeds in
-  `.claude/audit-golden/`); run it after editing agent prompts or Quick Rules. `ruby .claude/scripts/audit_rule_coverage.rb` reports
-  rules never cited.
-- Agents in `.claude/agents/`: `feature-blueprint-planner`, `senior-rails-dev` (the builder), `brick-method-auditor`, `room-class-auditor`,
-  `stimulus-controller-auditor`, `view-slice-auditor`, `principal-architect`.
-- Merging to `main` is a human step. The epic flow, commands and agents are copies of the ones in chadcn and papyro; keep them in step
-  until they are extracted into a shared plugin.
+The plan/build/gates/audit/review workflow is not in this repository: it is the `flow` plugin from the `papiroflexia`
+marketplace (one source shared by papyro, chadcn and chadcn-studio). This repo only parametrizes it:
+`.claude/workflow.yml` (stack facts, workspace repos, audit tracks, gate commands, mechanical checks, board settings; validate
+with `"${CLAUDE_PLUGIN_ROOT}/bin/flow" manifest check`), the `## Applies to` block at the top of every skill (which files a
+skill governs; `"${CLAUDE_PLUGIN_ROOT}/bin/flow" skill_router check` must print `ROUTER: OK`), and the gate permissions in
+`.claude/settings.json`. Workflow rules (claims, stages, merge policy): the plugin's `flow` skill.
+
+- Board (GitHub issues of this repository): `/flow:epic-plan <goal>` creates the items; `/flow:work --epic <slug>` is the worker loop
+  (claim, worktree, stages, audit, PR; never merges); `/flow:merge --epic <slug>` is the human-run release manager, the only command
+  that merges; `/flow:status`, `/flow:release`.
+- `/flow:plan-feature <item> [--epic …] [--dry-run]`: Top-Down blueprint and greenfield scaffolds; writes `docs/features/<slug>/ARCHITECTURE.md`.
+- `/flow:audit-feature [range] [--fix]`: Map-Reduce audit (Bricks -> Rooms/Stimulus -> Slices -> House) of the diff; the manifest's
+  `palette_leaks` check flags hardcoded colors outside the theme file; `--fix` runs the Actor-Critic loop. Output in `tmp/audit/<slug>/`.
+  `/flow:audit-golden` is its regression test against this repo's skills (seeds in `.claude/golden/audit/cases/`); run it after
+  editing Quick Rules or an `Applies to` block. `"${CLAUDE_PLUGIN_ROOT}/bin/flow" audit_rule_coverage` reports rules never cited.
+- Agents ship with the plugin: `flow:feature-blueprint-planner`, `flow:senior-rails-dev` (the builder), `flow:brick-method-auditor`,
+  `flow:room-class-auditor`, `flow:stimulus-controller-auditor`, `flow:view-slice-auditor`, `flow:principal-architect`.
+- Merging to `main` is a human step.

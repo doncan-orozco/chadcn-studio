@@ -5,6 +5,16 @@ description: "Background jobs and external clients in chadcn-studio (Solid Queue
 
 # Jobs and External Clients (chadcn-studio)
 
+## Applies to
+- when: `app/jobs/**/*.rb`
+- when: `app/mailers/**/*.rb`
+- when: `app/views/**/*mailer*`
+- when: `app/services/**/*.rb`
+- when: `app/concepts/*/service/**/*.rb` matching `/Anthropic|Net::HTTP|Faraday|timeout/`
+- companion: `operation-pattern` when matching `/Operation/`
+- system-review: never
+- note: External clients live under `app/concepts/*/service/` here (there is no `app/services/`); the content gate keeps pure-Ruby services such as the harmony rule out.
+
 ## Quick Rules
 Cite as `jobs-and-mailers R<n>`. Detail and examples follow below.
 

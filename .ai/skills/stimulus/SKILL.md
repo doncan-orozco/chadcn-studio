@@ -5,6 +5,12 @@ description: "Stimulus controllers for chadcn-studio (importmap, no bundler). Us
 
 # Stimulus Controllers (chadcn-studio)
 
+## Applies to
+- when: `app/javascript/**/*.js`
+- companion: `accessibility` always
+- system-review: never
+- note: The gem's `chadcn--*` controllers are not in this repository; `importmap`/vendor files are excluded by the orchestrator's track routing.
+
 ## Quick Rules
 Cite as `stimulus R<n>`. Detail and examples follow below.
 

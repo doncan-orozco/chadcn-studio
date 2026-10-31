@@ -1,0 +1,77 @@
+# Project manifest for the `flow` plugin (papiroflexia). Every /flow:* command reads this first.
+# Schema and defaults: docs/MANIFEST.md in the plugin repo. Validate with: "${CLAUDE_PLUGIN_ROOT}/bin/flow" manifest check
+version: 1
+name: chadcn-studio
+
+stack: >
+  Ruby 4.0 / Rails 8.1 / SQLite (Solid Queue/Cache/Cable), Phlex views (`app/views` under `Views::Base`, `app/components`
+  under `Components::Base`), Hotwire (Turbo + Stimulus via importmap, no bundler), Tailwind 4, the chadcn gem as the design
+  system (`Chadcn::*` components, `chadcn--*` Stimulus controllers consumed from the gem, the theme in
+  `app/assets/tailwind/theme/theme.css` in shadcn format), dry-operation/dry-monads/dry-validation in
+  `app/concepts/<domain>/{operation,contract,query,presenter}`, the `anthropic` gem for LLM theme generation (one
+  structured call, validated before use), Minitest + Capybara/Cuprite, RuboCop omakase plus rails/performance/minitest/
+  rake/capybara, Brakeman, strong_migrations. ONE repository. No Pundit and no authentication in v1; no i18n (English
+  only, plain strings are fine). Every surface renders from theme tokens: hardcoded palette classes or literal colors
+  outside the theme file are defects (PALETTE_LEAKS).
+
+repos:
+  - id: app
+    path: .
+
+tracks:
+  ruby:
+    globs: ["app/**/*.rb", "lib/**/*.rb"]
+  templates:
+    globs: ["app/views/**/*.erb"]
+  stimulus:
+    globs: ["app/javascript/**/*.js"]
+    exclude: ["**/importmap*", "**/vendor/**/*"]
+    gem_prefixes: ["chadcn--"]
+  slice: view
+  tests:
+    framework: minitest
+    globs: ["test/**/*.rb"]
+    mirror: "test/{dir}/{base}_test.rb"
+  house_only: ["config/importmap.rb", "app/assets/tailwind/theme/**/*"]
+
+gates:
+  style: "bin/rubocop {files}"
+  security: "bin/brakeman --quiet --no-pager --exit-on-warn --exit-on-error"
+  tests: "bin/rails test {files}"
+  js: null
+  all: "bin/ci"
+  extra: []
+
+checks:
+  test_coverage_map: {}
+  stimulus_wiring:
+    controllers: ["app/javascript/controllers"]
+  palette_leaks:
+    exclude: ["app/assets/tailwind/theme/**/*"]
+
+skills:
+  root: .ai/skills
+  house_note: >
+    Verify route -> controller -> operation/query -> presenter -> view -> Stimulus/Turbo per endpoint; the theme pipeline
+    (derivation, validation, export) lives in the theme concept and Ruby is the truth the live-preview JS mirrors; the
+    LLM call is one structured, schema-parsed call behind a job with an injected client and its output is validated
+    before use.
+
+board:
+  repo: null
+  source: epic
+  base: main
+  branch: "epic/{epic}/{number}-{slug}"
+  pr_title: "{title}"
+  worktrees: "../{repo}-wt"
+  stages: [plan, test-plan, build, gates, audit, fix, review, done]
+  audit_min: 8
+  fix_iterations: 3
+  merge: human
+
+agents:
+  builder: senior-rails-dev
+  specialised: []
+
+golden:
+  root: .claude/golden

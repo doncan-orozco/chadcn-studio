@@ -5,6 +5,13 @@ description: "SQLite and the Rails 8 stack in chadcn-studio: safe migrations (st
 
 # Database (SQLite + Rails 8)
 
+## Applies to
+- when: `db/migrate/**/*.rb`
+- when: `db/*schema*`
+- when: `config/{database,queue,cache,cable,recurring}.yml`
+- levels: system
+- system-review: when-touched
+
 ## Quick Rules
 
 Cite as `sqlite R<n>`. Detail and examples follow below / in references/.

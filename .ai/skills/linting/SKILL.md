@@ -5,6 +5,12 @@ description: "RuboCop standards for chadcn-studio. Use when running `bin/rubocop
 
 # Linting (RuboCop)
 
+## Applies to
+- when: always
+- levels: system
+- system-review: never
+- note: Loaded by name when fixing `bin/rubocop` offenses; never routed per file (RuboCop itself runs as a mechanical check).
+
 ## Quick Rules
 
 Cite as `linting R<n>`. Detail and examples follow below.

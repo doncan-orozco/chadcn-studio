@@ -5,6 +5,12 @@ description: "Domain-language naming rules for classes, methods, variables, keyw
 
 # Naming Conventions
 
+## Applies to
+- when: `**/*.rb`
+- when: `**/*.js`
+- system-review: never
+- note: Always listed first; vendored or generated JavaScript (`vendor/**`, `app/assets/builds/**`) is excluded by the orchestrator's track routing, not here.
+
 ## Quick Rules
 
 Cite as `naming-conventions R<n>`. Detail and examples follow below.
