@@ -1,6 +1,6 @@
 # The shadcn theme variables
 
-Source of truth: `Chadcn::Theme::REQUIRED` (32 names, both modes) and `Chadcn::Theme::ROOT_ONLY` (`radius`). The values below are the gem's zinc preset, which the harmony rule reproduces when the primary is zinc's own primary and the tint is 0.4.
+Source of truth: `Chadcn::Theme::REQUIRED` (32 names, both modes) and `Chadcn::Theme::ROOT_ONLY` (`radius`). The values below are the gem's zinc preset, which the harmony rule reproduces when the primary is zinc's own primary and the tint is 0.4, except light `muted-foreground`, which the rule sets to 0.54 (zinc's own value fails the 4.5:1 floor on the muted surface).
 
 ## Light (`:root`)
 
@@ -12,7 +12,7 @@ Source of truth: `Chadcn::Theme::REQUIRED` (32 names, both modes) and `Chadcn::T
 | `popover` / `popover-foreground` | `oklch(1 0 0)` / `oklch(0.141 0.005 285.823)` | overlay surface and text |
 | `primary` / `primary-foreground` | `oklch(0.21 0.006 285.885)` / `oklch(0.985 0 0)` | brand fill and text on it |
 | `secondary` / `secondary-foreground` | `oklch(0.967 0.001 286.375)` / `oklch(0.21 0.006 285.885)` | quiet fill and text |
-| `muted` / `muted-foreground` | `oklch(0.967 0.001 286.375)` / `oklch(0.552 0.016 285.938)` | de-emphasised fill and text |
+| `muted` / `muted-foreground` | `oklch(0.967 0.001 286.375)` / `oklch(0.54 0.016 285.938)` | de-emphasised fill and text |
 | `accent` / `accent-foreground` | `oklch(0.967 0.001 286.375)` / `oklch(0.21 0.006 285.885)` | hover fill and text |
 | `destructive` | `oklch(0.577 0.245 27.325)` | danger (fixed) |
 | `border` / `input` | `oklch(0.92 0.004 286.32)` | lines and field borders |
