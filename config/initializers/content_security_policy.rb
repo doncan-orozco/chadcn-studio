@@ -1,29 +1,27 @@
 # Be sure to restart your server when you modify this file.
 
-# Define an application-wide content security policy.
-# See the Securing Rails Applications Guide for more information:
+# Content security policy of every HTML response, enforced in all environments. Scripts are same-origin importmap
+# modules plus the nonced importmap and module tags (the nonce is random per request; Turbo Drive matches head scripts
+# without it, so never put an inline <script> in <body>). Styles need `unsafe-inline`: chadcn renders `style`
+# attributes AND `<style>` elements (ScrollArea, Chart::Style, the scroll-lock and input-otp controllers), so neither
+# a nonce nor `style-src-attr` works. img-src and font-src stay same-origin (plus data:) so injected CSS cannot
+# exfiltrate. A blocked resource only logs a securitypolicyviolation; the system suite catches behaviour regressions.
+# Turbo Streams over Action Cable use the same origin. See the Securing Rails Applications Guide:
 # https://guides.rubyonrails.org/security.html#content-security-policy-header
+Rails.application.configure do
+  config.content_security_policy do |policy|
+    policy.default_src :self
+    policy.script_src  :self
+    policy.style_src   :self, :unsafe_inline
+    policy.img_src     :self, :data
+    policy.font_src    :self, :data
+    policy.connect_src :self
+    policy.object_src  :none
+    policy.base_uri    :self
+    policy.form_action :self
+    policy.frame_ancestors :none
+  end
 
-# Rails.application.configure do
-#   config.content_security_policy do |policy|
-#     policy.default_src :self, :https
-#     policy.font_src    :self, :https, :data
-#     policy.img_src     :self, :https, :data
-#     policy.object_src  :none
-#     policy.script_src  :self, :https
-#     policy.style_src   :self, :https
-#     # Specify URI for violation reports
-#     # policy.report_uri "/csp-violation-report-endpoint"
-#   end
-#
-#   # Generate session nonces for permitted importmap, inline scripts, and inline styles.
-#   config.content_security_policy_nonce_generator = ->(request) { request.session.id.to_s }
-#   config.content_security_policy_nonce_directives = %w(script-src style-src)
-#
-#   # Automatically add `nonce` to `javascript_tag`, `javascript_include_tag`, and `stylesheet_link_tag`
-#   # if the corresponding directives are specified in `content_security_policy_nonce_directives`.
-#   # config.content_security_policy_nonce_auto = true
-#
-#   # Report violations without enforcing the policy.
-#   # config.content_security_policy_report_only = true
-# end
+  config.content_security_policy_nonce_generator = ->(_request) { SecureRandom.base64(16) }
+  config.content_security_policy_nonce_directives = %w[script-src]
+end

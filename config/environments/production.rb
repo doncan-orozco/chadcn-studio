@@ -79,12 +79,14 @@ Rails.application.configure do
   # Only use :id for inspections in production.
   config.active_record.attributes_for_inspect = [ :id ]
 
-  # Enable DNS rebinding protection and other `Host` header attacks.
-  # config.hosts = [
-  #   "example.com",     # Allow requests from example.com
-  #   /.*\.example\.com/ # Allow requests from subdomains like `www.example.com`
-  # ]
-  #
+  # Enable DNS rebinding protection and other `Host` header attacks. APP_HOST is the bare hostname; unset, the list
+  # stays empty so a first boot without it still answers.
+  app_host = ENV["APP_HOST"].to_s.strip
+  unless app_host.empty? || app_host.match?(/\A[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*\z/i)
+    raise ArgumentError, "APP_HOST must be a bare hostname (no scheme, port or path), got #{app_host.inspect}"
+  end
+  config.hosts = [ app_host ].compact_blank
+
   # Skip DNS rebinding protection for the default health check endpoint.
-  # config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
+  config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
 end
