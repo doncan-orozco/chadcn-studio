@@ -17,7 +17,7 @@
 ```ruby
 NEUTRAL_CHROMA_MAX = 0.015
 LIGHT_STEPS = { "background" => 1.0, "sidebar" => 0.985, "secondary" => 0.967, "muted" => 0.967, "accent" => 0.967,
-                "border" => 0.92, "input" => 0.92, "muted-foreground" => 0.552, "foreground" => 0.141 }.freeze
+                "border" => 0.92, "input" => 0.92, "muted-foreground" => 0.54, "foreground" => 0.141 }.freeze
 DARK_STEPS  = { "background" => 0.141, "card" => 0.21, "popover" => 0.21, "sidebar" => 0.21,
                 "secondary" => 0.274, "muted" => 0.274, "accent" => 0.274, "muted-foreground" => 0.705, "foreground" => 0.985 }.freeze
 DARK_PRIMARY_LIFT = 0.15        # added to L, result clamped to 0.92
@@ -37,7 +37,7 @@ REPAIR_MAX_STEPS = 10
 
 1. **Neutral color.** `neutral(l) = Oklch.new(l, tint * NEUTRAL_CHROMA_MAX, primary.hue)`; `background` in light is `oklch(1 0 0)` regardless of tint (white stays white).
 2. **Light surfaces.** `background`, `card`, `popover` = white; `sidebar` = neutral(0.985); `secondary`, `muted`, `accent` = neutral(0.967); `border`, `input` = neutral(0.92).
-3. **Light text.** `foreground`, `card-foreground`, `popover-foreground`, `sidebar-foreground` = neutral(0.141); `muted-foreground` = neutral(0.552) with chroma raised to `max(neutral chroma, 0.016)` so muted text keeps a hint of hue; `secondary-foreground`, `accent-foreground` = neutral(0.21).
+3. **Light text.** `foreground`, `card-foreground`, `popover-foreground`, `sidebar-foreground` = neutral(0.141); `muted-foreground` = neutral(0.54) with chroma raised to `max(neutral chroma, 0.016)` so muted text keeps a hint of hue; `secondary-foreground`, `accent-foreground` = neutral(0.21).
 4. **Light brand.** `primary` = input; `primary-foreground` = candidate with the higher `Chadcn::Theme.contrast` against `primary` (white candidate `oklch(0.985 0 0)` vs dark candidate neutral(0.141)).
 5. **Light lines.** `ring` = `Oklch.new(0.705, primary.chroma * 0.6, primary.hue)`.
 6. **Charts (both modes).** `chart-n` = `Oklch.new(CHART_LIGHTNESS[mode], max(primary.chroma, 0.12), (primary.hue + offset) % 360)`.
@@ -61,7 +61,7 @@ Input: `primary = oklch(0.55 0.20 250)` (a saturated blue), `tint = 0.5`, radius
 | `primary` | `oklch(0.55 0.2 250)` | `oklch(0.7 0.16 250)` |
 | `primary-foreground` | `oklch(0.985 0 0)` (white wins: ~5.6:1) | `oklch(0.141 0.008 250)` (dark wins) |
 | `secondary` | `oklch(0.967 0.008 250)` | `oklch(0.274 0.008 250)` |
-| `muted-foreground` | `oklch(0.552 0.016 250)` | `oklch(0.705 0.015 250)` |
+| `muted-foreground` | `oklch(0.54 0.016 250)` | `oklch(0.705 0.015 250)` |
 | `border` | `oklch(0.92 0.008 250)` | `oklch(1 0 0 / 10%)` |
 | `ring` | `oklch(0.705 0.12 250)` | `oklch(0.552 0.12 250)` |
 | `chart-1` … `chart-5` | hues 210, 230, 250, 270, 290 at L 0.65 C 0.2 | same hues at L 0.70 |
