@@ -25,9 +25,10 @@ class Generations::Operation::Request < Core::Operation
   private
 
   def capped?(hourly_cap)
-    return false unless hourly_cap.to_i.positive?
+    cap = hourly_cap.to_i
+    return false unless cap.positive?
 
-    Generations::Query::InWindow.call({ since: CAP_WINDOW.ago }).count >= hourly_cap
+    Generations::Query::InWindow.call({ since: CAP_WINDOW.ago }).count >= cap
   end
 
   def enqueue(generation)
