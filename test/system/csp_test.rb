@@ -46,6 +46,6 @@ class CspTest < ApplicationSystemTestCase
   test "a clean page records nothing" do
     visit root_path
 
-    assert_no_csp_violations
+    assert_empty csp_violations
   end
 end
