@@ -15,6 +15,7 @@ class SecurityHeadersTest < ActionDispatch::IntegrationTest
       assert_response :success
       assert_nil response.headers["Content-Security-Policy-Report-Only"]
       script_src = directive("script-src")
+
       assert_match(/'nonce-[^']+'/, script_src)
       assert_no_match(/unsafe-inline/, script_src)
       assert_includes script_src, "'self'"
@@ -25,6 +26,7 @@ class SecurityHeadersTest < ActionDispatch::IntegrationTest
     get root_path
 
     nonce = directive("script-src")[/'nonce-([^']+)'/, 1]
+
     assert_select "script[type=importmap][nonce='#{nonce}']"
     assert_select "meta[name=csp-nonce][content='#{nonce}']"
   end
@@ -63,7 +65,7 @@ class SecurityHeadersTest < ActionDispatch::IntegrationTest
   private
 
   def directive(name)
-    response.headers["Content-Security-Policy"].split(";").map(&:strip).find { |part| part.start_with?("#{name} ") }.to_s
+    response.headers["Content-Security-Policy"].split(";").map(&:strip).find { |part| part.start_with?("#{name} ") }.to_s.delete_prefix("#{name} ")
   end
 
   # Boots a production runner in a subprocess: production.rb reaches for `Rails.application`, so it cannot be
@@ -78,7 +80,8 @@ class SecurityHeadersTest < ActionDispatch::IntegrationTest
       { "RAILS_ENV" => "production", "SECRET_KEY_BASE_DUMMY" => "1", "APP_HOST" => nil }.merge(env),
       Rails.root.join("bin/rails").to_s, "runner", script, chdir: Rails.root.to_s
     )
-    assert status.success?, "production runner failed"
+
+    assert_predicate status, :success?, "production runner failed"
     JSON.parse(output.lines.last, symbolize_names: true)
   end
 end
