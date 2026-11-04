@@ -1,9 +1,10 @@
 # frozen_string_literal: true
 
 # A theme and a prompt -> a pending generation, with its job enqueued (llm-generation R6). No model call happens here.
-# `hourly_cap` is the most generations the whole site may start in an hour; nil or 0 turns the check off.
+# `hourly_cap` is the most generations the whole site may start in an hour; nil or any value below 1 turns the check off. The count and the save are not atomic, so a burst can overshoot the cap by a few.
 class Generations::Operation::Request < Core::Operation
   CAP_WINDOW = 1.hour
+  private_constant :CAP_WINDOW
 
   def initialize(enqueue: GenerateThemeJob.method(:perform_later))
     @enqueue = enqueue

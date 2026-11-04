@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The generations of every theme created since a moment (`since`), the window the hourly cap counts over.
+# The generations of every theme created since a moment (`since`; none without it), the window the hourly cap counts over.
 class Generations::Query::InWindow < ApplicationQuery
   base_scope { Generation.all }
 
@@ -9,8 +9,9 @@ class Generations::Query::InWindow < ApplicationQuery
   private
 
   def created_since(current_scope)
-    return current_scope unless filters[:since]
+    since = filters[:since]
+    return current_scope.none unless since
 
-    current_scope.where(created_at: filters[:since]..)
+    current_scope.where(created_at: since..)
   end
 end

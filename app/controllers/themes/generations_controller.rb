@@ -1,10 +1,11 @@
 class Themes::GenerationsController < ApplicationController
   FAILURES = %i[busy capped].freeze
+  private_constant :FAILURES
 
   rate_limit to: 5, within: 1.minute, only: :create, with: -> { throttled }
 
   def create
-    result = Generations::Operation::Request.new.call(theme: Theme.find(params[:theme_id]), prompt: prompt, hourly_cap: Rails.configuration.x.generations.hourly_cap)
+    result = Generations::Operation::Request.new.call(theme: Theme.find(params[:theme_id]), prompt: prompt, hourly_cap: hourly_cap)
 
     if result.success?
       render_status Generations::Presenter::Status.new(result.value![:model])
@@ -20,6 +21,8 @@ class Themes::GenerationsController < ApplicationController
   def throttled
     render_status Generations::Presenter::Status.new(Generation.new, failure: :throttled), status: :too_many_requests
   end
+
+  def hourly_cap = Rails.configuration.x.generations.hourly_cap
 
   def prompt = params.expect(generation: :prompt)[:prompt]
 

@@ -13,7 +13,7 @@ class Generations::Query::InWindowTest < ActiveSupport::TestCase
     assert_not_includes result, old
   end
 
-  test "without a start it lists every generation" do
-    assert_equal Generation.count, Generations::Query::InWindow.call.size
+  test "without a start it lists nothing" do
+    assert_empty Generations::Query::InWindow.call
   end
 end
