@@ -68,8 +68,8 @@ class Generations::Operation::RequestTest < ActiveSupport::TestCase
   end
 
   test "a cap of nil or 0 disables the check" do
-    [ nil, 0 ].each do |cap|
-      result = Generations::Operation::Request.new(enqueue: ->(_id) { }).call(theme: themes(:slate), prompt: "free #{cap}", hourly_cap: cap)
+    { nil => themes(:slate), 0 => themes(:blue) }.each do |cap, theme|
+      result = Generations::Operation::Request.new(enqueue: ->(_id) { }).call(theme: theme, prompt: "free", hourly_cap: cap)
 
       assert_predicate result, :success?
     end
