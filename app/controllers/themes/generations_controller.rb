@@ -1,13 +1,16 @@
 class Themes::GenerationsController < ApplicationController
+  FAILURES = %i[busy capped].freeze
+
   rate_limit to: 5, within: 1.minute, only: :create, with: -> { throttled }
 
   def create
-    result = Generations::Operation::Request.new.call(theme: Theme.find(params[:theme_id]), prompt: prompt)
+    result = Generations::Operation::Request.new.call(theme: Theme.find(params[:theme_id]), prompt: prompt, hourly_cap: Rails.configuration.x.generations.hourly_cap)
 
     if result.success?
       render_status Generations::Presenter::Status.new(result.value![:model])
     else
-      failure = result.failure[:code] == :busy ? :busy : :prompt
+      code = result.failure[:code]
+      failure = FAILURES.include?(code) ? code : :prompt
       render_status Generations::Presenter::Status.new(result.failure[:model], failure: failure), status: :unprocessable_entity
     end
   end
