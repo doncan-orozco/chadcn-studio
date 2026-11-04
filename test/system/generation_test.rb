@@ -43,4 +43,18 @@ class GenerationTest < ApplicationSystemTestCase
 
     assert_selector :testid, "generation-status", text: "declined"
   end
+
+  test "a site at its hourly cap explains it and generates nothing" do
+    original = Rails.configuration.x.generations.hourly_cap
+    GenerateThemeJob.client = FakeGenerationClient.new
+    Rails.configuration.x.generations.hourly_cap = 1
+    visit edit_theme_path(themes(:slate))
+
+    fill_in "Describe a theme", with: "calm blue"
+    click_on "Generate"
+
+    assert_selector :testid, "generation-status", text: "hourly generation limit"
+  ensure
+    Rails.configuration.x.generations.hourly_cap = original
+  end
 end

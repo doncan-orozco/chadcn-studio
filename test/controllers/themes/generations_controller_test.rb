@@ -39,6 +39,19 @@ class Themes::GenerationsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "already being generated"
   end
 
+  test "a site that reached its hourly cap answers 422 with the capped message and enqueues nothing" do
+    original = Rails.configuration.x.generations.hourly_cap
+    Rails.configuration.x.generations.hourly_cap = Generation.where(created_at: 1.hour.ago..).count
+    assert_no_enqueued_jobs do
+      post theme_generations_path(themes(:slate)), params: { generation: { prompt: "over" } }, as: :turbo_stream
+    end
+
+    assert_response :unprocessable_entity
+    assert_includes response.body, "hourly generation limit"
+  ensure
+    Rails.configuration.x.generations.hourly_cap = original
+  end
+
   test "more than five generations a minute from one address answer 429" do
     memory = ActiveSupport::Cache::MemoryStore.new
     Rails.cache.define_singleton_method(:increment) { |key, amount = 1, **options| memory.increment(key, amount, **options) }

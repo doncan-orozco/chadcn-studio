@@ -24,6 +24,13 @@ class Generations::Presenter::StatusTest < ActiveSupport::TestCase
     assert_equal "a" * 280, Generations::Presenter::Status.new(generation).rationale
   end
 
+  test "a capped failure says the studio reached its hourly limit" do
+    status = Generations::Presenter::Status.new(Generation.new, failure: :capped)
+
+    assert_predicate status, :failed?
+    assert_match(/hourly generation limit/, status.message)
+  end
+
   test "busy and throttled failures have their own messages" do
     assert_match(/already being generated/, Generations::Presenter::Status.new(Generation.new, failure: :busy).message)
     assert_match(/Too many generations/, Generations::Presenter::Status.new(Generation.new, failure: :throttled).message)

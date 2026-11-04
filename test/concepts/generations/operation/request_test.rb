@@ -47,4 +47,31 @@ class Generations::Operation::RequestTest < ActiveSupport::TestCase
     assert_equal "warm", generation.prompt
     assert_equal "unavailable", generation.error_code
   end
+
+  test "the site-wide count in the last hour at the cap fails with :capped, saves nothing and enqueues nothing" do
+    enqueued = []
+    cap = Generation.where(created_at: 1.hour.ago..).count
+    result = Generations::Operation::Request.new(enqueue: ->(id) { enqueued << id }).call(theme: themes(:slate), prompt: "one more", hourly_cap: cap)
+
+    assert_equal :capped, result.failure[:code]
+    assert_empty enqueued
+    assert_no_difference -> { Generation.count } do
+      Generations::Operation::Request.new(enqueue: ->(id) { enqueued << id }).call(theme: themes(:slate), prompt: "again", hourly_cap: cap)
+    end
+  end
+
+  test "generations older than an hour do not count toward the cap" do
+    Generation.update_all(created_at: 2.hours.ago)
+    result = Generations::Operation::Request.new(enqueue: ->(_id) { }).call(theme: themes(:slate), prompt: "fresh", hourly_cap: 1)
+
+    assert_predicate result, :success?
+  end
+
+  test "a cap of nil or 0 disables the check" do
+    { nil => themes(:slate), 0 => themes(:blue) }.each do |cap, theme|
+      result = Generations::Operation::Request.new(enqueue: ->(_id) { }).call(theme: theme, prompt: "free", hourly_cap: cap)
+
+      assert_predicate result, :success?
+    end
+  end
 end

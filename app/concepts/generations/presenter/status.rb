@@ -11,6 +11,7 @@ class Generations::Presenter::Status < Core::Presenter::Base
     "invalid" => "Claude's answer was not a usable palette. Try another prompt.",
     "busy" => "A theme is already being generated. Wait for it to finish.",
     "throttled" => "Too many generations in a short time. Try again in a minute.",
+    "capped" => "The studio has reached its hourly generation limit, try again later.",
     "prompt" => "Describe the theme in 1 to #{PROMPT_LIMIT} characters."
   }.freeze
   private_constant :MESSAGES

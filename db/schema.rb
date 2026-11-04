@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema[8.1].define(version: 2026_10_27_120100) do
+ActiveRecord::Schema[8.1].define(version: 2026_11_04_120000) do
   create_table "generations", force: :cascade do |t|
     t.integer "theme_id", null: false
     t.text "prompt", null: false
@@ -21,6 +21,7 @@ ActiveRecord::Schema[8.1].define(version: 2026_10_27_120100) do
     t.datetime "failed_at"
     t.datetime "created_at", null: false
     t.datetime "updated_at", null: false
+    t.index ["created_at"], name: "index_generations_on_created_at"
     t.index ["theme_id"], name: "index_generations_on_theme_id"
     t.check_constraint "(failed_at IS NULL) = (error_code IS NULL)", name: "generations_error_code_iff_failed"
     t.check_constraint "completed_at IS NULL OR failed_at IS NULL", name: "generations_single_outcome"
