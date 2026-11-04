@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
-# The generations of every theme created since a moment (`since`; none without it), the window the hourly cap counts over.
-class Generations::Query::InWindow < ApplicationQuery
+# The generations of every theme created since a moment (`since`; none without it): the recent ones the hourly cap counts.
+class Generations::Query::Recent < ApplicationQuery
   base_scope { Generation.all }
 
   pipeline :created_since
