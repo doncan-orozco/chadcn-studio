@@ -52,7 +52,7 @@ Full table with the zinc values and the text pairs the contrast check reads: [re
 
 1. **Primary** is the input `oklch(L C H)`.
 2. **Neutral hue** is the primary hue; **neutral chroma** is `tint × 0.015` (tint 0..1; 0.4 reproduces zinc's tint).
-3. **Light neutrals** take zinc's light lightness steps (background 1, sidebar 0.985, secondary/muted/accent 0.967, border/input 0.92, muted-foreground 0.552, foreground 0.141) at the neutral hue and chroma.
+3. **Light neutrals** take zinc's light lightness steps (background 1, sidebar 0.985, secondary/muted/accent 0.967, border/input 0.92, muted-foreground 0.54, foreground 0.141) at the neutral hue and chroma; muted-foreground is 0.54 rather than zinc's 0.552 because 0.552 on the muted surface measures 4.37:1, under the 4.5:1 floor.
 4. **Dark neutrals** take zinc's dark steps (background 0.141, card/popover/sidebar 0.21, secondary/muted/accent 0.274, muted-foreground 0.705, foreground 0.985); `border` and `input` are `oklch(1 0 0 / 10%)` and `/ 15%`.
 5. **Dark primary** is the primary lifted toward readability on dark surfaces (L + 0.15 clamped to 0.92, C × 0.8).
 6. **Foregrounds** are chosen by contrast between the near-white (0.985) and near-black (0.141) neutral candidates.
