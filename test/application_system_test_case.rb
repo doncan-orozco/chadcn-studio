@@ -33,6 +33,7 @@ class ApplicationSystemTestCase < ActionDispatch::SystemTestCase
       } catch (_) {}
     })
   JS
+  private_constant :CSP_STORAGE_KEY, :CSP_LISTENER
 
   setup do
     page.driver.browser.evaluate_on_new_document(CSP_LISTENER)
