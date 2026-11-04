@@ -1,8 +1,11 @@
 # Be sure to restart your server when you modify this file.
 
-# Content security policy of every HTML response, enforced in all environments so the system suite fails on a blocked
-# resource. Scripts are same-origin importmap modules plus the nonced importmap and Turbo tags. Styles need
-# `unsafe-inline` because chadcn components render `style` attributes; a nonce on style-src would make browsers ignore it.
+# Content security policy of every HTML response, enforced in all environments. Scripts are same-origin importmap
+# modules plus the nonced importmap and module tags (the nonce is random per request; Turbo Drive matches head scripts
+# without it, so never put an inline <script> in <body>). Styles need `unsafe-inline`: chadcn renders `style`
+# attributes AND `<style>` elements (ScrollArea, Chart::Style, the scroll-lock and input-otp controllers), so neither
+# a nonce nor `style-src-attr` works. img-src and font-src stay same-origin (plus data:) so injected CSS cannot
+# exfiltrate. A blocked resource only logs a securitypolicyviolation; the system suite catches behaviour regressions.
 # Turbo Streams over Action Cable use the same origin. See the Securing Rails Applications Guide:
 # https://guides.rubyonrails.org/security.html#content-security-policy-header
 Rails.application.configure do

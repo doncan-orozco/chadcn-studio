@@ -81,7 +81,11 @@ Rails.application.configure do
 
   # Enable DNS rebinding protection and other `Host` header attacks. APP_HOST is the bare hostname; unset, the list
   # stays empty so a first boot without it still answers.
-  config.hosts = [ ENV["APP_HOST"] ].compact_blank
+  app_host = ENV["APP_HOST"].to_s.strip
+  unless app_host.empty? || app_host.match?(/\A[a-z0-9](?:[a-z0-9-]*[a-z0-9])?(?:\.[a-z0-9](?:[a-z0-9-]*[a-z0-9])?)*\z/i)
+    raise ArgumentError, "APP_HOST must be a bare hostname (no scheme, port or path), got #{app_host.inspect}"
+  end
+  config.hosts = [ app_host ].compact_blank
 
   # Skip DNS rebinding protection for the default health check endpoint.
   config.host_authorization = { exclude: ->(request) { request.path == "/up" } }
