@@ -82,6 +82,7 @@ golden:
 # finds the theme the export task published.
 ux:
   base_url: http://localhost:3000
+  reset: "RAILS_ENV=development bin/rails db:seed:replant"   # truncates the development tables and reloads db/seeds.rb (Ocean, Forest, Sunset)
   viewports: [desktop]
   sign_in: null
   conventions: >
