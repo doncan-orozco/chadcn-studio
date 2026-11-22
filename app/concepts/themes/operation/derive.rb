@@ -37,8 +37,16 @@ class Themes::Operation::Derive < Core::Operation
 
   def validate(inputs)
     outcome = @contract.call(inputs.to_h)
-    return Success(outcome.to_h) if outcome.success?
+    return Success(canonical(outcome.to_h)) if outcome.success?
 
     Failure(code: :invalid, errors: outcome.errors.to_h)
+  end
+
+  # A color typed as hex becomes oklch here, so the stored inputs and the palette speak one color space.
+  def canonical(values)
+    values = values.merge(primary: Themes::Oklch.parse(values[:primary]).to_s)
+    return values unless values[:overrides]
+
+    values.merge(overrides: values[:overrides].transform_values { |variables| variables.to_h.transform_values { |color| Themes::Oklch.parse(color).to_s } })
   end
 end

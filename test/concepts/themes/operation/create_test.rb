@@ -12,6 +12,14 @@ class Themes::Operation::CreateTest < ActiveSupport::TestCase
     assert_equal "oklch(0.55 0.2 250)", theme.light["primary"]
   end
 
+  test "a hex brand color is stored as that color in oklch" do
+    theme = Themes::Operation::Create.new.call(name: "Acme", primary: "#1d4ed8").value![:model].reload
+
+    assert_equal "oklch(0.488 0.217 264.376)", theme.inputs["primary"]
+    assert_equal "oklch(0.488 0.217 264.376)", theme.light["primary"]
+    assert_valid_palette theme.palette
+  end
+
   test "a taken slug gets the next free suffix" do
     2.times { Themes::Operation::Create.new.call(name: "Zinc", primary: "oklch(0.55 0.2 250)").value! }
 

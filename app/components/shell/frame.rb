@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The app shell: a header with the theme toggle, an optional sidebar (an HTML string from the page) and the main area.
+# The app shell: a header with the Themes link and the theme toggle, an optional sidebar (an HTML string from the page) and the main area.
 class Components::Shell::Frame < Components::Base
   # `sidebar` is pre-rendered, escaped HTML (`content_for(:sidebar)`); a plain String would be trusted blindly, so it is refused.
   def initialize(sidebar: nil)
@@ -14,7 +14,12 @@ class Components::Shell::Frame < Components::Base
   def view_template(&)
     div(class: "flex min-h-svh flex-col", data: { testid: "shell" }) do
       header(class: "flex h-14 items-center justify-between border-b px-4") do
-        a(href: root_path, class: "text-sm font-semibold") { "Chadcn Studio" }
+        div(class: "flex items-center gap-2") do
+          a(href: root_path, class: "text-sm font-semibold") { "Chadcn Studio" }
+          nav(aria: { label: "Main" }) do
+            render Chadcn::Button.new(as_child: :a, href: themes_path, variant: "ghost", size: "sm") { "Themes" }
+          end
+        end
         render Components::Shell::ThemeToggle.new
       end
 

@@ -48,7 +48,36 @@ class Themes::OklchTest < ActiveSupport::TestCase
     assert_raises(Themes::Oklch::Invalid) { Themes::Oklch.new("light", 0, 0) }
     assert_raises(Themes::Oklch::Invalid) { Themes::Oklch.new(nil, 0, 0) }
     assert_raises(Themes::Oklch::Invalid) { Themes::Oklch.new("0x1A", 0, 0) }
-    [ "#ffffff", "oklch(a b c)", "oklch(0.5 0.1)", "hsl(0 0% 0%)", "" ].each do |value|
+    [ "oklch(a b c)", "oklch(0.5 0.1)", "hsl(0 0% 0%)", "" ].each do |value|
+      assert_raises(Themes::Oklch::Invalid, value) { Themes::Oklch.parse(value) }
+    end
+  end
+
+  test "parses a six-digit hex color, with or without the hash, in any case" do
+    [ "#1d4ed8", "1d4ed8", "#1D4ED8", " #1d4ed8 " ].each do |value|
+      assert_equal "oklch(0.488 0.217 264.376)", Themes::Oklch.parse(value).to_s, value
+    end
+    assert_equal "oklch(0.714 0.019 261.325)", Themes::Oklch.parse("#9ca3af").to_s
+    assert_equal "oklch(0.628 0.258 29.234)", Themes::Oklch.parse("#ff0000").to_s
+  end
+
+  test "parses a three-digit hex color as its doubled digits" do
+    assert_equal Themes::Oklch.parse("#1144dd"), Themes::Oklch.parse("#14d")
+    assert_equal "oklch(0.473 0.236 264.226)", Themes::Oklch.parse("#14D").to_s
+  end
+
+  test "a hex gray has no chroma and no hue" do
+    assert_equal "oklch(1 0 0)", Themes::Oklch.parse("#fff").to_s
+    assert_equal "oklch(0 0 0)", Themes::Oklch.parse("#000000").to_s
+    assert_equal "oklch(0.6 0 0)", Themes::Oklch.parse("#808080").to_s
+  end
+
+  test "a hex color is opaque" do
+    assert_nil Themes::Oklch.parse("#1d4ed8").alpha
+  end
+
+  test "rejects malformed hex" do
+    [ "#", "#12", "#1234", "#12345", "#1234567", "#1d4ed8ff", "14d", "#ggg", "#1d4edg", "1d4ed", "# 1d4ed8", "#1d4ed8; x" ].each do |value|
       assert_raises(Themes::Oklch::Invalid, value) { Themes::Oklch.parse(value) }
     end
   end

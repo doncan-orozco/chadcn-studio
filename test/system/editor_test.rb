@@ -96,6 +96,20 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "Renamed", @theme.reload.name
   end
 
+  test "an advanced override typed as hex is accepted and saved as oklch" do
+    open_group "advanced"
+    fill_in "override-light-border", with: "#9ca3af"
+    find_field("override-light-border").send_keys(:enter)
+
+    assert_selector :testid, "overridden", count: 1
+    assert_equal "oklch(0.714 0.019 261.325)", property("--border")
+
+    click_on "Save"
+
+    assert_text "Theme saved"
+    assert_equal({ "light" => { "border" => "oklch(0.714 0.019 261.325)" } }, @theme.reload.inputs["overrides"])
+  end
+
   test "Save persists an advanced override" do
     open_group "advanced"
     fill_in "override-light-ring", with: "oklch(0.6 0.1 30)"
@@ -133,7 +147,9 @@ class EditorTest < ApplicationSystemTestCase
     assert_selector :testid, "group-#{key}-panel"
   end
 
+  # The panel scrolls to the field that was filled; its Close button is at the top.
   def close_group
+    execute_script("document.querySelector('[data-state=open][data-slot=dialog-content]').scrollTop = 0")
     find("[data-chadcn--dialog-part=close]", match: :first, visible: :visible).click
 
     assert_no_selector "[data-state=open][data-slot=dialog-content]"

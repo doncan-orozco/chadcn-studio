@@ -9,6 +9,7 @@ class Components::Editor::AdvancedOverrides < Components::Base
 
   def view_template
     div(class: "grid gap-6") do
+      p(class: "text-sm text-muted-foreground") { "Type a hex color such as #9ca3af, or an oklch(...) value. Clear a field to follow the rule again." }
       @group.modes.each { |mode| section_for(mode) }
     end
   end

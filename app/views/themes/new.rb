@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Views::Themes::New < Views::Base
-  PRIMARY_EXAMPLE = "oklch(0.55 0.2 250)"
+  PRIMARY_EXAMPLE = "#1d4ed8"
   private_constant :PRIMARY_EXAMPLE
 
   def initialize(theme)

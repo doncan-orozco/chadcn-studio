@@ -33,6 +33,13 @@ class Themes::Operation::UpdateTest < ActiveSupport::TestCase
     assert_equal({ "light" => { "ring" => "oklch(0.6 0.1 30)" } }, model.inputs["overrides"])
   end
 
+  test "a hex override is stored and applied as oklch" do
+    model = Themes::Operation::Update.new.call(model: @theme, params: { "inputs" => { "overrides" => { "light" => { "border" => "#9ca3af" } } } }).value![:model].reload
+
+    assert_equal({ "light" => { "border" => "oklch(0.714 0.019 261.325)" } }, model.inputs["overrides"])
+    assert_equal "oklch(0.714 0.019 261.325)", model.light["border"]
+  end
+
   test "posted overrides replace the stored ones and a cleared field re-derives the variable" do
     @theme.update_columns(inputs: { "primary" => "oklch(0.55 0.2 250)", "overrides" => { "light" => { "ring" => "oklch(0.6 0.1 30)" } } })
     overrides = { "light" => { "ring" => "", "chart-1" => "oklch(0.7 0.1 10)" } }
