@@ -17,6 +17,11 @@ class Themes::Presenter::ListTest < ActiveSupport::TestCase
     assert_equal "No themes yet.", list.summary
   end
 
+  test "New theme leads only on an empty list" do
+    assert_equal "outline", Themes::Presenter::List.new(Theme.all).new_theme_variant
+    assert_equal "default", Themes::Presenter::List.new(Theme.none).new_theme_variant
+  end
+
   test "one theme is singular" do
     assert_equal "1 theme, newest first.", Themes::Presenter::List.new(Theme.where(slug: "zinc")).summary
   end
