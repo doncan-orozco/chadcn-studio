@@ -16,4 +16,30 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
       assert_select "header nav[aria-label=Main] a[href=?]", themes_path, { text: "Themes" }, path
     end
   end
+
+  test "home lists existing themes under the buttons, each name linking to its editor" do
+    get root_path
+
+    assert_response :success
+    assert_select "main h2", text: "Your themes"
+    Theme.find_each do |theme|
+      assert_select "main ul[aria-label='Your themes'] a[href=?]", edit_theme_path(theme), text: theme.name
+    end
+  end
+
+  test "home lists at most the five newest themes" do
+    6.times { |i| themes(:zinc).dup.update!(name: "Extra #{i}", slug: "extra-#{i}") }
+
+    get root_path
+
+    assert_select "main ul[aria-label='Your themes'] li", 5
+  end
+
+  test "home with no themes has no Your themes list" do
+    Theme.destroy_all
+    get root_path
+
+    assert_response :success
+    assert_select "main h2", text: "Your themes", count: 0
+  end
 end
