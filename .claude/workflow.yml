@@ -75,3 +75,106 @@ agents:
 
 golden:
   root: .claude/golden
+
+# What /flow:audit-ux walks and judges. Tasks are goals in the user's words: never name the menu or the page.
+# The walker changes data in the development database (it creates, publishes and deletes themes); `bin/rails db:seed`
+# restores the three seed themes by name. Within a feature the tasks are walked in priority order, so "stop sharing"
+# finds the theme the export task published.
+ux:
+  base_url: http://localhost:3000
+  reset: "RAILS_ENV=development bin/rails db:seed:replant"   # truncates the development tables and reloads db/seeds.rb (Ocean, Forest, Sunset)
+  viewports: [desktop]
+  sign_in: null
+  conventions: >
+    One primary action per screen, rendered with the default Chadcn::Button; every color comes from the theme tokens;
+    the editor saves only on Save (no autosave) while the preview updates live; destructive actions ask for confirmation
+    in a Chadcn dialog; English only.
+  skills: [design-system, accessibility]
+  personas:
+    - id: developer
+      description: >
+        A Rails developer who uses the chadcn gem and wants their app to look like their brand. Comfortable with code,
+        not a designer: knows their brand color as a hex code (for example #1d4ed8), does not know color theory or
+        what oklch means. On a laptop, first visit to the studio.
+  features:
+    - id: create
+      tasks:
+        - id: create-theme
+          goal: "Make a new theme called Acme from my brand color, a strong blue"
+          persona: developer
+          priority: 1
+          start: /
+          resume_from: /themes
+          done_when: "a theme named Acme exists in my brand color and I can see its colors applied to a page"
+          budget: {clicks: 4, seconds: 40}
+    - id: tune
+      tasks:
+        - id: round-corners
+          goal: "Make the corners of my Ocean theme rounder and keep the change"
+          persona: developer
+          priority: 1
+          start: /
+          resume_from: /themes
+          done_when: "the preview shows rounder corners and the change is saved"
+          budget: {clicks: 6, seconds: 45}
+        - id: preview-on-form
+          goal: "See how my Ocean theme looks on a page with a form"
+          persona: developer
+          priority: 2
+          start: /
+          resume_from: /themes
+          done_when: "a form page is shown in the Ocean theme"
+          budget: {clicks: 4}
+        - id: check-dark-mode
+          goal: "Check how my Ocean theme looks in dark mode"
+          persona: developer
+          priority: 2
+          start: /
+          resume_from: /themes
+          done_when: "a page is shown in the dark version of the Ocean theme"
+          budget: {clicks: 4}
+        - id: pin-one-color
+          goal: "Make the borders of my Ocean theme a specific gray without changing the other colors"
+          persona: developer
+          priority: 3
+          start: /
+          resume_from: /themes
+          done_when: "the borders use the gray I chose, the other colors are unchanged and the change is saved"
+    - id: generate
+      tasks:
+        - id: generate-from-description
+          goal: "Get a theme for a calm, earthy coffee shop site without choosing any color myself"
+          persona: developer
+          priority: 2
+          start: /
+          done_when: "a new theme made from my description is shown on a page"
+    - id: export
+      tasks:
+        - id: get-import-command
+          goal: "Get what I need to use my Ocean theme in my own Rails app"
+          persona: developer
+          priority: 1
+          start: /
+          done_when: "the command that imports the Ocean theme into an app is on screen and can be copied"
+          budget: {clicks: 5, seconds: 40}
+        - id: stop-sharing
+          goal: "Stop sharing my Ocean theme publicly"
+          persona: developer
+          priority: 3
+          start: /
+          done_when: "the Ocean theme is shown as not published"
+    - id: library
+      tasks:
+        - id: reopen-theme
+          goal: "Find the Forest theme I made earlier and continue editing it"
+          persona: developer
+          priority: 2
+          start: /
+          done_when: "the Forest theme is open and its settings can be changed"
+          budget: {clicks: 2}
+        - id: delete-theme
+          goal: "Delete the Sunset theme, which I no longer want"
+          persona: developer
+          priority: 3
+          start: /
+          done_when: "Sunset is no longer in my list of themes"
