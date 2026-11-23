@@ -15,11 +15,25 @@ class Themes::Contract::InputsTest < ActiveSupport::TestCase
     assert_equal [ -40.0, -20.0, 0.0, 20.0, 40.0 ], result[:chart_offsets]
   end
 
-  test "primary must be an oklch color in range" do
-    [ "#336699", "oklch(1.2 0.2 250)", "oklch(0.5 0.9 250)", "oklch(0.5 0.2 400)", "red" ].each do |bad|
+  test "primary must be a hex color or an oklch color in range" do
+    [ "#33669", "oklch(1.2 0.2 250)", "oklch(0.5 0.9 250)", "oklch(0.5 0.2 400)", "red" ].each do |bad|
       assert_includes validate(primary: bad).errors.to_h.keys, :primary, bad
     end
     assert_includes validate.errors.to_h.keys, :primary
+  end
+
+  test "primary accepts hex" do
+    %w[#1d4ed8 1d4ed8 #14d].each { |hex| assert_predicate validate(primary: hex), :success?, hex }
+  end
+
+  test "an invalid color is answered with one plain sentence and an example" do
+    assert_equal [ "must be a hex color such as #1d4ed8, or an oklch(...) value" ], validate(primary: "blue").errors.to_h[:primary]
+    assert_equal [ "light: --border must be a hex color such as #9ca3af, or an oklch(...) value" ],
+      validate(primary: "#1d4ed8", overrides: { "light" => { "border" => "gray" } }).errors.to_h[:overrides]
+  end
+
+  test "overrides accept hex" do
+    assert_predicate validate(primary: "oklch(0.5 0.2 250)", overrides: { "light" => { "border" => "#9ca3af" } }), :success?
   end
 
   test "tint stays within 0..1" do

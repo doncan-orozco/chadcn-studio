@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 # The few choices the harmony rule needs (theme-science R7). Shape and ranges only; the derivation is the operation's.
+# A color is hex or oklch(...): whatever `Themes::Oklch.parse` reads.
 class Themes::Contract::Inputs < Dry::Validation::Contract
   RADIUS = /\A\d+(?:\.\d+)?rem\z/
   CHART_OFFSETS_SIZE = 5
@@ -21,9 +22,9 @@ class Themes::Contract::Inputs < Dry::Validation::Contract
 
   rule(:primary) do
     color = Themes::Oklch.parse(value)
-    key.failure("must be an opaque oklch color that Chadcn::Theme can judge") if color.alpha || !judgeable?(color)
+    key.failure("must be an opaque color that Chadcn::Theme can judge") if color.alpha || !judgeable?(color)
   rescue Themes::Oklch::Invalid
-    key.failure("must be an oklch color such as oklch(0.55 0.2 250) with L 0..1, C 0..0.4, H 0..360")
+    key.failure("must be a hex color such as #1d4ed8, or an oklch(...) value")
   end
 
   rule(:chart_offsets) do
@@ -44,9 +45,9 @@ class Themes::Contract::Inputs < Dry::Validation::Contract
         parsed = Themes::Oklch.parse(color)
         next if parsed.alpha && ALPHA_VARIABLES.fetch(mode.to_s, []).include?(name.to_s)
 
-        key.failure("#{mode}: --#{name} must be an opaque oklch color that Chadcn::Theme can judge") if parsed.alpha || !judgeable?(parsed)
+        key.failure("#{mode}: --#{name} must be an opaque color that Chadcn::Theme can judge") if parsed.alpha || !judgeable?(parsed)
       rescue Themes::Oklch::Invalid
-        key.failure("#{mode}: --#{name} must be an oklch color")
+        key.failure("#{mode}: --#{name} must be a hex color such as #9ca3af, or an oklch(...) value")
       end
     end
   end

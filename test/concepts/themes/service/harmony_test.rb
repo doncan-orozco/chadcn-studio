@@ -51,10 +51,11 @@ class Themes::Service::HarmonyTest < ActiveSupport::TestCase
     assert_equal low, palette.root["foreground"]
   end
 
-  test "a hex light override does not raise" do
+  test "a hex light override is applied in the oklch spelling" do
     palette = Themes::Service::Harmony.call(BLUE.merge(overrides: { "light" => { "background" => "#fafafa", "card" => "#ffffff" } }))
 
-    assert_equal "#fafafa", palette.root["background"]
+    assert_equal "oklch(0.985 0 0)", palette.root["background"]
+    assert_equal "oklch(1 0 0)", palette.root["card"]
   end
 
   test "mid lightness primaries are repaired until the pair passes" do

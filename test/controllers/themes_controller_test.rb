@@ -32,6 +32,31 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to edit_theme_path(Theme.find_by!(slug: "ocean"))
   end
 
+  test "POST /themes with a hex brand color stores that color, not a default" do
+    post themes_path, params: { theme: { name: "Acme", primary: "#1d4ed8" } }
+
+    theme = Theme.find_by!(slug: "acme")
+
+    assert_redirected_to edit_theme_path(theme)
+    assert_equal "oklch(0.488 0.217 264.376)", theme.light["primary"]
+  end
+
+  test "GET /themes/new shows a hex example and no prefilled color" do
+    get new_theme_path
+
+    assert_select "input[name='theme[primary]'][placeholder='#1d4ed8']:not([value])"
+    assert_select "#theme-primary-description", text: /#1d4ed8/
+  end
+
+  test "POST /themes with a color that is neither hex nor oklch says what to type, once" do
+    post themes_path, params: { theme: { name: "Bad", primary: "blue" } }
+
+    assert_response :unprocessable_entity
+    assert_select "#theme-primary-error", text: "must be a hex color such as #1d4ed8, or an oklch(...) value"
+    assert_select "#theme-primary-description", count: 0
+    assert_select "input[name='theme[primary]'][value=blue]"
+  end
+
   test "POST /themes with an out-of-range color re-renders the form with the error" do
     assert_no_difference("Theme.count") { post themes_path, params: { theme: { name: "Bad", primary: "oklch(2 0.2 250)" } } }
 

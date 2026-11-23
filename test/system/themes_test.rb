@@ -11,6 +11,26 @@ class ThemesTest < ApplicationSystemTestCase
     assert_field "Name", with: "Bad"
   end
 
+  test "from home, a theme created with a hex brand color opens in the editor with that color" do
+    visit root_path
+    click_on "Create theme"
+    fill_in "Name", with: "Acme"
+    fill_in "Primary color", with: "#1d4ed8"
+    click_on "Create theme"
+
+    assert_text "Theme created"
+    assert_selector "#summary-brand", text: "oklch(0.488 0.217 264.376)"
+    assert_equal "oklch(0.488 0.217 264.376)", Theme.find_by!(slug: "acme").light["primary"]
+  end
+
+  test "the header's Themes link opens the list from home" do
+    visit root_path
+    within("header") { click_on "Themes" }
+
+    assert_current_path themes_path
+    assert_selector :testid, "theme-card", minimum: 1
+  end
+
   test "the list and the show page render without JS errors in light and dark" do
     %w[light dark].each do |scheme|
       visit themes_path
