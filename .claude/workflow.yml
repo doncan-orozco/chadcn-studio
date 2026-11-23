@@ -141,6 +141,21 @@ ux:
           resume_from: /themes
           knows: "the gray is #9ca3af"
           done_when: "the borders use the gray I chose, the other colors are unchanged and the change is saved"
+        - id: change-brand-color
+          goal: "Change the main color of my Ocean theme to my new brand color and keep the change"
+          persona: developer
+          priority: 2
+          start: /
+          resume_from: /themes
+          knows: "the new brand color is #0f766e"
+          done_when: "the preview uses the new color and the change is saved"
+        - id: tint-surfaces
+          goal: "Make the backgrounds and cards of my Ocean theme a little less gray, closer to its blue, and keep the change"
+          persona: developer
+          priority: 3
+          start: /
+          resume_from: /themes
+          done_when: "the backgrounds and cards are visibly tinted with the theme's blue and the change is saved"
     - id: generate
       tasks:
         - id: generate-from-description
@@ -161,12 +176,19 @@ ux:
           done_when: "the command that imports the Ocean theme into an app is on screen and can be copied"
           budget: {clicks: 5, seconds: 40}
         - id: stop-sharing
-          goal: "Stop sharing my Ocean theme publicly"
+          goal: "Share my Ocean theme publicly, then change my mind and stop sharing it"
           persona: developer
           priority: 3
           start: /
           resume_from: /themes
-          done_when: "the Ocean theme is shown as not published"
+          done_when: "the Ocean theme was shown as published and is now shown as not published"
+        - id: download-css
+          goal: "Download my Ocean theme as a theme.css file I can drop into my app"
+          persona: developer
+          priority: 2
+          start: /
+          resume_from: /themes
+          done_when: "a theme.css file of the Ocean theme has been downloaded"
     - id: library
       tasks:
         - id: reopen-theme
@@ -184,3 +206,26 @@ ux:
           start: /
           resume_from: /themes
           done_when: "Sunset is no longer in my list of themes"
+        - id: rename-theme
+          goal: "Rename my Forest theme to Forest Green"
+          persona: developer
+          priority: 3
+          start: /
+          resume_from: /themes
+          done_when: "Forest Green is in my list of themes and Forest is not"
+        - id: look-up-value
+          goal: "Find the exact color my Ocean theme uses for its main color in dark mode"
+          persona: developer
+          priority: 3
+          start: /
+          resume_from: /themes
+          done_when: "the dark-mode value of the Ocean theme's primary color is on screen"
+    - id: gallery
+      tasks:
+        - id: browse-components
+          goal: "See which components chadcn offers and what each one looks like"
+          persona: developer
+          priority: 3
+          start: /
+          resume_from: /gallery
+          done_when: "the catalog of chadcn components is on screen, each shown rendered"
