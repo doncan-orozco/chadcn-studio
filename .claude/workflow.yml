@@ -139,6 +139,7 @@ ux:
           priority: 3
           start: /
           resume_from: /themes
+          knows: "the gray is #9ca3af"
           done_when: "the borders use the gray I chose, the other colors are unchanged and the change is saved"
     - id: generate
       tasks:
@@ -147,6 +148,7 @@ ux:
           persona: developer
           priority: 2
           start: /
+          resume_from: /themes
           done_when: "a new theme made from my description is shown on a page"
     - id: export
       tasks:
@@ -155,6 +157,7 @@ ux:
           persona: developer
           priority: 1
           start: /
+          resume_from: /themes
           done_when: "the command that imports the Ocean theme into an app is on screen and can be copied"
           budget: {clicks: 5, seconds: 40}
         - id: stop-sharing
@@ -162,6 +165,7 @@ ux:
           persona: developer
           priority: 3
           start: /
+          resume_from: /themes
           done_when: "the Ocean theme is shown as not published"
     - id: library
       tasks:
@@ -170,6 +174,7 @@ ux:
           persona: developer
           priority: 2
           start: /
+          resume_from: /themes
           done_when: "the Forest theme is open and its settings can be changed"
           budget: {clicks: 2}
         - id: delete-theme
@@ -177,4 +182,5 @@ ux:
           persona: developer
           priority: 3
           start: /
+          resume_from: /themes
           done_when: "Sunset is no longer in my list of themes"
