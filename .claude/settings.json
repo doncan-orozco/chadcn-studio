@@ -1,6 +1,6 @@
 {
   "env": {
-    "RBENV_VERSION": "4.0.0"
+    "RBENV_VERSION": "4.0.10"
   },
   "permissions": {
     "allow": [
