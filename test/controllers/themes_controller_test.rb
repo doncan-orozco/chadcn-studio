@@ -116,4 +116,19 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_redirected_to themes_path
   end
+
+  test "PATCH /themes/:id names the saved theme in the toast" do
+    theme = themes(:zinc)
+    patch theme_path(theme), params: { theme: { name: "Ocean" } }
+
+    assert_redirected_to edit_theme_path(theme)
+    assert_equal "Ocean saved", flash[:notice]
+  end
+
+  test "GET /themes/:id/edit reads Save theme and renders the unsaved marker hidden" do
+    get edit_theme_path(themes(:zinc))
+
+    assert_select "button[data-testid=save]", text: "Save theme"
+    assert_select "[data-testid=unsaved][hidden][role=status]", text: "Unsaved changes"
+  end
 end

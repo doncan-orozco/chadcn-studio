@@ -88,11 +88,29 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal before, property("--foreground")
   end
 
+  test "the toolbar offers Save theme and shows Unsaved changes only once the editor differs" do
+    assert_button "Save theme"
+    assert_no_selector :testid, "unsaved"
+
+    fill_in "Name", with: "Renamed"
+
+    assert_selector :testid, "unsaved", text: "Unsaved changes"
+  end
+
+  test "moving a slider marks the editor unsaved" do
+    open_group "brand"
+    thumb = find(:testid, "primary-lightness").find("[role=slider]")
+    x, y = center_of(thumb)
+    page.driver.browser.mouse.move(x: x, y: y).down.move(x: x + 60, y: y, steps: 4).up
+
+    assert_selector :testid, "unsaved", text: "Unsaved changes"
+  end
+
   test "Save persists the name and the derived palette" do
     fill_in "Name", with: "Renamed"
-    click_on "Save"
+    click_on "Save theme"
 
-    assert_text "Theme saved"
+    assert_text "Renamed saved"
     assert_equal "Renamed", @theme.reload.name
   end
 
@@ -104,9 +122,9 @@ class EditorTest < ApplicationSystemTestCase
     assert_selector :testid, "overridden", count: 1
     assert_equal "oklch(0.714 0.019 261.325)", property("--border")
 
-    click_on "Save"
+    click_on "Save theme"
 
-    assert_text "Theme saved"
+    assert_text "Zinc saved"
     assert_equal({ "light" => { "border" => "oklch(0.714 0.019 261.325)" } }, @theme.reload.inputs["overrides"])
   end
 
@@ -117,16 +135,16 @@ class EditorTest < ApplicationSystemTestCase
 
     assert_selector :testid, "overridden", count: 1
     close_group
-    click_on "Save"
+    click_on "Save theme"
 
-    assert_text "Theme saved"
+    assert_text "Zinc saved"
     assert_equal({ "light" => { "ring" => "oklch(0.6 0.1 30)" } }, @theme.reload.inputs["overrides"])
     assert_equal "oklch(0.6 0.1 30)", @theme.light["ring"]
   end
 
   test "a rejected Save re-renders the editor with the errors" do
     page.execute_script("document.querySelector('[name=\"theme[inputs][primary]\"]').value = 'oklch(2 0.2 250)'")
-    click_on "Save"
+    click_on "Save theme"
 
     assert_selector :testid, "editor-errors", text: "Primary must be"
     assert_selector :testid, "preview-root"

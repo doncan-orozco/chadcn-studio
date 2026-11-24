@@ -10,12 +10,13 @@ class Views::Themes::Edit::Toolbar < Views::Base
   end
 
   def view_template
-    form(action: @presenter.save_path, method: "post", class: "flex flex-wrap items-end gap-3 border-b p-3", data: { editor__preview_target: "form", testid: "editor-form" }) do
+    form(action: @presenter.save_path, method: "post", class: "flex flex-wrap items-end gap-3 border-b p-3", data: { editor__preview_target: "form", action: "input->editor--preview#markDirty change->editor--preview#markDirty", testid: "editor-form" }) do
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
       input(type: "hidden", name: "theme[inputs][primary]", value: @presenter.primary, data: { editor__preview_target: "primaryField" })
       input(type: "hidden", name: "theme[inputs][radius]", value: @presenter.radius, data: { editor__preview_target: "radiusField" })
       name_field
-      render Chadcn::Button.new(type: "submit", name: "_method", value: "patch", data: { testid: "save" }) { "Save" }
+      render Chadcn::Button.new(type: "submit", name: "_method", value: "patch", data: { testid: "save" }) { "Save theme" }
+      unsaved_marker
       derivation_submitters
       div(id: "editor-errors", role: "alert", class: "w-full empty:hidden", data: { testid: "editor-errors" }) do
         render Components::Editor::ErrorList.new(messages: @presenter.failures)
@@ -25,6 +26,11 @@ class Views::Themes::Edit::Toolbar < Views::Base
   end
 
   private
+
+  # Shown by the preview controller once the editor differs from the stored theme; a status region so it is announced.
+  def unsaved_marker
+    span(hidden: true, role: "status", class: "self-center text-sm text-muted-foreground", data: { editor__preview_target: "unsaved", testid: "unsaved" }) { "Unsaved changes" }
+  end
 
   def name_field
     div(class: "grid gap-1") do
