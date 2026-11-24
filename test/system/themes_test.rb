@@ -45,6 +45,23 @@ class ThemesTest < ApplicationSystemTestCase
     assert_selector :testid, "palette"
   end
 
+  test "the card's name opens the editor and its Edit button is at least 24 px tall" do
+    visit themes_path
+    height = evaluate_script("document.querySelector(\"[data-testid=theme-card] a[aria-label^='Edit']\").getBoundingClientRect().height")
+
+    assert_operator height, :>=, 24
+    click_on "Zinc"
+
+    assert_current_path edit_theme_path(themes(:zinc))
+  end
+
+  test "the show page's main action opens the editor" do
+    visit theme_path(themes(:zinc))
+    click_on "Preview and edit"
+
+    assert_current_path edit_theme_path(themes(:zinc))
+  end
+
   test "deleting a theme from its page returns to the list" do
     visit theme_path(themes(:zinc))
     accept_confirm { click_on "Delete" }
