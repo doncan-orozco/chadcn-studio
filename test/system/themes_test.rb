@@ -55,6 +55,18 @@ class ThemesTest < ApplicationSystemTestCase
     assert_current_path edit_theme_path(themes(:zinc))
   end
 
+  test "clicking the card body opens the editor, and the Edit button still works above the stretched link" do
+    visit themes_path
+    find(:testid, "theme-card", text: "Zinc").click
+
+    assert_current_path edit_theme_path(themes(:zinc))
+
+    visit themes_path
+    within(:testid, "theme-card", text: "Zinc") { click_on "Edit" }
+
+    assert_current_path edit_theme_path(themes(:zinc))
+  end
+
   test "the show page's main action opens the editor" do
     visit theme_path(themes(:zinc))
     click_on "Preview and edit"
