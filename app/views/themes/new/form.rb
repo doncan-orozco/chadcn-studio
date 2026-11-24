@@ -13,6 +13,10 @@ class Views::Themes::New::Form < Views::Base
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
       labelled_input(:name, "Name", value: @theme.name, placeholder: "Ocean", maxlength: 80, required: true)
       labelled_input(:primary, "Primary color", value: primary_value, placeholder: @primary_example, description: "Your brand color, e.g. #{@primary_example}. oklch(...) works too.", required: true)
+      p(class: "text-sm text-muted-foreground", data: { testid: "required-legend" }) do
+        span(class: "text-destructive", aria_hidden: "true") { "*" }
+        plain " Required"
+      end
       render Chadcn::Button.new(type: "submit") { "Create theme" }
     end
   end
@@ -26,11 +30,19 @@ class Views::Themes::New::Form < Views::Base
     errors = @theme.errors[attribute]
     id = "theme-#{attribute}"
     render Chadcn::Field.new(data: { invalid: errors.any?.to_s }) do |field|
-      field.label(html_for: id) { label }
+      field.label(html_for: id) { required_label(label, input[:required]) }
       field.render Chadcn::Input.new(id: id, name: "theme[#{attribute}]", default_value: value, aria: { invalid: errors.any?.to_s, describedby: described_by(id, errors, description) }, **input)
       field.description(id: "#{id}-description") { description } if description && errors.none?
       field.error(id: "#{id}-error") { errors.to_sentence } if errors.any?
     end
+  end
+
+  # The asterisk is decoration: the input's `required` attribute is what assistive technology announces.
+  def required_label(label, required)
+    plain label
+    return unless required
+
+    span(class: "ml-0.5 text-destructive", aria_hidden: "true") { "*" }
   end
 
   def described_by(id, errors, description)
