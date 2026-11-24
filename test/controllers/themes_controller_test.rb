@@ -129,7 +129,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     get edit_theme_path(themes(:zinc))
 
     assert_select "button[data-testid=save]", text: "Save theme"
-    assert_select "[data-testid=unsaved][hidden][role=status]", text: "Unsaved changes"
+    assert_select "[role=status] [data-testid=unsaved][hidden]", text: "Unsaved changes"
   end
 
   test "PATCH /themes/:id rejected re-renders the editor with the unsaved marker visible" do
@@ -144,6 +144,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     patch theme_path(theme), params: { theme: { name: "<b>x</b>" } }
     follow_redirect!
 
+    assert_includes response.body, "&lt;b&gt;x&lt;/b&gt; saved"
     assert_select "b", 0
   end
 end
