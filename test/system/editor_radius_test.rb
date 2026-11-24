@@ -34,4 +34,11 @@ class EditorRadiusTest < ApplicationSystemTestCase
 
     assert_equal "1.5rem", find(:testid, "radius-value").text
   end
+
+  test "the number box never blocks Save, whatever the stored radius is" do
+    fill_in "Name", with: "Renamed"
+    click_on "Save"
+
+    assert_text "Theme saved"
+  end
 end

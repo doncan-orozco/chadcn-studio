@@ -47,9 +47,11 @@ class Components::Editor::SliderField < Components::Base
     end
   end
 
+  # Kept out of the editor form (`form:` names no form): a stored radius off the box's step grid (0.625rem) would fail the
+  # browser's step validation and block Save. The slider and the hidden `radiusField` carry the value that is posted.
   def number_box
     render Chadcn::Input.new(
-      id: "#{@id}-number", type: "number", default_value: @value, class: "w-20 shrink-0", aria: { label: "#{@label} in #{@unit}" },
+      id: "#{@id}-number", type: "number", default_value: @value, class: "w-20 shrink-0", form: "#{@id}-number-form", aria: { label: "#{@label} in #{@unit}" },
       data: { editor__slider_number_target: "input", action: "change->editor--slider-number#type keydown.enter->editor--slider-number#confirm", testid: "#{@id}-number" }, **@range
     )
   end
