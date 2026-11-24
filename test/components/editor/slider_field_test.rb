@@ -6,7 +6,7 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
   test "a slider with a unit gets a number box and its value in the label" do
     html = render_field(unit: "rem")
 
-    assert_includes html, "Corner radius <output"
+    assert_includes html, '<span id="radius-label">Corner radius</span>'
     assert_includes html, ">0.625rem</output>"
     assert_includes html, 'type="number"'
     assert_includes html, 'step="0.05"'
@@ -21,6 +21,13 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
     assert_includes html, 'data-editor--slider-number-target="readout"'
     assert_includes html, 'data-editor--slider-number-unit-value="rem"'
     assert_includes html, "chadcn--slider:value-change->editor--slider-number#mirror"
+  end
+
+  test "a whole float prints like the browser does" do
+    html = render_field(unit: "rem", value: 1.0)
+
+    assert_includes html, ">1rem</output>"
+    assert_includes html, 'value="1"'
   end
 
   test "a slider without a unit stays a plain slider" do

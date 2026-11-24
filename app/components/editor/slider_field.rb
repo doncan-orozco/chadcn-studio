@@ -13,12 +13,12 @@ class Components::Editor::SliderField < Components::Base
   def initialize(id:, label:, value:, min:, max:, step:, channel: nil, live: true, name: nil, unit: nil)
     @id = id
     @label = label
-    @slider = { default_value: [ value ], min: min, max: max, step: step, name: name }
     @channel = channel
     @live = live
     @unit = unit
-    @value = value
+    @value = value.is_a?(Float) && value == value.floor ? value.to_i : value
     @range = { min: min, max: max, step: step }
+    @slider = { default_value: [ @value ], name: name, **@range }
   end
 
   def view_template
@@ -40,8 +40,8 @@ class Components::Editor::SliderField < Components::Base
   end
 
   def label_text
-    span(id: "#{@id}-label", class: "text-sm font-medium") do
-      plain "#{@label} "
+    div(class: "flex items-baseline gap-1 text-sm font-medium") do
+      span(id: "#{@id}-label") { @label }
       next unless @unit
 
       output(for: "#{@id}-number", aria: { live: "off" }, data: { editor__slider_number_target: "readout", testid: "#{@id}-value" }) { "#{@value}#{@unit}" }

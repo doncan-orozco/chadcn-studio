@@ -25,13 +25,33 @@ export default class extends Controller {
     if (thumb) this.#describe(thumb, value)
   }
 
-  // The box `change`: the typed value, clamped to the slider's range and snapped to its step.
+  disconnect() {
+    cancelAnimationFrame(this.walkFrame)
+  }
+
+  // The box `change`: the typed value, clamped to the slider's range and snapped to its step. The walk runs on the next
+  // frame, after the browser's own focus move (Tab), because the slider's keyboard handler focuses its thumb: focus goes
+  // back to wherever it was so typing never pulls it out of the box.
   type() {
-    const thumb = this.#thumb
-    if (!thumb || this.inputTarget.value.trim() === "") return this.#restore()
+    cancelAnimationFrame(this.walkFrame)
+    this.walkFrame = requestAnimationFrame(() => {
+      const thumb = this.#thumb
+      const delta = thumb ? this.#delta(thumb) : 0
+      if (delta !== 0) {
+        const held = document.activeElement
+        this.#walk(thumb, delta)
+        if (held && held !== thumb && held !== document.body && held.isConnected) held.focus({ preventScroll: true })
+      }
+      this.#restore()
+    })
+  }
+
+  // Steps from the slider's value to the typed one (0 when the box is empty or not a number).
+  #delta(thumb) {
+    if (this.inputTarget.value.trim() === "") return 0
 
     const typed = Number(this.inputTarget.value)
-    if (!Number.isFinite(typed)) return this.#restore()
+    if (!Number.isFinite(typed)) return 0
 
     const min = Number(this.inputTarget.min)
     const max = Number(this.inputTarget.max)
@@ -40,9 +60,7 @@ export default class extends Controller {
     const raw = (Number(thumb.getAttribute("aria-valuenow")) - min) / step
     const current = Math.abs(raw - Math.round(raw)) < 1e-6 ? Math.round(raw) : raw
     const target = Math.round((Math.min(Math.max(typed, min), max) - min) / step)
-    const delta = target - current
-    if (delta !== 0) this.#walk(thumb, delta)
-    this.#restore()
+    return target - current
   }
 
   #walk(thumb, delta) {
