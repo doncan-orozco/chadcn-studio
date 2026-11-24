@@ -14,7 +14,7 @@ class Views::Themes::New::Form < Views::Base
       labelled_input(:name, "Name", value: @theme.name, placeholder: "Ocean", maxlength: 80, required: true)
       labelled_input(:primary, "Primary color", value: primary_value, placeholder: @primary_example, description: "Your brand color, e.g. #{@primary_example}. oklch(...) works too.", required: true)
       p(class: "text-sm text-foreground/70", data: { testid: "required-legend" }) do
-        span(class: "text-destructive", aria_hidden: "true") { "*" }
+        asterisk
         plain " Required"
       end
       render Chadcn::Button.new(type: "submit") { "Create theme" }
@@ -26,12 +26,12 @@ class Views::Themes::New::Form < Views::Base
   # Nothing is prefilled: a default color would be saved as the brand color by a user who never looked at the field.
   def primary_value = @theme.inputs&.fetch("primary", nil)
 
-  def labelled_input(attribute, label, description: nil, value: nil, **input)
+  def labelled_input(attribute, label, description: nil, value: nil, required: false, **input)
     errors = @theme.errors[attribute]
     id = "theme-#{attribute}"
     render Chadcn::Field.new(data: { invalid: errors.any?.to_s }) do |field|
-      field.label(html_for: id) { required_label(label, input[:required]) }
-      field.render Chadcn::Input.new(id: id, name: "theme[#{attribute}]", default_value: value, aria: { invalid: errors.any?.to_s, describedby: described_by(id, errors, description) }, **input)
+      field.label(html_for: id) { required_label(label, required) }
+      field.render Chadcn::Input.new(id: id, name: "theme[#{attribute}]", default_value: value, required: required, aria: { invalid: errors.any?.to_s, describedby: described_by(id, errors, description) }, **input)
       field.description(id: "#{id}-description") { description } if description && errors.none?
       field.error(id: "#{id}-error") { errors.to_sentence } if errors.any?
     end
@@ -42,8 +42,11 @@ class Views::Themes::New::Form < Views::Base
     plain label
     return unless required
 
-    span(class: "ml-0.5 text-destructive", aria_hidden: "true") { "*" }
+    plain " "
+    asterisk
   end
+
+  def asterisk = span(class: "text-destructive", aria_hidden: "true") { "*" }
 
   def described_by(id, errors, description)
     [ ("#{id}-description" if description && errors.none?), ("#{id}-error" if errors.any?) ].compact.join(" ").presence
