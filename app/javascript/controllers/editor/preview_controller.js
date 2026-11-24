@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The live preview of the theme editor (stimulus R14, theme-science R6). It only sets CSS custom properties on the preview
-// root and toggles its `dark` class: while a slider moves it formats ONE oklch string from L, C and H (or one rem length);
+// The live preview of the theme editor (stimulus R14, theme-science R6). It reveals the "Unsaved changes" marker the view
+// rendered hidden, and otherwise only sets CSS custom properties on the preview root and toggles its `dark` class: while a slider moves it formats ONE oklch string from L, C and H (or one rem length);
 // everything else (foregrounds, ring, charts...) arrives from the server as a whole palette after the slider is released.
 // Wrapper of the editor: the preview root is a target, the toolbar form posts the inputs to /derivations.
 const DECIMALS = 3
@@ -11,7 +11,13 @@ export default class extends Controller {
   static targets = ["root", "palette", "primaryField", "radiusField", "lightness", "chroma", "hue", "radius", "form", "derive", "refresh", "unsaved"]
   static values = { mode: { type: String, default: "light" } }
 
+  connect() {
+    this.cleanBeforeCache = () => this.#hideUnsaved()
+    document.addEventListener("turbo:before-cache", this.cleanBeforeCache)
+  }
+
   disconnect() {
+    document.removeEventListener("turbo:before-cache", this.cleanBeforeCache)
     cancelAnimationFrame(this.animationFrame)
     this.animationFrame = null
     this.pendingChannel = null
@@ -79,6 +85,11 @@ export default class extends Controller {
     this.#setVariable("--primary", event.detail.primary)
     this.dispatch("change", { detail: { mode: this.modeValue } })
     this.formTarget.requestSubmit(this.refreshTarget)
+  }
+
+  // A Turbo snapshot never keeps the marker visible over what a restore shows as stored values.
+  #hideUnsaved() {
+    if (this.hasUnsavedTarget) this.unsavedTarget.hidden = true
   }
 
   #flush() {

@@ -29,7 +29,8 @@ class ThemesController < ApplicationController
     result = Themes::Operation::Update.new.call(model: theme, params: update_params.to_h)
 
     if result.success?
-      redirect_to edit_theme_path(result.value![:model]), notice: "#{result.value![:model].name} saved"
+      saved = result.value![:model]
+      redirect_to edit_theme_path(saved), notice: "#{saved.name} saved"
     else
       render Views::Themes::Edit.new(Themes::Presenter::Editor.new(result.failure[:model])), status: :unprocessable_entity
     end

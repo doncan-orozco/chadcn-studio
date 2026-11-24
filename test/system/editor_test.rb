@@ -147,6 +147,7 @@ class EditorTest < ApplicationSystemTestCase
     click_on "Save theme"
 
     assert_selector :testid, "editor-errors", text: "Primary must be"
+    assert_selector :testid, "unsaved", text: "Unsaved changes"
     assert_selector :testid, "preview-root"
     assert_equal "Zinc", @theme.reload.name
   end

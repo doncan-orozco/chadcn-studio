@@ -131,4 +131,19 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "button[data-testid=save]", text: "Save theme"
     assert_select "[data-testid=unsaved][hidden][role=status]", text: "Unsaved changes"
   end
+
+  test "PATCH /themes/:id rejected re-renders the editor with the unsaved marker visible" do
+    patch theme_path(themes(:zinc)), params: { theme: { name: "Zinc", inputs: { primary: "oklch(2 0.2 250)" } } }
+
+    assert_response :unprocessable_entity
+    assert_select "[data-testid=unsaved]:not([hidden])", text: "Unsaved changes"
+  end
+
+  test "PATCH /themes/:id escapes a markup name in the toast" do
+    theme = themes(:zinc)
+    patch theme_path(theme), params: { theme: { name: "<b>x</b>" } }
+    follow_redirect!
+
+    assert_select "b", 0
+  end
 end
