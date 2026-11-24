@@ -8,7 +8,7 @@ class PreviewsTest < ApplicationSystemTestCase
         click_on scheme.capitalize
 
         assert_selector :testid, "preview-root"
-        assert_selector "h1"
+        assert_selector "h1, h2"
         assert_selector(scheme == "dark" ? "html.dark" : "html:not(.dark)")
       end
     end

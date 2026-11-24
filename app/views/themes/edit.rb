@@ -9,6 +9,7 @@ class Views::Themes::Edit < Views::Base
 
   def view_template
     div(class: "flex flex-col", data: { controller: "editor--preview", action: "editor--color:picked->editor--preview#pick", testid: "editor" }) do
+      h1(class: "px-3 pt-3 text-2xl font-semibold tracking-tight") { @presenter.title }
       render Views::Themes::Edit::Toolbar.new(@presenter)
       sharing
       generation
