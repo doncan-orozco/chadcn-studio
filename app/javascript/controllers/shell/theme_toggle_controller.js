@@ -1,16 +1,22 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Mirrors the chosen color scheme (`data-theme` on <html>, set by the gem's chadcn--theme controller) into `aria-pressed`
-// on the Light / Dark / System buttons, so the active one is announced and styled as pressed.
-// Wired in the view to `chadcn--theme:changed` and `storage@window`, because the gem's cross-tab #follow does not dispatch.
+// Mirrors the chosen color scheme (`data-theme` on <html>, written by the gem's chadcn--theme controller) into `aria-pressed`
+// on the Light / Dark / System buttons. It observes the attribute itself, so it is right whatever order the two controllers
+// register in and whichever path changed the scheme (a click, another instance's `changed` event, another tab's `storage`).
 export default class extends Controller {
   static targets = ["button"]
 
+  #observer = new MutationObserver(() => this.sync())
+
   connect() {
+    this.#observer.observe(document.documentElement, { attributes: true, attributeFilter: ["data-theme"] })
     this.sync()
   }
 
-  // Runs after the gem's controller has written `data-theme` (connect order, its `changed` event and its window `storage` listener all precede this call).
+  disconnect() {
+    this.#observer.disconnect()
+  }
+
   sync() {
     const current = document.documentElement.dataset.theme || "system"
     this.buttonTargets.forEach((button) => {

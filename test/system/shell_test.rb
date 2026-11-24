@@ -31,4 +31,17 @@ class ShellTest < ApplicationSystemTestCase
     assert_selector "[data-testid=theme-dark][aria-pressed=true]"
     assert_selector "[data-testid=theme-system][aria-pressed=false]"
   end
+
+  test "a stored color scheme is pressed on load and System is pressed by default" do
+    visit root_path
+
+    assert_selector "[data-testid=theme-system][aria-pressed=true]"
+
+    execute_script("localStorage.setItem('shadcn-theme', 'dark')")
+    visit root_path
+
+    assert_selector "html.dark"
+    assert_selector "[data-testid=theme-dark][aria-pressed=true]"
+    assert_selector "[data-testid=theme-system][aria-pressed=false]"
+  end
 end
