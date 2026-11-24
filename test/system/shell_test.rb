@@ -23,4 +23,12 @@ class ShellTest < ApplicationSystemTestCase
     assert_selector "[data-testid=theme-light][aria-pressed=false]"
     assert_selector "[data-testid=theme-system][aria-pressed=false]"
   end
+
+  test "a color scheme chosen in another tab moves the pressed button" do
+    visit root_path
+    execute_script("localStorage.setItem('shadcn-theme', 'dark'); window.dispatchEvent(new StorageEvent('storage', { key: 'shadcn-theme', storageArea: localStorage }))")
+
+    assert_selector "[data-testid=theme-dark][aria-pressed=true]"
+    assert_selector "[data-testid=theme-system][aria-pressed=false]"
+  end
 end
