@@ -11,6 +11,15 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
     assert_includes html, 'type="number"'
     assert_includes html, 'step="0.05"'
     assert_includes html, "editor--slider-number#type"
+    assert_not_includes html, "slider-number#confirm"
+    assert_includes html, 'form="radius-number-form"'
+    assert_includes html, 'aria-label="Corner radius in rem"'
+    assert_includes html, '<output for="radius-number"'
+    assert_includes html, 'aria-live="off"'
+    assert_includes html, 'data-editor--slider-number-target="slider"'
+    assert_includes html, 'data-editor--slider-number-target="input"'
+    assert_includes html, 'data-editor--slider-number-target="readout"'
+    assert_includes html, 'data-editor--slider-number-unit-value="rem"'
     assert_includes html, "chadcn--slider:value-change->editor--slider-number#mirror"
   end
 

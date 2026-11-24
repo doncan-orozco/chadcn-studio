@@ -8,6 +8,7 @@ class Components::Editor::SliderField < Components::Base
     commit: "chadcn--slider:value-commit->editor--preview#commit"
   }.freeze
   MIRROR = "chadcn--slider:value-change->editor--slider-number#mirror"
+  DETACHED_FORM_SUFFIX = "-number-form"
 
   def initialize(id:, label:, value:, min:, max:, step:, channel: nil, live: true, name: nil, unit: nil)
     @id = id
@@ -32,7 +33,7 @@ class Components::Editor::SliderField < Components::Base
     div(class: "grid gap-2") do
       label_text
       div(class: "flex items-center gap-3") do
-        render Chadcn::Slider.new(id: @id, aria: { labelledby: "#{@id}-label" }, data: data, **@slider)
+        render Chadcn::Slider.new(id: @id, aria: { labelledby: "#{@id}-label" }, data: slider_attributes, **@slider)
         number_box if @unit
       end
     end
@@ -43,7 +44,7 @@ class Components::Editor::SliderField < Components::Base
       plain "#{@label} "
       next unless @unit
 
-      output(for: "#{@id}-number", data: { editor__slider_number_target: "readout", testid: "#{@id}-value" }) { "#{@value}#{@unit}" }
+      output(for: "#{@id}-number", aria: { live: "off" }, data: { editor__slider_number_target: "readout", testid: "#{@id}-value" }) { "#{@value}#{@unit}" }
     end
   end
 
@@ -51,15 +52,15 @@ class Components::Editor::SliderField < Components::Base
   # browser's step validation and block Save. The slider and the hidden `radiusField` carry the value that is posted.
   def number_box
     render Chadcn::Input.new(
-      id: "#{@id}-number", type: "number", default_value: @value, class: "w-20 shrink-0", form: "#{@id}-number-form", aria: { label: "#{@label} in #{@unit}" },
-      data: { editor__slider_number_target: "input", action: "change->editor--slider-number#type keydown.enter->editor--slider-number#confirm", testid: "#{@id}-number" }, **@range
+      id: "#{@id}-number", type: "number", default_value: @value, class: "w-20 shrink-0", form: "#{@id}#{DETACHED_FORM_SUFFIX}", aria: { label: "#{@label} in #{@unit}" },
+      data: { editor__slider_number_target: "input", action: "change->editor--slider-number#type", testid: "#{@id}-number" }, **@range
     )
   end
 
-  def data
-    wiring = { editor__slider_number_target: ("slider" if @unit), action: [ ACTIONS.fetch(@live ? :live : :commit), (MIRROR if @unit) ].compact.join(" "), testid: @id }
-    return wiring unless @channel
+  def slider_attributes
+    attributes = { editor__slider_number_target: ("slider" if @unit), action: [ ACTIONS.fetch(@live ? :live : :commit), (MIRROR if @unit) ].compact.join(" "), testid: @id }
+    return attributes unless @channel
 
-    wiring.merge(editor__preview_target: @channel, editor__preview_channel_param: @channel)
+    attributes.merge(editor__preview_target: @channel, editor__preview_channel_param: @channel)
   end
 end

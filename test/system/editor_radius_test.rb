@@ -16,6 +16,7 @@ class EditorRadiusTest < ApplicationSystemTestCase
 
     assert_equal "0.65rem", find(:testid, "radius-value").text
     assert_equal "0.65", find(:testid, "radius-number").value
+    assert_equal "0.65rem", find(:testid, "radius").find("[role=slider]")["aria-valuetext"]
   end
 
   test "a typed radius moves the slider and the preview, snapped to the step" do
@@ -26,6 +27,24 @@ class EditorRadiusTest < ApplicationSystemTestCase
     assert_equal "1.15rem", find(:testid, "radius-value").text
     assert_equal "1.15", find(:testid, "radius").find("[role=slider]")["aria-valuenow"]
     assert_equal "1.15rem", evaluate_script("document.querySelector('[data-testid=preview-root]').style.getPropertyValue('--radius')")
+    assert_equal "1.15rem", find_field("theme[inputs][radius]", type: :hidden, visible: :all).value
+  end
+
+  test "typing the current value changes nothing" do
+    box = find(:testid, "radius-number")
+    box.fill_in with: "0.625"
+    box.send_keys(:enter)
+
+    assert_equal "0.625rem", find(:testid, "radius-value").text
+    assert_equal "0.625", find(:testid, "radius").find("[role=slider]")["aria-valuenow"]
+  end
+
+  test "a typed value just below an off-grid radius lands on it" do
+    box = find(:testid, "radius-number")
+    box.fill_in with: "0.6"
+    box.send_keys(:enter)
+
+    assert_equal "0.6rem", find(:testid, "radius-value").text
   end
 
   test "a typed radius past the range stops at the end of the slider" do
