@@ -61,7 +61,7 @@ class Components::Editor::GroupDialog < Components::Base
   end
 
   def radius
-    render Components::Editor::SliderField.new(id: "radius", label: "Radius (rem)", value: @group.radius_rem, min: 0, max: 1.5, step: 0.025, channel: "radius")
+    render Components::Editor::SliderField.new(id: "radius", label: "Corner radius", value: @group.radius_rem, min: 0, max: 1.5, step: 0.05, channel: "radius", unit: "rem")
     rows
   end
 
