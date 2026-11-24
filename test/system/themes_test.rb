@@ -67,6 +67,25 @@ class ThemesTest < ApplicationSystemTestCase
     assert_current_path edit_theme_path(themes(:zinc))
   end
 
+  test "clicking the empty footer strip of a card opens the editor" do
+    visit themes_path
+    find(:testid, "theme-card", text: "Zinc").find("[data-slot=card-footer]").click(x: 0, y: 0)
+
+    assert_current_path edit_theme_path(themes(:zinc))
+  end
+
+  test "the Delete button keeps a destructive border in dark mode" do
+    visit themes_path
+    click_on "Dark"
+    visit theme_path(themes(:zinc))
+
+    assert_selector "html.dark"
+    border = evaluate_script("getComputedStyle(document.querySelector(\"button[aria-label='Delete Zinc']\")).borderTopColor")
+    neutral = evaluate_script("(() => { const probe = document.createElement('div'); probe.className = 'border border-input'; document.body.append(probe); return getComputedStyle(probe).borderTopColor })()")
+
+    refute_equal neutral, border
+  end
+
   test "the show page's main action opens the editor" do
     visit theme_path(themes(:zinc))
     click_on "Preview and edit"

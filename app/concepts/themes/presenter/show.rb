@@ -12,7 +12,6 @@ class Themes::Presenter::Show < Core::Presenter::Base
 
   def title = name
   def edit_path = helpers.edit_theme_path(__getobj__)
-  def edit_label = "Edit #{name}"
   def delete_label = "Delete #{name}"
   def summary = "#{published? ? 'Published' : 'Draft'} theme, #{rows.size} variables."
 

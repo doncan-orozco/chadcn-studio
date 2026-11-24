@@ -15,9 +15,10 @@ class Views::Themes::Index::Card < Views::Base
         card.description { @card.created_label }
       end
       card.content { render Components::Themes::SwatchStrip.new(swatches: @card.swatches, label: @card.swatches_label) }
-      card.footer(class: "relative justify-between") do
+      card.footer(class: "justify-between") do
         render Chadcn::Badge.new(variant: @card.badge_variant) { @card.status_label }
-        render Chadcn::Button.new(as_child: :a, href: @card.edit_path, variant: "outline", size: "sm", class: "min-h-6 min-w-6", aria: { label: @card.edit_label }) { "Edit" }
+        # relative lifts only the control above the stretched title link; the rest of the footer still opens the editor.
+        render Chadcn::Button.new(as_child: :a, href: @card.edit_path, variant: "outline", size: "sm", class: "relative", aria: { label: @card.edit_label }) { "Edit" }
       end
     end
   end
