@@ -120,6 +120,12 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid=publication-link][href=?]", "/t/slate.css"
   end
 
+  test "GET /themes/:id/edit puts the theme name in the document title" do
+    get edit_theme_path(themes(:zinc))
+
+    assert_select "title", text: "Edit Zinc - Chadcn Studio"
+  end
+
   test "GET /themes/:id shows the palette, light and dark" do
     get theme_path(themes(:zinc))
 

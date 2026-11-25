@@ -155,6 +155,27 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "Zinc", @theme.reload.name
   end
 
+  test "a group panel shows the light and dark values as text and links to all values" do
+    open_group "brand"
+    row = find(:testid, "group-brand-panel").find(:testid, "variable-rows").find("li", text: /\A--primary\n/)
+
+    assert_equal @theme.light["primary"], row.find("[data-value=light]").text
+    assert_equal @theme.dark["primary"], row.find("[data-value=dark]").text
+    assert_selector :testid, "all-values-link"
+    assert_equal "#{theme_path(@theme)}#all-values", URI(find(:testid, "all-values-link")[:href]).then { |uri| [ uri.path, uri.fragment ].join("#") }
+  end
+
+  test "the All values link survives a derivation" do
+    open_group "brand"
+    find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
+
+    assert_selector "#summary-brand", text: "oklch(0.215"
+    panel = find(:testid, "group-brand-panel")
+
+    assert panel.has_selector?(:testid, "variable-rows")
+    assert panel.has_selector?(:testid, "all-values-link")
+  end
+
   test "the page switcher renders the other preview pages inside the preview root" do
     click_on "Settings"
 
