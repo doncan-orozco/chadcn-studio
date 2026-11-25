@@ -12,7 +12,7 @@ class Views::Themes::New::Form < Views::Base
     form(action: themes_path, method: "post", class: "space-y-5", data: { testid: "new-theme-form" }) do
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
       labelled_input(:name, "Name", value: @theme.name, placeholder: "Ocean", maxlength: 80, required: true)
-      labelled_input(:primary, "Primary color", value: primary_value, placeholder: @primary_example, description: "Your brand color, e.g. #{@primary_example}. oklch(...) works too.", required: true)
+      labelled_input(:primary, "Brand color", value: primary_value, placeholder: @primary_example, description: "Your brand color, e.g. #{@primary_example}. oklch(...) works too.", required: true)
       p(class: "text-sm text-foreground/70", data: { testid: "required-legend" }) do
         asterisk
         plain " Required"
