@@ -45,6 +45,54 @@ class ThemesTest < ApplicationSystemTestCase
     assert_selector :testid, "palette"
   end
 
+  test "the card's name opens the editor and its Edit button is at least 24 px tall" do
+    visit themes_path
+    height = evaluate_script("document.querySelector(\"[data-testid=theme-card] a[aria-label^='Edit']\").getBoundingClientRect().height")
+
+    assert_operator height, :>=, 24
+    click_on "Zinc"
+
+    assert_current_path edit_theme_path(themes(:zinc))
+  end
+
+  test "clicking the card body opens the editor, and the Edit button still works above the stretched link" do
+    visit themes_path
+    find(:testid, "theme-card", text: "Zinc").click
+
+    assert_current_path edit_theme_path(themes(:zinc))
+
+    visit themes_path
+    within(:testid, "theme-card", text: "Zinc") { click_on "Edit" }
+
+    assert_current_path edit_theme_path(themes(:zinc))
+  end
+
+  test "clicking the empty footer strip of a card opens the editor" do
+    visit themes_path
+    find(:testid, "theme-card", text: "Zinc").find("[data-slot=card-footer]").click(x: 0, y: 0)
+
+    assert_current_path edit_theme_path(themes(:zinc))
+  end
+
+  test "the Delete button keeps a destructive border in dark mode" do
+    visit themes_path
+    click_on "Dark"
+    visit theme_path(themes(:zinc))
+
+    assert_selector "html.dark"
+    border = evaluate_script("getComputedStyle(document.querySelector(\"button[aria-label='Delete Zinc']\")).borderTopColor")
+    neutral = evaluate_script("(() => { const probe = document.createElement('div'); probe.className = 'border border-input'; document.body.append(probe); return getComputedStyle(probe).borderTopColor })()")
+
+    refute_equal neutral, border
+  end
+
+  test "the show page's main action opens the editor" do
+    visit theme_path(themes(:zinc))
+    click_on "Preview and edit"
+
+    assert_current_path edit_theme_path(themes(:zinc))
+  end
+
   test "deleting a theme from its page returns to the list" do
     visit theme_path(themes(:zinc))
     accept_confirm { click_on "Delete" }

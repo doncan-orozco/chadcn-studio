@@ -6,6 +6,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-testid=theme-card]", Theme.count
+    assert_select "[data-testid=theme-card] a[href=?]", edit_theme_path(themes(:zinc)), text: "Zinc"
     assert_select "[data-testid=theme-card] [role=img] span", Theme.count * Themes::Presenter::Card::SWATCHES.size
   end
 
@@ -102,6 +103,9 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "h1", "Zinc"
+    assert_select "a[href='#{edit_theme_path(themes(:zinc))}'][data-variant=default]", "Preview and edit"
+    assert_select "button[data-variant=destructive]", false
+    assert_select "button[aria-label='Delete Zinc'][data-variant=outline].text-destructive", "Delete"
     assert_select "[data-testid=palette] tbody tr", Chadcn::Theme::REQUIRED.size + Chadcn::Theme::ROOT_ONLY.size
   end
 
