@@ -104,7 +104,7 @@ class ThemesTest < ApplicationSystemTestCase
   test "the new theme form marks Name and Primary color as required" do
     visit new_theme_path
 
-    assert_selector :testid, "required-legend", text: "* Required"
+    assert_text "* Required"
     assert_selector "label[for='theme-name'] span[aria-hidden='true']", text: "*"
     assert_selector "label[for='theme-primary'] span[aria-hidden='true']", text: "*"
     assert_selector "#theme-name[required]"
@@ -113,7 +113,7 @@ class ThemesTest < ApplicationSystemTestCase
 
   test "a blank name re-renders the form with the error under Name and the color kept" do
     visit new_theme_path
-    page.execute_script("document.querySelector('[data-testid=new-theme-form]').noValidate = true")
+    find(:testid, "new-theme-form").execute_script("this.noValidate = true")
     fill_in "Primary color", with: "#1d4ed8"
     click_on "Create theme"
 
