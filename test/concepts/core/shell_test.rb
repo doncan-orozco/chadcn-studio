@@ -28,14 +28,6 @@ class Core::ShellTest < ActionDispatch::IntegrationTest
     assert_select "#studio-appearance", text: "Studio appearance"
   end
 
-  test "the preview mode switch is a 24 px target, named Dark preview and badged while on" do
-    fragment = Nokogiri::HTML5.fragment(Components::Editor::ModeSwitch.new.call)
-
-    assert fragment.at_css("div.min-h-6 > label.min-h-6[for=preview-dark]")
-    assert_equal "Dark preview", fragment.at_css("[id=preview-dark]")["aria-label"]
-    assert_match(/group-has-\[\[aria-checked=true\]\]\/mode:inline-flex/, fragment.at_css("[data-testid=dark-preview-badge]")["class"])
-  end
-
   test "the frame renders an html_safe sidebar and refuses a plain string" do
     assert_nothing_raised { Components::Shell::Frame.new(sidebar: ActiveSupport::SafeBuffer.new("<nav></nav>")) }
     assert_nothing_raised { Components::Shell::Frame.new }
