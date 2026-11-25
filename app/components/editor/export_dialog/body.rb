@@ -36,12 +36,13 @@ class Components::Editor::ExportDialog::Body < Components::Base
   end
 
   def import_command
-    div(class: "grid gap-1", data: { controller: "editor--export", editor__export_copied_label_value: "Copied" }) do
+    div(class: "grid gap-1", role: "group", aria: { labelledby: "import-command-label" }, data: { controller: "editor--export", editor__export_copied_label_value: "Copied" }) do
       p(id: "import-command-label", class: "text-sm font-medium leading-none") { "Import into a chadcn app" }
       div(class: "flex items-start gap-2") do
-        code(aria: { labelledby: "import-command-label" }, class: "flex-1 break-all rounded-md border bg-muted px-3 py-2 font-mono text-xs", data: { testid: "import-command", editor__export_target: "source" }) { @presenter.css.import_command }
-        render Chadcn::Button.new(type: "button", variant: "outline", aria: { live: "polite" }, data: { testid: "import-copy", editor__export_target: "button", action: "editor--export#copy" }) { "Copy" }
+        code(class: "flex-1 break-all rounded-md border bg-muted px-3 py-2 font-mono text-xs", data: { testid: "import-command", editor__export_target: "source" }) { @presenter.css.import_command }
+        render Chadcn::Button.new(type: "button", variant: "outline", data: { testid: "import-copy", editor__export_target: "button", action: "editor--export#copy" }) { "Copy" }
       end
+      span(class: "sr-only", role: "status", data: { testid: "import-copy-status", editor__export_target: "status" })
     end
   end
 end

@@ -2,24 +2,40 @@ import { Controller } from "@hotwired/stimulus"
 
 // Copies the import command to the clipboard and says so on the button for a moment. The label comes from the view.
 export default class extends Controller {
-  static targets = ["source", "button"]
+  static targets = ["source", "button", "status"]
   static values = { copiedLabel: String, resetMs: { type: Number, default: 2000 } }
 
   #timer = null
+  #originalLabel = null
+
+  connect() {
+    this.#originalLabel = this.buttonTarget.textContent
+  }
 
   disconnect() {
-    clearTimeout(this.#timer)
+    this.#restore()
   }
 
   async copy() {
-    await navigator.clipboard.writeText(this.sourceTarget.textContent.trim())
+    try {
+      await navigator.clipboard.writeText(this.sourceTarget.textContent.trim())
+    } catch {
+      return // The clipboard is blocked here; the command stays selectable in the block, and no confirmation is claimed.
+    }
     this.#confirm()
   }
 
   #confirm() {
-    const original = this.buttonTarget.textContent
-    this.buttonTarget.textContent = this.copiedLabelValue
     clearTimeout(this.#timer)
-    this.#timer = setTimeout(() => { this.buttonTarget.textContent = original }, this.resetMsValue)
+    this.buttonTarget.textContent = this.copiedLabelValue
+    this.statusTarget.textContent = this.copiedLabelValue
+    this.#timer = setTimeout(() => this.#restore(), this.resetMsValue)
+  }
+
+  #restore() {
+    clearTimeout(this.#timer)
+    this.#timer = null
+    if (this.hasStatusTarget) this.statusTarget.textContent = ""
+    if (this.#originalLabel !== null && this.hasButtonTarget) this.buttonTarget.textContent = this.#originalLabel
   }
 }

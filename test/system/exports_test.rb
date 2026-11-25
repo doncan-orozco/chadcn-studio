@@ -54,6 +54,8 @@ class ExportsTest < ApplicationSystemTestCase
     click_on "Copy"
 
     assert_selector :testid, "import-copy", text: "Copied"
+    assert_selector :testid, "import-copy-status", text: "Copied", visible: :all
+    assert_selector :testid, "import-copy", text: "Copy", exact_text: true, wait: 5
   end
 
   test "unpublishing takes the theme off its URL" do
