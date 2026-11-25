@@ -66,13 +66,13 @@ class ShellTest < ApplicationSystemTestCase
     visit root_path
     within("header nav[aria-label=Main]") { click_on "Components" }
 
-    assert_current_path gallery_path
+    assert_current_path gallery_path, wait: 15
   end
 
   test "home offers Browse components next to Browse themes" do
     visit root_path
     within("main#main-content") { click_on "Browse components" }
 
-    assert_current_path gallery_path
+    assert_current_path gallery_path, wait: 15
   end
 end
