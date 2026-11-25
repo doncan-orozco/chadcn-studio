@@ -151,8 +151,10 @@ class EditorTest < ApplicationSystemTestCase
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
     assert_selector "#summary-brand", text: "oklch(0.215"
-    assert_selector :testid, "variable-rows", visible: :all
-    assert_selector :testid, "all-values-link", visible: :all
+    panel = find(:testid, "group-brand-panel")
+
+    assert panel.has_selector?(:testid, "variable-rows")
+    assert panel.has_selector?(:testid, "all-values-link")
   end
 
   test "the page switcher renders the other preview pages inside the preview root" do
