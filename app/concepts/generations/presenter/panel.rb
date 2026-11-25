@@ -2,6 +2,9 @@
 
 # The generation panel of a theme's editor: where the prompt goes, which stream it listens to and the last generation, if any.
 class Generations::Presenter::Panel < Core::Presenter::Base
+  PROMPT_PARAM = "generation[prompt]"
+  PROMPT_PLACEHOLDER = "warm editorial, terracotta, soft corners"
+
   def self.for(theme, configured: configured?)
     new(theme, latest: Generations::Query::Latest.call({ theme_id: theme.id }).first, configured: configured)
   end
@@ -21,11 +24,11 @@ class Generations::Presenter::Panel < Core::Presenter::Base
 
   def stream_source = __getobj__
 
-  def prompt_param = "generation[prompt]"
+  def prompt_param = PROMPT_PARAM
 
   def prompt_limit = Generations::Presenter::Status::PROMPT_LIMIT
 
-  def prompt_placeholder = "warm editorial, terracotta, soft corners"
+  def prompt_placeholder = PROMPT_PLACEHOLDER
 
   # A studio that cannot generate says so instead of showing the last generation.
   def status

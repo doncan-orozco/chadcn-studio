@@ -25,6 +25,6 @@ class GenerationsController < ApplicationController
   def prompt = params.expect(generation: :prompt)[:prompt]
 
   def render_new(status, **options)
-    render Views::Themes::New.new(Theme.new, generation_status: status, prompt: prompt), **options
+    render Views::Themes::New.new(Theme.new, intake: Generations::Presenter::Intake.for(prompt: prompt, status: status)), **options
   end
 end

@@ -41,4 +41,12 @@ class Generations::Operation::BeginTest < ActiveSupport::TestCase
     end
     assert_empty enqueued
   end
+
+  test "an enqueue that raises leaves no placeholder theme behind" do
+    operation = Generations::Operation::Begin.new(request: Generations::Operation::Request.new(enqueue: ->(_id) { raise IOError, "queue down" }))
+
+    assert_no_difference -> { Theme.count } do
+      assert_raises(IOError) { operation.call(prompt: "calm blue") }
+    end
+  end
 end

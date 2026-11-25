@@ -4,12 +4,9 @@ class Views::Themes::New < Views::Base
   PRIMARY_EXAMPLE = "#1d4ed8"
   private_constant :PRIMARY_EXAMPLE
 
-  # `generation_status` and `prompt` come back when a prompt was refused; the page is the same one that asked for it.
-  def initialize(theme, generation_status: nil, prompt: nil, configured: Generations::Presenter::Panel.configured?)
+  def initialize(theme, intake:)
     @theme = theme
-    @generation_status = generation_status
-    @prompt = prompt
-    @configured = configured
+    @intake = intake
   end
 
   def view_template
@@ -27,7 +24,7 @@ class Views::Themes::New < Views::Base
           card.title { "Or describe it" }
           card.description { "Claude picks the colors from your words. You can adjust them in the editor." }
         end
-        card.content { render Views::Themes::New::Describe.new(status: @generation_status, prompt: @prompt, configured: @configured) }
+        card.content { render Components::Editor::GenerationPanel.new(panel: @intake, primary: true) }
       end
     end
   end

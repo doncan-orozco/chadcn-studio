@@ -37,5 +37,8 @@ class Generations::Operation::Begin < Core::Operation
 
     theme.destroy
     requested
+  rescue StandardError
+    theme.destroy
+    raise
   end
 end
