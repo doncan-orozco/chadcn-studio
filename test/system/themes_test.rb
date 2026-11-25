@@ -166,4 +166,12 @@ class ThemesTest < ApplicationSystemTestCase
 
     assert_selector :testid, "deleted-status", text: "Zinc deleted"
   end
+
+  test "a card's Delete button removes that theme from the list" do
+    visit themes_path
+    within(:testid, "theme-card", text: "Zinc") { accept_confirm { find("button[aria-label='Delete Zinc']").click } }
+
+    assert_current_path themes_path
+    assert_no_selector :testid, "theme-card", text: "Zinc"
+  end
 end

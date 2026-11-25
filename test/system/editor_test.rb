@@ -210,6 +210,14 @@ class EditorTest < ApplicationSystemTestCase
     assert_selector "[data-testid=preview-root] h1", visible: :visible
   end
 
+  test "the editor offers Delete beside the other actions and it returns to the list" do
+    visit edit_theme_path(themes(:zinc))
+    accept_confirm { find("button[aria-label='Delete Zinc']").click }
+
+    assert_current_path themes_path
+    assert_no_selector :testid, "theme-card", text: "Zinc"
+  end
+
   private
 
   # The brand group is not a dialog: it sits open in the sidebar, its variable rows behind a disclosure.

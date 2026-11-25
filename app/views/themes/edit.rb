@@ -27,6 +27,7 @@ class Views::Themes::Edit < Views::Base
     publication_state(sharing)
     render Components::Editor::PublishToggle.new(presenter: sharing)
     render Components::Editor::ExportDialog.new(presenter: sharing)
+    render Components::Themes::DeleteButton.new(theme_id: @presenter.id, label: "Delete #{@presenter.name}")
   end
 
   def publication_state(sharing)
