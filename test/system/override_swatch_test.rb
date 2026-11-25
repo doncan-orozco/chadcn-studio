@@ -29,12 +29,27 @@ class OverrideSwatchTest < ApplicationSystemTestCase
     assert_equal derived, swatch[:style]
   end
 
+  test "a hex without # is understood, as the server reads it" do
+    override_field.send_keys("ff0000")
+
+    assert_equal "typed", swatch["data-state"]
+  end
+
+  test "a color the server would reject is not shown as understood" do
+    derived = swatch[:style]
+    override_field.send_keys("red")
+
+    assert_equal "invalid", swatch["data-state"]
+    assert_equal derived, swatch[:style]
+  end
+
   test "closing the panel keeps what was typed" do
     find_field("override-light-border").send_keys("#9ca3af")
     find(:testid, "group-advanced-panel").send_keys(:escape)
     find(:testid, "group-advanced").click
 
     assert_field "override-light-border", with: /#9ca3af|oklch\(0\.71/
+    assert_selector :testid, "unsaved"
   end
 
   private

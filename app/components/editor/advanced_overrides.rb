@@ -10,7 +10,7 @@ class Components::Editor::AdvancedOverrides < Components::Base
   def view_template
     div(class: "grid gap-6") do
       p(class: "text-sm text-muted-foreground") { "Type a hex color such as #9ca3af, or an oklch(...) value. Clear a field to follow the rule again." }
-      p(class: "text-sm text-muted-foreground", data: { testid: "overrides-close-note" }) { "Closing this panel keeps what you typed; it is saved with the theme." }
+      p(class: "text-sm text-muted-foreground", data: { testid: "overrides-close-note" }) { "Closing this panel keeps your overrides; they are shown as oklch once applied. Save the theme to store them." }
       @group.modes.each { |mode| section_for(mode) }
     end
   end
@@ -43,7 +43,7 @@ class Components::Editor::AdvancedOverrides < Components::Base
 
   # The parsed color of the field: the typed value, else the derived one the rule would give. Decorative; the text beside it is the value.
   def swatch(override)
-    span(class: "size-6 shrink-0 rounded-md border", style: override.style, aria: { hidden: "true" },
+    span(class: "size-6 shrink-0 rounded-md border data-[state=invalid]:border-dashed data-[state=invalid]:border-destructive", style: override.style, aria: { hidden: "true" },
          data: { testid: "override-swatch", editor__override_swatch_target: "swatch", derived: override.style })
   end
 end

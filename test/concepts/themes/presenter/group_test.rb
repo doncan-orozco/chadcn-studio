@@ -139,5 +139,6 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
 
     assert_equal "#ffffff", row.placeholder
     assert_equal "not a color", row.with(derived: "not a color").placeholder
+    assert_equal "oklch(1 0 0 / 10%)", row.with(derived: "oklch(1 0 0 / 10%)").placeholder
   end
 end

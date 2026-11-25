@@ -38,9 +38,10 @@ class Themes::Presenter::Group < Core::Presenter::Base
   Override = Data.define(:mode, :name, :derived, :value, :style, :field_name, :field_id) do
     def overridden? = value.present?
 
-    # The derived value in the hex a person would type; the oklch string when it cannot be converted.
+    # The derived value in the hex a person would type; the oklch string when hex cannot say it (translucent, or not a color).
     def placeholder
-      Themes::Oklch.parse(derived).to_hex
+      color = Themes::Oklch.parse(derived)
+      color.alpha ? derived : color.to_hex
     rescue Themes::Oklch::Invalid
       derived
     end

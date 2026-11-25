@@ -1,9 +1,28 @@
 import { Controller } from "@hotwired/stimulus"
 import { formatCss, parse } from "culori"
 
+// The grammar Themes::Oklch.parse reads, and nothing more (app/concepts/themes/oklch.rb HEX, PATTERN and ranges): a hex
+// with or without "#", "#rgb", or oklch(L C H [/ A%]). Anything else the contract rejects on change, so the swatch must not
+// claim to have understood it. Display only: Ruby validates and derives (architecture R13, theme-science R6).
+const HEX = /^\s*(?:#?([0-9a-f]{6})|#([0-9a-f]{3}))\s*$/i
+const NUMBER = String.raw`-?\d+(?:\.\d+)?|-?\.\d+`
+const OKLCH = new RegExp(String.raw`^\s*oklch\(\s*(${NUMBER})\s+(${NUMBER})\s+(${NUMBER})(?:\s*/\s*(${NUMBER})%)?\s*\)\s*$`, "i")
+const within = (value, min, max) => value === undefined || (value >= min && value <= max)
+
+function readable(text) {
+  const hex = HEX.exec(text)
+  if (hex) return parse(`#${hex[1] || hex[2]}`)
+
+  const match = OKLCH.exec(text)
+  if (!match) return undefined
+
+  const [l, c, h, a] = match.slice(1).map((number) => (number === undefined ? undefined : Number(number)))
+  return within(l, 0, 1) && within(c, 0, 0.4) && within(h, 0, 360) && within(a, 0, 100) ? parse(text) : undefined
+}
+
 // Paints the swatch beside an override field with the color being typed, as the user types (the server only sees it on
-// change). An unparseable value falls back to the derived swatch, so a half-typed hex never leaves a stale color; clearing
-// the field shows what the rule gives. Display only: the server validates and derives (theme-science R6).
+// change). A value the server would not read falls back to the derived swatch, drawn with a dashed border so it does not
+// look like an empty field; clearing the field shows what the rule gives.
 export default class extends Controller {
   static targets = ["input", "swatch"]
 
@@ -13,15 +32,9 @@ export default class extends Controller {
 
   paint() {
     const typed = this.inputTarget.value.trim()
-    const color = typed ? parse(typed) : undefined
+    const color = typed ? readable(typed) : undefined
 
-    if (color) {
-      this.swatchTarget.style.cssText = `background-color: ${formatCss(color)}`
-      this.swatchTarget.dataset.state = "typed"
-      return
-    }
-
-    this.swatchTarget.style.cssText = this.swatchTarget.dataset.derived || ""
-    this.swatchTarget.dataset.state = typed ? "invalid" : "derived"
+    this.swatchTarget.style.cssText = color ? `background-color: ${formatCss(color)}` : this.swatchTarget.dataset.derived || ""
+    this.swatchTarget.dataset.state = color ? "typed" : typed ? "invalid" : "derived"
   }
 }

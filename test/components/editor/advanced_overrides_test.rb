@@ -20,14 +20,17 @@ class Components::Editor::AdvancedOverridesTest < ActiveSupport::TestCase
     assert page.has_css?("input[data-editor--override-swatch-target='input']", count: rows)
   end
 
-  test "placeholders are the derived color as hex, never oklch" do
-    html = Components::Editor::AdvancedOverrides.new(group: @group).call
+  test "placeholders are the derived color as hex, except the translucent ones hex cannot say" do
+    page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
 
-    assert_match(/placeholder="#\h{6}"/, html)
-    refute_match(/placeholder="oklch/, html)
+    assert_match(/\A#\h{6}\z/, page.find_by_id("override-light-border")[:placeholder])
+    assert_match(%r{\Aoklch\(.+/ \d+%\)\z}, page.find_by_id("override-dark-border")[:placeholder])
   end
 
-  test "the panel says that closing keeps what was typed" do
-    assert_includes Components::Editor::AdvancedOverrides.new(group: @group).call, "Closing this panel keeps what you typed"
+  test "the panel says Close keeps the overrides and Save stores them" do
+    html = Components::Editor::AdvancedOverrides.new(group: @group).call
+
+    assert_includes html, "Closing this panel keeps your overrides"
+    assert_includes html, "Save the theme to store them"
   end
 end
