@@ -33,6 +33,12 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "main ul[aria-label='Your themes'] a.focus-visible\\:underline"
   end
 
+  test "home theme links are block rows at least 24px tall" do
+    get root_path
+
+    assert_select "main ul[aria-label='Your themes'] a.block.py-1\\.5"
+  end
+
   test "home lists at most the five newest themes" do
     extras = Array.new(6) { |i| themes(:zinc).dup.tap { |theme| theme.update!(name: "Extra #{i}", slug: "extra-#{i}") } }
 

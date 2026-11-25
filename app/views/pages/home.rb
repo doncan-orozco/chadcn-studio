@@ -26,7 +26,7 @@ class Views::Pages::Home < Views::Base
       h2(class: "text-lg font-semibold tracking-tight") { "Your themes" }
       ul(class: "space-y-1", aria: { label: "Your themes" }) do
         @presenter.cards.each do |card|
-          li { a(href: card.edit_path, class: "text-sm font-medium underline-offset-4 hover:underline focus-visible:underline focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none") { card.name } }
+          li { a(href: card.edit_path, class: "block py-1.5 text-sm font-medium underline-offset-4 hover:underline focus-visible:underline focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none") { card.name } }
         end
       end
     end
