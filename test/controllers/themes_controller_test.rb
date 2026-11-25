@@ -113,6 +113,12 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid=palette] tbody tr", Chadcn::Theme::REQUIRED.size + Chadcn::Theme::ROOT_ONLY.size
   end
 
+  test "GET /themes/:id swatches carry a border that shows on both backgrounds" do
+    get theme_path(themes(:zinc))
+
+    assert_select "[data-testid=palette] span.border.border-foreground\\/40[aria-hidden=true]"
+  end
+
   test "GET /themes/:id for an unknown id is 404" do
     get theme_path(0)
 
