@@ -61,6 +61,16 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "#theme-primary-description", text: /#1d4ed8/
   end
 
+  test "GET /themes/new marks both fields as required and says what the star means" do
+    get new_theme_path
+
+    assert_select "label[for='theme-name'] span[aria-hidden='true']", text: "*"
+    assert_select "label[for='theme-primary'] span[aria-hidden='true']", text: "*"
+    assert_select "input[name='theme[name]'][required]"
+    assert_select "input[name='theme[primary]'][required]"
+    assert_select "[data-testid=required-legend]", text: /Required/
+  end
+
   test "POST /themes with a color that is neither hex nor oklch says what to type, once" do
     post themes_path, params: { theme: { name: "Bad", primary: "blue" } }
 
@@ -83,6 +93,8 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_entity
     assert_select "[id='theme-primary-error']"
+    assert_select "[data-testid=required-legend]"
+    assert_select "label[for='theme-name'] span[aria-hidden='true']", text: "*"
   end
 
   test "GET /themes/:id shows the palette, light and dark" do
