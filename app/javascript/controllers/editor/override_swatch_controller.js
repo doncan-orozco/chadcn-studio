@@ -16,8 +16,8 @@ function readable(text) {
   const match = OKLCH.exec(text)
   if (!match) return undefined
 
-  const [l, c, h, a] = match.slice(1).map((number) => (number === undefined ? undefined : Number(number)))
-  return within(l, 0, 1) && within(c, 0, 0.4) && within(h, 0, 360) && within(a, 0, 100) ? parse(text) : undefined
+  const [lightness, chroma, hue, alpha] = match.slice(1).map((number) => (number === undefined ? undefined : Number(number)))
+  return within(lightness, 0, 1) && within(chroma, 0, 0.4) && within(hue, 0, 360) && within(alpha, 0, 100) ? parse(text) : undefined
 }
 
 // Paints the swatch beside an override field with the color being typed, as the user types (the server only sees it on
