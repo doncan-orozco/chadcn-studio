@@ -17,7 +17,12 @@ class Components::Themes::DeleteButton < Components::Base
     form(action: theme_path(@theme_id), method: "post", class: "inline", data: { turbo_confirm: "Delete this theme?" }) do
       input(type: "hidden", name: "_method", value: "delete")
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
-      render Chadcn::Button.new(type: "submit", variant: "outline", size: @size, class: [ DESTRUCTIVE_OUTLINE, @attrs[:class] ].compact.join(" "), aria: { label: @label }) { "Delete" }
+      render Chadcn::Button.new(type: "submit", variant: "outline", size: @size, aria: { label: @label }, **button_attrs) { "Delete" }
     end
   end
+
+  private
+
+  # Every attribute the caller passes reaches the button; the destructive look is prepended to its class.
+  def button_attrs = @attrs.merge(class: [ DESTRUCTIVE_OUTLINE, @attrs[:class] ].compact.join(" "))
 end

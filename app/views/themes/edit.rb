@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# The theme editor: one toolbar row (title, name, Save, Publish, Export), the groups sidebar and the live preview.
+# The theme editor: one toolbar row (title, name, Save, Publish, Export, Delete), the groups sidebar and the live preview.
 # `editor--preview` wraps all three; only the preview root carries the palette.
 class Views::Themes::Edit < Views::Base
   include Phlex::Rails::Helpers::ContentFor
