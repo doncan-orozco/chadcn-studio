@@ -128,6 +128,14 @@ class EditorTest < ApplicationSystemTestCase
     assert_selector :testid, "brand-color", visible: :visible
   end
 
+  # The form follows the toolbar row, so its top is the row's bottom. An error may legitimately wrap the row; this is the clean state.
+  test "the toolbar row is at most 100 px tall" do
+    row_bottom = evaluate_script("arguments[0].getBoundingClientRect().top", find(:testid, "editor-form"))
+    editor_top = evaluate_script("arguments[0].getBoundingClientRect().top", find(:testid, "editor"))
+
+    assert_operator row_bottom - editor_top, :<=, 100
+  end
+
   test "Save persists the name and the derived palette" do
     fill_in "Name", with: "Renamed"
     click_on "Save theme"
