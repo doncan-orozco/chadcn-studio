@@ -63,7 +63,8 @@ export default class extends Controller {
     event.target.dispatchEvent(new Event("change", { bubbles: true }))
   }
 
-  // The editor now differs from the stored theme: reveal the "Unsaved changes" marker the view rendered hidden.
+  // The editor now differs from the stored theme: reveal the "Unsaved changes" marker the view rendered hidden and hide the
+  // "Saved" marker the view rendered visible (both sit in the toolbar's status region, so the change is announced).
   // Native `input`/`change` of the form's fields call it; sliders and the picker write hidden inputs, so they call it too.
   markDirty() {
     if (this.hasUnsavedTarget) this.unsavedTarget.hidden = false

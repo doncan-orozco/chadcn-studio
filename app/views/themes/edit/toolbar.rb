@@ -20,7 +20,7 @@ class Views::Themes::Edit::Toolbar < Views::Base
       h1(class: "mr-2 self-center text-xl font-semibold tracking-tight") { @presenter.title }
       name_field
       render Chadcn::Button.new(type: "submit", form: FORM_ID, name: "_method", value: "patch", data: { testid: "save" }) { "Save theme" }
-      unsaved_marker
+      save_status
       div(class: "ml-auto flex items-center gap-2", &)
     end
     editor_form
@@ -43,7 +43,7 @@ class Views::Themes::Edit::Toolbar < Views::Base
 
   # One status region (announced) that always says where the editor stands: "Saved" while it matches the stored theme, and
   # "Unsaved changes" once the preview controller sees an edit, or at once when a rejected Save re-renders the form with them.
-  def unsaved_marker
+  def save_status
     span(role: "status", class: "self-center text-sm text-foreground/70") do
       span(hidden: @presenter.failed?, data: { editor__preview_target: "saved", testid: "saved" }) { "Saved" }
       span(hidden: !@presenter.failed?, data: { editor__preview_target: "unsaved", testid: "unsaved" }) { "Unsaved changes" }
