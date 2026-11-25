@@ -72,5 +72,15 @@ class Components::Editor::GroupDialog < Components::Base
 
   def rows
     div(id: @group.rows_id) { render Components::Editor::VariableRows.new(rows: @group.rows) }
+    all_values_link
+  end
+
+  # Outside the stream target: a derivation (always an unsaved theme) must not erase it.
+  def all_values_link
+    return unless @group.values_path
+
+    p(class: "pt-2 text-xs") do
+      a(href: @group.values_path, class: "underline underline-offset-4", data: { testid: "all-values-link" }) { "See all values" }
+    end
   end
 end

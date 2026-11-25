@@ -18,7 +18,7 @@ class Components::Editor::GenerationPanel < Components::Base
         render Chadcn::Label.new(html_for: "generation-prompt") { "Describe a theme" }
         render Chadcn::Input.new(**prompt_attributes)
       end
-      render Chadcn::Button.new(type: "submit", variant: "outline", data: { testid: "generate" }) { "Generate" }
+      render Chadcn::Button.new(type: "submit", variant: "outline", disabled: !@panel.configured?, data: { testid: "generate" }) { "Generate" }
     end
     render Components::Editor::GenerationStatus.new(status: status)
   end
@@ -30,9 +30,9 @@ class Components::Editor::GenerationPanel < Components::Base
   def prompt_attributes
     attributes = {
       id: "generation-prompt", name: @panel.prompt_param, maxlength: @panel.prompt_limit, required: true,
-      placeholder: @panel.prompt_placeholder, class: "w-80", aria: { describedby: "generation_status" }
+      placeholder: @panel.prompt_placeholder, disabled: !@panel.configured?, class: "w-80", aria: { describedby: "generation_status" }
     }
-    attributes[:aria][:invalid] = "true" if status&.failed?
+    attributes[:aria][:invalid] = "true" if @panel.configured? && status&.failed?
     attributes
   end
 end

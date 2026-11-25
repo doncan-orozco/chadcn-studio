@@ -12,6 +12,6 @@ class Themes::Presenter::List
   def empty? = cards.empty?
   def summary = empty? ? "No themes yet." : "#{cards.size} #{cards.size == 1 ? 'theme' : 'themes'}, newest first."
 
-  # New theme leads only when there is no card to lead instead.
-  def new_theme_variant = empty? ? "default" : "outline"
+  # New theme is the list's one primary; each card's Edit stays outline.
+  def new_theme_variant = "default"
 end

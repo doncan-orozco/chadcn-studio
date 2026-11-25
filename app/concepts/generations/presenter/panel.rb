@@ -2,14 +2,20 @@
 
 # The generation panel of a theme's editor: where the prompt goes, which stream it listens to and the last generation, if any.
 class Generations::Presenter::Panel < Core::Presenter::Base
-  def self.for(theme)
-    new(theme, latest: Generations::Query::Latest.call({ theme_id: theme.id }).first)
+  def self.for(theme, configured: configured?)
+    new(theme, latest: Generations::Query::Latest.call({ theme_id: theme.id }).first, configured: configured)
   end
 
-  def initialize(theme, latest: nil)
+  # A key in the environment, or the client the job was given (tests).
+  def self.configured? = Generations::Service::Client.configured? || GenerateThemeJob.client.present?
+
+  def initialize(theme, latest: nil, configured: self.class.configured?)
     super(theme)
     @latest = latest
+    @configured = configured
   end
+
+  def configured? = @configured
 
   def create_path = helpers.theme_generations_path(__getobj__)
 
@@ -21,5 +27,10 @@ class Generations::Presenter::Panel < Core::Presenter::Base
 
   def prompt_placeholder = "warm editorial, terracotta, soft corners"
 
-  def status = @latest && Generations::Presenter::Status.new(@latest)
+  # A studio that cannot generate says so instead of showing the last generation.
+  def status
+    return Generations::Presenter::Status.new(Generation.new, failure: :not_configured) unless @configured
+
+    @latest && Generations::Presenter::Status.new(@latest)
+  end
 end

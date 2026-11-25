@@ -10,10 +10,10 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid=theme-card] [role=img] span", Theme.count * Themes::Presenter::Card::SWATCHES.size
   end
 
-  test "GET /themes makes New theme secondary while themes exist" do
+  test "GET /themes makes New theme the primary while themes exist" do
     get themes_path
 
-    assert_select "main a[href=?][data-variant=outline]", new_theme_path, text: "New theme"
+    assert_select "main a[href=?][data-variant=default]", new_theme_path, text: "New theme"
   end
 
   test "GET /themes keeps New theme primary on the empty state" do
