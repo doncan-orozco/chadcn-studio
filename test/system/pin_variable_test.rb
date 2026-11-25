@@ -18,6 +18,8 @@ class PinVariableTest < ApplicationSystemTestCase
 
     assert_selector :testid, "group-advanced-panel"
     assert_no_selector :testid, "group-surfaces-panel", visible: :visible
+    assert_selector "[data-state=open][data-slot=dialog-content]", count: 1
+    assert evaluate_script("document.activeElement.closest('[data-testid=group-advanced-panel]') !== null"), "focus lands inside the Advanced panel"
   end
 
   test "Advanced lists primary, border and ring first and the sublabel says what it is for" do

@@ -83,6 +83,11 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     assert_equal names.uniq, names
   end
 
+  test "a group's trigger id is the one panel links name" do
+    assert_equal "group-advanced-trigger", Themes::Presenter::Group.new(@theme, key: "advanced").trigger_id
+    assert_equal Themes::Presenter::Group.trigger_id("surfaces"), Themes::Presenter::Group.new(@theme, key: "surfaces").trigger_id
+  end
+
   test "only the groups of read-only rows point to Advanced" do
     pinnable = Themes::Presenter::Group.all(@theme).select(&:pinnable?).map(&:key)
 

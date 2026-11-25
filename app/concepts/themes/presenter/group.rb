@@ -29,6 +29,9 @@ class Themes::Presenter::Group < Core::Presenter::Base
     def overridden? = value.present?
   end
 
+  # The sidebar entry that opens a group's panel; links between panels name it.
+  def self.trigger_id(key) = "group-#{key}-trigger"
+
   def self.all(theme) = KEYS.map { |key| new(theme, key: key) }
 
   def initialize(theme, key:)
@@ -45,6 +48,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
   def summary_id = "summary-#{key}"
   def rows_id = "rows-#{key}"
   def panel_id = "group-#{key}"
+  def trigger_id = self.class.trigger_id(key)
 
   # The element the derivation stream updates inside this group's panel.
   def controls_id = key == "advanced" ? "advanced-overrides" : "#{key}-controls"
