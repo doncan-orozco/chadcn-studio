@@ -133,6 +133,14 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "Zinc", @theme.reload.name
   end
 
+  test "name, Save, Publish, Export and Describe a theme share one row above the groups" do
+    tops = %w[save publish-toggle export describe].map { |id| evaluate_script("Math.round(document.querySelector('[data-testid=#{id}]').getBoundingClientRect().top)") }
+    tops << evaluate_script("Math.round(document.querySelector('#theme-name').getBoundingClientRect().top)")
+
+    assert_equal 1, tops.uniq.size, "the controls sit on #{tops.uniq.size} rows"
+    assert_operator evaluate_script("document.querySelector('[data-testid=editor-form]').parentElement.getBoundingClientRect().bottom - document.querySelector('[data-testid=editor]').getBoundingClientRect().top"), :<=, 100
+  end
+
   test "the page switcher renders the other preview pages inside the preview root" do
     click_on "Settings"
 
