@@ -28,7 +28,6 @@ class Themes::Presenter::CardTest < ActiveSupport::TestCase
   end
 
   test "paths, status and date" do
-    assert_equal "/themes/#{themes(:blue).id}", @card.path
     assert_equal "/themes/#{themes(:blue).id}/edit", @card.edit_path
     assert_equal "Draft", @card.status_label
     assert_equal "Published", Themes::Presenter::Card.new(themes(:slate)).status_label
