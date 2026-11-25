@@ -87,9 +87,11 @@ class GenerationTest < ApplicationSystemTestCase
     key = ENV.delete("ANTHROPIC_API_KEY")
     visit edit_theme_path(themes(:slate))
 
+    click_on "Describe a theme"
+
     assert_selector :testid, "generation-status", text: "Generation is not set up in this studio"
     assert_button "Generate", disabled: true
-    assert_field "Describe a theme", disabled: true
+    assert_field "Prompt", disabled: true
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
   end

@@ -185,6 +185,8 @@ class EditorTest < ApplicationSystemTestCase
   end
 
   test "the describe dialog opens from the keyboard, lands on the prompt, tabs to Generate and returns focus on Escape" do
+    GenerateThemeJob.client = FakeGenerationClient.new # an unconfigured studio disables the prompt
+    visit edit_theme_path(@theme)
     evaluate_script("document.querySelector('[data-testid=describe]').focus()")
     page.driver.browser.keyboard.type(:enter)
 
@@ -200,6 +202,8 @@ class EditorTest < ApplicationSystemTestCase
 
     assert_no_selector :testid, "generation-panel"
     assert_equal "describe", evaluate_script("document.activeElement.dataset.testid")
+  ensure
+    GenerateThemeJob.client = nil
   end
 
   test "a group panel shows the light and dark values as text and links to all values" do
