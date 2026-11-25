@@ -17,7 +17,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "home lists existing themes under the buttons, each name linking to its editor" do
+  test "home lists existing themes above the buttons, each name linking to its editor" do
     get root_path
 
     assert_response :success
@@ -25,6 +25,17 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     Themes::Query::Recent.call.limit(PagesController::HOME_THEMES).each do |theme|
       assert_select "main ul[aria-label='Your themes'] a[href=?]", edit_theme_path(theme), text: theme.name
     end
+  end
+
+  test "home puts Your themes before Create theme in document order, so tab and heading order follow" do
+    get root_path
+
+    nodes = css_select("main h1, main h2, main a")
+    heading = nodes.index { |node| node.name == "h2" && node.text.strip == "Your themes" }
+    create = nodes.index { |node| node.name == "a" && node.text.strip == "Create theme" }
+
+    assert_operator nodes.index { |node| node.name == "h1" }, :<, heading
+    assert_operator heading, :<, create
   end
 
   test "home theme links carry a visible focus style" do
@@ -58,5 +69,6 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "main h2", text: "Your themes", count: 0
+    assert_select "main a[href=?]", new_theme_path, text: "Create theme"
   end
 end

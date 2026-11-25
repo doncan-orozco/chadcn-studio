@@ -61,6 +61,9 @@ class Themes::Presenter::Group < Core::Presenter::Base
   def trigger_id = self.class.trigger_id(key)
   def advanced_trigger_id = self.class.trigger_id("advanced")
 
+  # The element the derivation stream updates with the brand swatch and its hex.
+  def swatch_id = "#{key}-swatch"
+
   # The element the derivation stream updates inside this group's panel.
   def controls_id = key == "advanced" ? "advanced-overrides" : "#{key}-controls"
 
@@ -75,6 +78,14 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   # The brand color as the three numbers the sliders move.
   def primary = inputs.to_h["primary"].presence || light["primary"]
+
+  # The brand color as a person writes it: the hex they typed while the primary still is that color, else the closest hex.
+  def hex
+    typed = inputs.to_h["primary_hex"]
+    typed.present? && Themes::Oklch.parse(typed).to_s == brand_color.to_s ? typed : brand_color.to_hex
+  rescue Themes::Oklch::Invalid
+    brand_color.to_hex
+  end
 
   def lightness = brand_color.lightness
   def chroma = brand_color.chroma

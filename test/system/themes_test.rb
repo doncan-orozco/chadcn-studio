@@ -20,6 +20,7 @@ class ThemesTest < ApplicationSystemTestCase
 
     assert_text "Theme created"
     assert_selector "#summary-brand", text: "Blue"
+    assert_selector :testid, "brand-hex", text: "#1d4ed8"
     assert_equal "oklch(0.488 0.217 264.376)", Theme.find_by!(slug: "acme").light["primary"]
   end
 
@@ -136,6 +137,15 @@ class ThemesTest < ApplicationSystemTestCase
 
     assert_operator evaluate_script("#{row}.getBoundingClientRect().height"), :>=, 24
     assert_includes evaluate_script("getComputedStyle(#{row}.querySelector('[data-link-name]')).textDecorationLine"), "underline"
+  end
+
+  test "home lists the saved themes above the Create theme button, the only default button on the page" do
+    visit root_path
+    list_top = evaluate_script("document.querySelector(\"ul[aria-label='Your themes']\").getBoundingClientRect().top")
+    create_top = evaluate_script("Array.from(document.querySelectorAll('main a')).find(function(a){return a.textContent.trim() === 'Create theme'}).getBoundingClientRect().top")
+
+    assert_operator list_top, :<, create_top
+    assert_selector "main a[data-variant=default]", count: 1
   end
 
   test "a card's title reads as a link at rest" do

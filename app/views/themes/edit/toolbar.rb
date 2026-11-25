@@ -32,6 +32,8 @@ class Views::Themes::Edit::Toolbar < Views::Base
     form(id: FORM_ID, action: @presenter.save_path, method: "post", data: { editor__preview_target: "form", action: "input->editor--preview#markDirty change->editor--preview#markDirty", testid: "editor-form" }) do
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
       input(type: "hidden", name: "theme[inputs][primary]", value: @presenter.primary, data: { editor__preview_target: "primaryField" })
+      # Trusted only while it still parses to the primary (Derive drops it otherwise); Save keeps the stored one.
+      input(type: "hidden", name: "theme[inputs][primary_hex]", value: @presenter.primary_hex)
       input(type: "hidden", name: "theme[inputs][radius]", value: @presenter.radius, data: { editor__preview_target: "radiusField" })
       derivation_submitters
       div(id: "editor-errors", role: "alert", class: "w-full border-b p-3 empty:hidden", data: { testid: "editor-errors" }) do

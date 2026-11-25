@@ -114,8 +114,23 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     assert_equal %w[surfaces charts sidebar], pinnable
   end
 
+  test "the brand swatch id is the stream target of the brand swatch" do
+    assert_equal "brand-swatch", Themes::Presenter::Group.new(@theme, key: "brand").swatch_id
+  end
+
   test "controls ids are the stream targets of the brand and advanced panels" do
     assert_equal "brand-controls", Themes::Presenter::Group.new(@theme, key: "brand").controls_id
     assert_equal "advanced-overrides", Themes::Presenter::Group.new(@theme, key: "advanced").controls_id
+  end
+
+  test "the brand hex is the typed one while the primary is still that color, else the closest hex" do
+    @theme.inputs = { "primary" => Themes::Oklch.parse("#1d4ed8").to_s, "primary_hex" => "#1d4ed8" }
+    group = Themes::Presenter::Group.new(@theme, key: "brand")
+
+    assert_equal "#1d4ed8", group.hex
+
+    @theme.inputs = { "primary" => "oklch(0.55 0.2 250)", "primary_hex" => "#1d4ed8" }
+
+    assert_equal Themes::Oklch.parse("oklch(0.55 0.2 250)").to_hex, Themes::Presenter::Group.new(@theme, key: "brand").hex
   end
 end

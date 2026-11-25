@@ -6,7 +6,7 @@ class Themes::ExportsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_equal "text/css", response.media_type
-    assert_match(/attachment; filename="slate\.css"/, response.headers["Content-Disposition"])
+    assert_match(/attachment; filename="theme\.css"/, response.headers["Content-Disposition"])
     assert_equal themes(:slate).palette, Chadcn::Theme.parse(response.body)
     assert_includes response.body, "/* source: chadcn-studio Slate http://www.example.com/t/slate.css */"
   end
