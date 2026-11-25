@@ -70,8 +70,23 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     refute_includes group.overrides("dark").map(&:name), "--radius"
   end
 
-  test "without overrides the advanced summary says so" do
-    assert_equal "No overrides", Themes::Presenter::Group.new(@theme, key: "advanced").summary
+  test "without overrides the advanced summary says what the group is for" do
+    assert_equal "Set one color by hex", Themes::Presenter::Group.new(@theme, key: "advanced").summary
+  end
+
+  test "advanced lists primary, border and ring first, then the rest, radius last" do
+    names = Themes::Presenter::Group.new(@theme, key: "advanced").overrides("light").map(&:name)
+
+    assert_equal %w[--primary --border --ring], names.first(3)
+    assert_equal "--radius", names.last
+    assert_equal Themes::Presenter::Group.new(@theme, key: "advanced").variables.size - 1, names.size
+    assert_equal names.uniq, names
+  end
+
+  test "only the groups of read-only rows point to Advanced" do
+    pinnable = Themes::Presenter::Group.all(@theme).select(&:pinnable?).map(&:key)
+
+    assert_equal %w[surfaces charts sidebar], pinnable
   end
 
   test "controls ids are the stream targets of the brand and advanced panels" do

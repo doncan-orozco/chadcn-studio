@@ -4,6 +4,7 @@
 # content is force-mounted into the editor form, so a closed group keeps its fields and the stream can reach them.
 class Components::Editor::GroupDialog < Components::Base
   CONTAINER = "#editor-panels"
+  ADVANCED_TRIGGER = "group-advanced-trigger"
   # The trigger button is the `group/menu-button`. Hovered, active or open (the selected group) it paints --sidebar-accent,
   # where muted text is under 4.5:1, so its sublabel takes the accent foreground; sibling entries stay muted.
   SUBLABEL = "truncate text-xs text-muted-foreground group-hover/menu-button:text-sidebar-accent-foreground " \
@@ -21,7 +22,7 @@ class Components::Editor::GroupDialog < Components::Base
 
     render Chadcn::Sidebar::MenuItem.new do
       render Chadcn::Dialog.new(id: @group.panel_id, modal: false) do
-        render Chadcn::Dialog::Trigger.new(as_child: Chadcn::Sidebar::MenuButton.new(size: "lg", class: "group/menu-button", data: { testid: @group.panel_id })) { entry }
+        render Chadcn::Dialog::Trigger.new(as_child: Chadcn::Sidebar::MenuButton.new(id: "#{@group.panel_id}-trigger", size: "lg", class: "group/menu-button", data: { testid: @group.panel_id })) { entry }
         render Chadcn::Dialog::Portal.new(force_mount: true, container: CONTAINER) { panel }
       end
     end
@@ -65,8 +66,17 @@ class Components::Editor::GroupDialog < Components::Base
     when "surfaces" then surfaces
     when "radius" then radius
     when "dark" then render Components::Editor::ModeSwitch.new
-    when "advanced" then div(id: @group.controls_id) { render Components::Editor::AdvancedOverrides.new(group: @group) }
+    when "advanced" then advanced
     else rows
+    end
+  end
+
+  # The filter sits outside the stream target, so a derivation never clears what was typed; the controller re-applies it to the
+  # rows the stream brings in.
+  def advanced
+    div(data: { controller: "editor--variable-filter", editor__variable_filter_empty_label_value: "No variable matches" }) do
+      render Components::Editor::VariableFilter.new
+      div(id: @group.controls_id) { render Components::Editor::AdvancedOverrides.new(group: @group) }
     end
   end
 
@@ -82,7 +92,16 @@ class Components::Editor::GroupDialog < Components::Base
 
   def rows
     div(id: @group.rows_id) { render Components::Editor::VariableRows.new(rows: @group.rows) }
+    advanced_link if @group.pinnable?
     all_values_link
+  end
+
+  # The rows only show values; setting one exactly happens in Advanced. This closes the panel and opens that group's.
+  def advanced_link
+    p(class: "flex flex-wrap items-center gap-x-2 pt-2 text-xs text-muted-foreground", data: { controller: "editor--panel-link", editor__panel_link_trigger_id_value: ADVANCED_TRIGGER }) do
+      span { "To set one exactly, use Advanced" }
+      render Chadcn::Dialog::Close.new(as_child: Chadcn::Button.new(variant: "outline", size: "sm", data: { action: "click->editor--panel-link#open", testid: "open-advanced" })) { "Open Advanced" }
+    end
   end
 
   # Outside the stream target: a derivation (always an unsaved theme) must not erase it.
