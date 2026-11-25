@@ -7,28 +7,60 @@ class Components::Editor::SliderField < Components::Base
     live: "chadcn--slider:value-change->editor--preview#slide chadcn--slider:value-commit->editor--preview#commit",
     commit: "chadcn--slider:value-commit->editor--preview#commit"
   }.freeze
+  MIRROR = "chadcn--slider:value-change->editor--slider-number#mirror"
+  DETACHED_FORM_SUFFIX = "-number-form"
 
-  def initialize(id:, label:, value:, min:, max:, step:, channel: nil, live: true, name: nil)
+  def initialize(id:, label:, value:, min:, max:, step:, channel: nil, live: true, name: nil, unit: nil)
     @id = id
     @label = label
-    @slider = { default_value: [ value ], min: min, max: max, step: step, name: name }
     @channel = channel
     @live = live
+    @unit = unit
+    @value = value.is_a?(Float) && value == value.floor ? value.to_i : value
+    @range = { min: min, max: max, step: step }
+    @slider = { default_value: [ @value ], name: name, **@range }
   end
 
   def view_template
-    div(class: "grid gap-2") do
-      span(id: "#{@id}-label", class: "text-sm font-medium") { @label }
-      render Chadcn::Slider.new(id: @id, aria: { labelledby: "#{@id}-label" }, data: data, **@slider)
-    end
+    return field unless @unit
+
+    div(class: "grid gap-2", data: { controller: "editor--slider-number", editor__slider_number_unit_value: @unit }) { field }
   end
 
   private
 
-  def data
-    wiring = { action: ACTIONS.fetch(@live ? :live : :commit), testid: @id }
-    return wiring unless @channel
+  def field
+    div(class: "grid gap-2") do
+      label_text
+      div(class: "flex items-center gap-3") do
+        render Chadcn::Slider.new(id: @id, aria: { labelledby: "#{@id}-label" }, data: slider_attributes, **@slider)
+        number_box if @unit
+      end
+    end
+  end
 
-    wiring.merge(editor__preview_target: @channel, editor__preview_channel_param: @channel)
+  def label_text
+    div(class: "flex items-baseline gap-1 text-sm font-medium") do
+      span(id: "#{@id}-label") { @label }
+      next unless @unit
+
+      output(for: "#{@id}-number", aria: { live: "off" }, data: { editor__slider_number_target: "readout", testid: "#{@id}-value" }) { "#{@value}#{@unit}" }
+    end
+  end
+
+  # Kept out of the editor form (`form:` names no form): a stored radius off the box's step grid (0.625rem) would fail the
+  # browser's step validation and block Save. The slider and the hidden `radiusField` carry the value that is posted.
+  def number_box
+    render Chadcn::Input.new(
+      id: "#{@id}-number", type: "number", default_value: @value, class: "w-20 shrink-0", form: "#{@id}#{DETACHED_FORM_SUFFIX}", aria: { label: "#{@label} in #{@unit}" },
+      data: { editor__slider_number_target: "input", action: "change->editor--slider-number#type", testid: "#{@id}-number" }, **@range
+    )
+  end
+
+  def slider_attributes
+    attributes = { editor__slider_number_target: ("slider" if @unit), action: [ ACTIONS.fetch(@live ? :live : :commit), (MIRROR if @unit) ].compact.join(" "), testid: @id }
+    return attributes unless @channel
+
+    attributes.merge(editor__preview_target: @channel, editor__preview_channel_param: @channel)
   end
 end

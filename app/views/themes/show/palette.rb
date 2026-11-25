@@ -31,7 +31,7 @@ class Views::Themes::Show::Palette < Views::Base
 
   def value(text, style)
     div(class: "flex items-center gap-2") do
-      span(class: "size-4 shrink-0 rounded-sm border", style: style, aria: { hidden: "true" }) if style
+      span(class: "size-4 shrink-0 rounded-sm border border-foreground/40", style: style, aria: { hidden: "true" }) if style
       span(class: "font-mono text-xs") { text }
     end
   end
