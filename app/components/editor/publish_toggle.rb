@@ -9,7 +9,7 @@ class Components::Editor::PublishToggle < Components::Base
   end
 
   def view_template
-    form(action: @presenter.publication_path, method: "post", class: "inline") do
+    form(action: @presenter.publication_path, method: "post", id: "publish-toggle-form", class: "inline") do
       input(type: "hidden", name: "_method", value: "delete") if @presenter.unpublish?
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
       render Chadcn::Button.new(type: "submit", variant: "outline", data: { testid: "publish-toggle" }) { @presenter.publication_label }

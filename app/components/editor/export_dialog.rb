@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Getting the theme out: download the CSS or JSON and read the command that imports the public URL. A draft has no URL
-# yet, so the dialog says to publish first.
+# yet, so the dialog offers to publish it in place; the publication answers with a Turbo Stream that swaps `Body` in.
 class Components::Editor::ExportDialog < Components::Base
   def initialize(presenter:)
     @presenter = presenter
@@ -13,7 +13,7 @@ class Components::Editor::ExportDialog < Components::Base
       render Chadcn::Dialog::Portal.new do
         render Chadcn::Dialog::Content.new(data: { testid: "export-panel" }) do
           heading
-          @presenter.published? ? download_links : draft_notice
+          render Body.new(presenter: @presenter)
         end
       end
     end
@@ -27,9 +27,29 @@ class Components::Editor::ExportDialog < Components::Base
       render(Chadcn::Dialog::Description.new { "A shadcn theme.css, or the same theme as JSON." })
     end
   end
+end
 
-  def draft_notice
-    p(class: "text-sm text-muted-foreground", data: { testid: "export-draft" }) { "Publish this theme to get its download links and import URL." }
+# The part of the dialog that depends on publication: the publish button on a draft, the links and command once public.
+class Components::Editor::ExportDialog::Body < Components::Base
+  include Phlex::Rails::Helpers::FormAuthenticityToken
+
+  def initialize(presenter:)
+    @presenter = presenter
+  end
+
+  def view_template
+    div(id: "export-body") { @presenter.published? ? download_links : draft_offer }
+  end
+
+  private
+
+  def draft_offer
+    form(action: @presenter.publication_path, method: "post", class: "grid gap-3", data: { testid: "export-draft" }) do
+      input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
+      input(type: "hidden", name: "from", value: "export_dialog")
+      p(class: "text-sm text-muted-foreground") { "This theme is a draft. Publish it to get its download links and import command." }
+      render Chadcn::Button.new(type: "submit", data: { testid: "export-publish" }) { "Publish and show import command" }
+    end
   end
 
   def download_links
