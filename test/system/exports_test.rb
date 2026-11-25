@@ -19,7 +19,7 @@ class ExportsTest < ApplicationSystemTestCase
 
     assert_selector :testid, "download-css"
     assert_selector :testid, "download-json"
-    assert_match(%r{\Abin/rails theme:import\[http://.+/t/zinc\.css\]\z}, find(:testid, "import-command").value)
+    assert_match(%r{\Abin/rails theme:import\[http://.+/t/zinc\.css\]\z}, find(:testid, "import-command").text)
   end
 
   test "a draft publishes from inside the dialog and the dialog stays open" do
@@ -30,7 +30,7 @@ class ExportsTest < ApplicationSystemTestCase
 
     assert_selector :testid, "export-panel"
     assert_selector :testid, "download-css"
-    assert_match(%r{\Abin/rails theme:import\[http://.+/t/zinc\.css\]\z}, find(:testid, "import-command").value)
+    assert_match(%r{\Abin/rails theme:import\[http://.+/t/zinc\.css\]\z}, find(:testid, "import-command").text)
     assert_predicate themes(:zinc).reload, :published?
     send_keys :escape
 
@@ -41,6 +41,19 @@ class ExportsTest < ApplicationSystemTestCase
 
     assert_selector :testid, "download-css"
     assert_no_selector :testid, "export-draft"
+  end
+
+  test "the import command shows in full and a Copy button confirms the copy" do
+    visit edit_theme_path(themes(:slate))
+
+    click_on "Export"
+    command = find(:testid, "import-command")
+
+    assert_match(%r{\Abin/rails theme:import\[http://.+/t/slate\.css\]\z}, command.text)
+    assert_operator command.native.property("scrollWidth"), :<=, command.native.property("clientWidth")
+    click_on "Copy"
+
+    assert_selector :testid, "import-copy", text: "Copied"
   end
 
   test "unpublishing takes the theme off its URL" do

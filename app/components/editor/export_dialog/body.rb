@@ -31,9 +31,16 @@ class Components::Editor::ExportDialog::Body < Components::Base
         render Chadcn::Button.new(as_child: :a, href: @presenter.css.path, download: @presenter.css.filename, data: { testid: "download-css" }) { "Download CSS" }
         render Chadcn::Button.new(as_child: :a, href: @presenter.json.path, download: @presenter.json.filename, variant: "outline", data: { testid: "download-json" }) { "Download JSON" }
       end
-      div(class: "grid gap-1") do
-        render Chadcn::Label.new(html_for: "import-command") { "Import into a chadcn app" }
-        render Chadcn::Input.new(id: "import-command", readonly: true, value: @presenter.css.import_command, class: "font-mono text-xs", data: { testid: "import-command" })
+      import_command
+    end
+  end
+
+  def import_command
+    div(class: "grid gap-1", data: { controller: "editor--export", editor__export_copied_label_value: "Copied" }) do
+      p(id: "import-command-label", class: "text-sm font-medium leading-none") { "Import into a chadcn app" }
+      div(class: "flex items-start gap-2") do
+        code(aria: { labelledby: "import-command-label" }, class: "flex-1 break-all rounded-md border bg-muted px-3 py-2 font-mono text-xs", data: { testid: "import-command", editor__export_target: "source" }) { @presenter.css.import_command }
+        render Chadcn::Button.new(type: "button", variant: "outline", aria: { live: "polite" }, data: { testid: "import-copy", editor__export_target: "button", action: "editor--export#copy" }) { "Copy" }
       end
     end
   end
