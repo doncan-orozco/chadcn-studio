@@ -100,4 +100,25 @@ class ThemesTest < ApplicationSystemTestCase
     assert_current_path themes_path
     assert_no_text "Zinc"
   end
+
+  test "the new theme form marks Name and Primary color as required" do
+    visit new_theme_path
+
+    assert_selector :testid, "required-legend", text: "* Required"
+    assert_selector "label[for='theme-name'] span[aria-hidden='true']", text: "*"
+    assert_selector "label[for='theme-primary'] span[aria-hidden='true']", text: "*"
+    assert_selector "#theme-name[required]"
+    assert_selector "#theme-primary[required]"
+  end
+
+  test "a blank name re-renders the form with the error under Name and the color kept" do
+    visit new_theme_path
+    page.execute_script("document.querySelector('[data-testid=new-theme-form]').noValidate = true")
+    fill_in "Primary color", with: "#1d4ed8"
+    click_on "Create theme"
+
+    assert_selector "#theme-name-error"
+    assert_selector "#theme-name[aria-invalid='true']"
+    assert_field "Primary color", with: "oklch(0.488 0.217 264.376)"
+  end
 end
