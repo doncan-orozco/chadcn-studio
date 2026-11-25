@@ -31,7 +31,7 @@ class Components::Editor::ExportDialog < Components::Base
   def draft_notice
     div(class: "grid gap-3") do
       p(class: "text-sm text-foreground/70", data: { testid: "export-draft" }) { "Publish this theme to get its download links and import URL." }
-      render Components::Editor::PublishToggle.new(presenter: @presenter, variant: "default", testid: "export-publish")
+      render Components::Editor::PublishToggle.new(presenter: @presenter, variant: "default", data: { testid: "export-publish" })
     end
   end
 
