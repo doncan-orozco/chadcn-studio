@@ -97,7 +97,7 @@ class Components::Editor::GroupDialog < Components::Base
 
   # The rows only show values; setting one exactly happens in Advanced. This closes the panel and opens that group's.
   def advanced_link
-    p(class: "flex flex-wrap items-center gap-x-2 pt-2 text-xs text-muted-foreground", data: { controller: "editor--panel-link", editor__panel_link_trigger_id_value: ::Themes::Presenter::Group.trigger_id("advanced"), editor__panel_link_focus_id_value: Components::Editor::VariableFilter::ID }) do
+    p(class: "flex flex-wrap items-center gap-x-2 pt-2 text-xs text-muted-foreground", data: { controller: "editor--panel-link", editor__panel_link_trigger_id_value: @group.advanced_trigger_id, editor__panel_link_focus_id_value: Components::Editor::VariableFilter::ID }) do
       span { "To set one exactly, use Advanced" }
       render Chadcn::Dialog::Close.new(as_child: Chadcn::Button.new(variant: "outline", size: "sm", data: { action: "click->editor--panel-link#open", testid: "open-advanced" })) { "Open Advanced" }
     end

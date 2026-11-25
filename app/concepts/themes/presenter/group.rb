@@ -59,6 +59,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
   def rows_id = "rows-#{key}"
   def panel_id = "group-#{key}"
   def trigger_id = self.class.trigger_id(key)
+  def advanced_trigger_id = self.class.trigger_id("advanced")
 
   # The element the derivation stream updates inside this group's panel.
   def controls_id = key == "advanced" ? "advanced-overrides" : "#{key}-controls"

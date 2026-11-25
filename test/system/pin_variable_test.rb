@@ -19,7 +19,7 @@ class PinVariableTest < ApplicationSystemTestCase
     assert_selector :testid, "group-advanced-panel"
     assert_no_selector :testid, "group-surfaces-panel", visible: :visible
     assert_selector "[data-state=open][data-slot=dialog-content]", count: 1
-    assert evaluate_script("document.activeElement.closest('[data-testid=group-advanced-panel]') !== null"), "focus lands inside the Advanced panel"
+    assert_equal Components::Editor::VariableFilter::ID, evaluate_script("document.activeElement.id"), "focus lands on Find a variable"
   end
 
   test "Advanced lists primary, border and ring first and the sublabel says what it is for" do
@@ -50,5 +50,14 @@ class PinVariableTest < ApplicationSystemTestCase
 
     assert_selector :testid, "overridden", count: 1
     assert_equal [ "ring", "sidebar-ring" ], all(:testid, "override-row", visible: :visible).map { |row| row["data-variable"] }.uniq
+  end
+
+  test "filtering is not an edit" do
+    find(:testid, "group-advanced").click
+    fill_in "Find a variable", with: "ring"
+    find_field("Find a variable").send_keys(:tab)
+
+    assert_equal [ "ring", "sidebar-ring" ], all(:testid, "override-row", visible: :visible).map { |row| row["data-variable"] }.uniq
+    assert_no_selector :testid, "unsaved"
   end
 end
