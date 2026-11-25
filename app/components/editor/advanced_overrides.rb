@@ -10,6 +10,7 @@ class Components::Editor::AdvancedOverrides < Components::Base
   def view_template
     div(class: "grid gap-6") do
       p(class: "text-sm text-muted-foreground") { "Type a hex color such as #9ca3af, or an oklch(...) value. Clear a field to follow the rule again." }
+      p(class: "text-sm text-muted-foreground", data: { testid: "overrides-close-note" }) { "Closing this panel keeps what you typed; it is saved with the theme." }
       @group.modes.each { |mode| section_for(mode) }
     end
   end
@@ -24,16 +25,32 @@ class Components::Editor::AdvancedOverrides < Components::Base
   end
 
   def field(override)
-    div(class: "grid gap-1", data: { testid: "override-row", overridden: override.overridden?.to_s, variable: override.name.delete_prefix("--"), editor__variable_filter_target: "row" }) do
+    div(class: "grid gap-1", data: { controller: "editor--override-swatch", testid: "override-row", overridden: override.overridden?.to_s, variable: override.name.delete_prefix("--"), editor__variable_filter_target: "row" }) do
       div(class: "flex items-center justify-between gap-2") do
         render Chadcn::Label.new(html_for: override.field_id, class: "font-mono text-xs") { override.name }
         render Chadcn::Badge.new(variant: "secondary", data: { testid: "overridden" }) { "Overridden" } if override.overridden?
       end
-      render Chadcn::Input.new(
-        id: override.field_id, name: override.field_name, default_value: override.value, placeholder: override.derived,
-        autocomplete: "off", spellcheck: "false", class: "font-mono text-xs",
-        data: { action: "change->editor--preview#commit keydown.enter->editor--preview#confirm:prevent" }
-      )
+      div(class: "flex items-center gap-2") do
+        swatch(override)
+        render Chadcn::Input.new(
+          id: override.field_id, name: override.field_name, default_value: override.value, placeholder: placeholder(override),
+          autocomplete: "off", spellcheck: "false", class: "font-mono text-xs",
+          data: { editor__override_swatch_target: "input", action: "input->editor--override-swatch#paint change->editor--preview#commit keydown.enter->editor--preview#confirm:prevent" }
+        )
+      end
     end
+  end
+
+  # The parsed color of the field: the typed value, else the derived one the rule would give. Decorative; the text beside it is the value.
+  def swatch(override)
+    span(class: "size-6 shrink-0 rounded-md border", style: override.style, aria: { hidden: "true" },
+         data: { testid: "override-swatch", editor__override_swatch_target: "swatch", derived: override.style })
+  end
+
+  # The derived value in the hex a person would type, so the placeholder shows what to type; oklch when it cannot be converted.
+  def placeholder(override)
+    ::Themes::Oklch.parse(override.derived).to_hex
+  rescue ::Themes::Oklch::Invalid
+    override.derived
   end
 end
