@@ -17,7 +17,6 @@ class Themes::Presenter::Group < Core::Presenter::Base
     "radius" => { label: "Radius", description: "How round corners are.", variables: RADIUS },
     "charts" => { label: "Charts", description: "The five chart colors.", variables: CHARTS },
     "sidebar" => { label: "Sidebar", description: "The sidebar mirror of the palette.", variables: SIDEBAR },
-    "dark" => { label: "Dark mode", description: "Preview the dark palette of this theme.", variables: [] },
     "advanced" => { label: "Advanced", description: "Pin a single variable; the others keep following the rule.", variables: COLORS + RADIUS }
   }.freeze
   KEYS = DEFINITIONS.keys.freeze
@@ -51,7 +50,6 @@ class Themes::Presenter::Group < Core::Presenter::Base
     case key
     when "brand" then primary
     when "radius" then light["radius"].to_s
-    when "dark" then "Light and dark palettes"
     when "advanced" then override_count.zero? ? "No overrides" : "#{override_count} overridden"
     else "#{variables.size} variables"
     end
@@ -75,6 +73,9 @@ class Themes::Presenter::Group < Core::Presenter::Base
       Row.new(name: "--#{variable}", light: light[variable], light_style: swatch(light[variable]), dark: dark[variable], dark_style: swatch(dark[variable]))
     end
   end
+
+  # The theme page's full table; nil while the theme is unsaved (a derivation never has an id).
+  def values_path = persisted? ? "#{helpers.theme_path(__getobj__)}#all-values" : nil
 
   # One field per overridable variable of the mode; a blank field is not an override.
   def overrides(mode)

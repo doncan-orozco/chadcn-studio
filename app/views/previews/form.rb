@@ -16,7 +16,7 @@ class Views::Previews::Form < Views::Base
         card.content { fields }
         card.footer(class: "justify-between") do
           render Chadcn::Button.new(variant: "outline") { "Cancel" }
-          render Chadcn::Button.new { "Save" }
+          render Chadcn::Button.new { "Create account" }
         end
       end
       danger

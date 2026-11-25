@@ -3,8 +3,8 @@ require "test_helper"
 class Themes::Presenter::EditorTest < ActiveSupport::TestCase
   setup { @editor = Themes::Presenter::Editor.new(themes(:zinc)) }
 
-  test "lists the seven groups of the sidebar" do
-    assert_equal [ "Brand color", "Surfaces and text", "Radius", "Charts", "Sidebar", "Dark mode", "Advanced" ], @editor.groups.map(&:label)
+  test "lists the six groups of the sidebar" do
+    assert_equal [ "Brand color", "Surfaces and text", "Radius", "Charts", "Sidebar", "Advanced" ], @editor.groups.map(&:label)
     assert_equal "Charts", @editor.group("charts").label
   end
 
@@ -66,5 +66,9 @@ class Themes::Presenter::EditorTest < ActiveSupport::TestCase
     assert_equal "/themes/#{themes(:zinc).id}", @editor.save_path
     assert_equal "/derivations", @editor.derivations_path
     assert_equal "/derivations?controls=1", @editor.refresh_path
+  end
+
+  test "the document title carries the theme name" do
+    assert_equal "Edit Zinc - Chadcn Studio", @editor.document_title
   end
 end

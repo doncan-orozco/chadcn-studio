@@ -58,16 +58,16 @@ class Components::Editor::GenerationPanel < Components::Base
         render Chadcn::Label.new(html_for: "generation-prompt") { "Prompt" }
         render Chadcn::Input.new(**prompt_attributes)
       end
-      render Chadcn::Button.new(type: "submit", data: { testid: "generate" }) { "Generate" }
+      render Chadcn::Button.new(type: "submit", disabled: !@panel.configured?, data: { testid: "generate" }) { "Generate" }
     end
   end
 
   def prompt_attributes
     attributes = {
       id: "generation-prompt", name: @panel.prompt_param, maxlength: @panel.prompt_limit, required: true,
-      placeholder: @panel.prompt_placeholder, aria: { describedby: "generation_status" }
+      placeholder: @panel.prompt_placeholder, disabled: !@panel.configured?, aria: { describedby: "generation_status" }
     }
-    attributes[:aria][:invalid] = "true" if status&.failed?
+    attributes[:aria][:invalid] = "true" if @panel.configured? && status&.failed?
     attributes
   end
 end
