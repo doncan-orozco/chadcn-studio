@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Views::Pages::Home < Views::Base
-  ROW_LINK = "flex min-h-9 items-center gap-3 rounded-md px-2 text-sm font-medium hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+  ROW_LINK = "flex min-h-8 w-full items-center gap-3 rounded-md px-2 text-sm font-medium hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
 
   def initialize(presenter)
     @presenter = presenter
