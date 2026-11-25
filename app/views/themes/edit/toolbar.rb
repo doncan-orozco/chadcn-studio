@@ -10,7 +10,7 @@ class Views::Themes::Edit::Toolbar < Views::Base
   end
 
   def view_template
-    form(action: @presenter.save_path, method: "post", class: "flex flex-wrap items-end gap-3 border-b p-3", data: { editor__preview_target: "form", testid: "editor-form" }) do
+    form(action: @presenter.save_path, method: "post", class: "flex flex-wrap items-end gap-3 p-3", data: { editor__preview_target: "form", testid: "editor-form" }) do
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
       input(type: "hidden", name: "theme[inputs][primary]", value: @presenter.primary, data: { editor__preview_target: "primaryField" })
       input(type: "hidden", name: "theme[inputs][radius]", value: @presenter.radius, data: { editor__preview_target: "radiusField" })

@@ -9,7 +9,7 @@ class Views::Themes::Edit < Views::Base
 
   def view_template
     div(class: "flex flex-col", data: { controller: "editor--preview", action: "editor--color:picked->editor--preview#pick", testid: "editor" }) do
-      bar
+      header
       render Chadcn::Sidebar::Provider.new(class: "min-h-0 flex-col md:flex-row") do
         render Views::Themes::Edit::Groups.new(@presenter)
         render Views::Themes::Edit::Preview.new(@presenter)
@@ -20,8 +20,8 @@ class Views::Themes::Edit < Views::Base
   private
 
   # One row above the groups: the heading, the name and Save (the toolbar form), Publish, Export and the describe dialog.
-  def bar
-    div(class: "flex flex-wrap items-end border-b [&>form]:border-b-0") do
+  def header
+    div(class: "flex flex-wrap items-end border-b") do
       h1(class: "px-3 pb-3 text-2xl font-semibold leading-9 tracking-tight") { @presenter.title }
       render Views::Themes::Edit::Toolbar.new(@presenter)
       actions
