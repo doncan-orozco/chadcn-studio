@@ -10,7 +10,6 @@ class Components::Editor::VariableRows < Components::Base
     ul(class: "space-y-2 text-xs", data: { testid: "variable-rows" }) do
       @rows.each { |row| variable(row) }
     end
-    all_values_link
   end
 
   private
@@ -29,15 +28,6 @@ class Components::Editor::VariableRows < Components::Base
     span(class: "flex min-w-0 items-center gap-1") do
       swatch(style, label)
       span(class: "truncate font-mono select-all", data: { value: mode }, title: label) { text }
-    end
-  end
-
-  def all_values_link
-    path = @rows.values_path
-    return unless path
-
-    p(class: "pt-2 text-xs") do
-      a(href: path, class: "underline underline-offset-4", data: { testid: "all-values-link" }) { "See all values" }
     end
   end
 

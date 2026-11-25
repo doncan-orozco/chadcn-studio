@@ -24,11 +24,11 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
   end
 
   test "rows link to the theme page under All values" do
-    assert_equal "/themes/#{@theme.id}#all-values", Themes::Presenter::Group.new(@theme, key: "brand").rows.values_path
+    assert_equal "/themes/#{@theme.id}#all-values", Themes::Presenter::Group.new(@theme, key: "brand").values_path
   end
 
   test "an unsaved theme has no All values link" do
-    assert_nil Themes::Presenter::Group.new(Theme.new(light: @theme.light, dark: @theme.dark), key: "brand").rows.values_path
+    assert_nil Themes::Presenter::Group.new(Theme.new(light: @theme.light, dark: @theme.dark), key: "brand").values_path
   end
 
   test "the brand group exposes the primary as the three numbers the sliders move" do

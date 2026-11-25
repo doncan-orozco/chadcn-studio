@@ -146,6 +146,15 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "#{theme_path(@theme)}#all-values", URI(find(:testid, "all-values-link")[:href]).then { |uri| [ uri.path, uri.fragment ].join("#") }
   end
 
+  test "the All values link survives a derivation" do
+    open_group "brand"
+    find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
+
+    assert_selector "#summary-brand", text: "oklch(0.215"
+    assert_selector :testid, "variable-rows", visible: :all
+    assert_selector :testid, "all-values-link", visible: :all
+  end
+
   test "the page switcher renders the other preview pages inside the preview root" do
     click_on "Settings"
 
