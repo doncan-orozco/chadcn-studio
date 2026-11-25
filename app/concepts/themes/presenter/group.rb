@@ -23,7 +23,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   # What a collapsed group says, in the user's words: the brand color is named from the primary, the rest say what they change.
   SUMMARIES = { "surfaces" => "Backgrounds, cards and text", "charts" => "Five chart colors", "sidebar" => "Sidebar colors" }.freeze
-  # Upper bound of each hue name on the oklch wheel; red also owns the wrap-around above the last bound.
+  # Upper bound of each hue name on the oklch wheel; pink also owns the wrap-around above the last bound.
   HUE_NAMES = [ [ 15, "pink" ], [ 40, "red" ], [ 75, "orange" ], [ 115, "yellow" ], [ 170, "green" ], [ 210, "teal" ], [ 275, "blue" ], [ 335, "purple" ] ].freeze
   GRAY_CHROMA = 0.03
 
