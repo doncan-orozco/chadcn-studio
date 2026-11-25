@@ -24,7 +24,7 @@ class Themes::Oklch
   LMS_FROM_LAB = [ [ 1.0, 0.3963377774, 0.2158037573 ], [ 1.0, -0.1055613458, -0.0638541728 ], [ 1.0, -0.0894841775, -1.2914855480 ] ].freeze
   RGB_FROM_LMS = [ [ 4.0767416621, -3.3077115913, 0.2309699292 ], [ -1.2684380046, 2.6097574011, -0.3413193965 ], [ -0.0041960863, -0.7034186147, 1.7076147010 ] ].freeze
 
-  private_constant :NUMBER, :PATTERN, :HEX, :LMS, :LAB, :ACHROMATIC
+  private_constant :NUMBER, :PATTERN, :HEX, :LMS, :LAB, :ACHROMATIC, :LMS_FROM_LAB, :RGB_FROM_LMS
 
   attr_reader :lightness, :chroma, :hue, :alpha
 
@@ -35,6 +35,12 @@ class Themes::Oklch
     match = PATTERN.match(value.to_s) or raise Invalid, "not a hex or oklch color: #{value.inspect}"
 
     new(*match.captures.compact.map { |number| Float(number) })
+  end
+
+  # "#1D4ED8", "1d4ed8" or "#1de" -> "#1d4ed8"; nil when the text is not a hex color.
+  def self.normalize_hex(text)
+    hex = HEX.match(text.to_s) or return
+    "##{(hex[1] || hex[2].gsub(/\h/) { |digit| digit * 2 }).downcase}"
   end
 
   # Six hex digits of sRGB -> oklch.

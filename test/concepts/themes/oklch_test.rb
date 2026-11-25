@@ -82,6 +82,13 @@ class Themes::OklchTest < ActiveSupport::TestCase
     end
   end
 
+  test "normalize_hex spells any hex as lower-case #rrggbb and refuses the rest" do
+    assert_equal "#1d4ed8", Themes::Oklch.normalize_hex("#1D4ED8")
+    assert_equal "#1d4ed8", Themes::Oklch.normalize_hex(" 1d4ed8 ")
+    assert_equal "#11ddee", Themes::Oklch.normalize_hex("#1de")
+    assert_nil Themes::Oklch.normalize_hex("oklch(0.5 0.1 250)")
+  end
+
   test "to_hex writes the sRGB hex of a color, and a typed hex comes back within a few steps through the stored spelling" do
     assert_equal "#1d4ed8", Themes::Oklch.parse("#1d4ed8").to_hex
     assert_equal "#ffffff", Themes::Oklch.new(1, 0, 0).to_hex

@@ -7,7 +7,7 @@ class Components::Editor::BrandSwatch < Components::Base
   end
 
   def view_template
-    span(class: "size-4 shrink-0 rounded-full border", style: @group.hex_swatch_style, aria: { hidden: "true" })
+    span(class: "size-4 shrink-0 rounded-full border", style: ::Themes::Presenter::Card.swatch_style(@group.hex), aria: { hidden: "true" })
     span(class: "font-mono text-foreground", data: { testid: "brand-hex" }) { @group.hex }
   end
 end

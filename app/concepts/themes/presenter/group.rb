@@ -76,8 +76,6 @@ class Themes::Presenter::Group < Core::Presenter::Base
     brand_color.to_hex
   end
 
-  def hex_swatch_style = "background-color: #{hex}"
-
   def lightness = brand_color.lightness
   def chroma = brand_color.chroma
   def hue = brand_color.hue

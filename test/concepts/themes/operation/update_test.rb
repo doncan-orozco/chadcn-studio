@@ -74,4 +74,15 @@ class Themes::Operation::UpdateTest < ActiveSupport::TestCase
     assert_equal :invalid, failure[:code]
     assert_predicate failure[:model].errors[:name], :any?
   end
+
+  test "the typed hex survives a save that leaves the primary alone and is dropped when the primary moves" do
+    @theme.update!(inputs: { "primary" => Themes::Oklch.parse("#1d4ed8").to_s, "primary_hex" => "#1d4ed8" })
+    saved = Themes::Operation::Update.new.call(model: @theme, params: { "inputs" => { "radius" => "0.5rem" } }).value![:model].reload
+
+    assert_equal "#1d4ed8", saved.inputs["primary_hex"]
+
+    moved = Themes::Operation::Update.new.call(model: saved, params: { "inputs" => { "primary" => "oklch(0.55 0.2 250)" } }).value![:model].reload
+
+    assert_nil moved.inputs["primary_hex"]
+  end
 end

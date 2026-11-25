@@ -3,7 +3,7 @@
 # The few choices the harmony rule needs (theme-science R7). Shape and ranges only; the derivation is the operation's.
 # A color is hex or oklch(...): whatever `Themes::Oklch.parse` reads.
 class Themes::Contract::Inputs < Dry::Validation::Contract
-  PRIMARY_HEX = /\A#\h{6}\z/
+  TYPED_HEX_FORMAT = /\A#\h{6}\z/
   RADIUS = /\A\d+(?:\.\d+)?rem\z/
   CHART_OFFSETS_SIZE = 5
   MODES = %w[light dark].freeze
@@ -11,12 +11,12 @@ class Themes::Contract::Inputs < Dry::Validation::Contract
   CHART_OFFSET_RANGE = (-360.0..360.0)
   # The only overrides that may carry alpha: the dark mode's translucent border and input.
   ALPHA_VARIABLES = { "dark" => %w[border input] }.freeze
-  private_constant :PRIMARY_HEX, :RADIUS, :CHART_OFFSETS_SIZE, :MODES, :OVERRIDABLE, :CHART_OFFSET_RANGE, :ALPHA_VARIABLES
+  private_constant :TYPED_HEX_FORMAT, :RADIUS, :CHART_OFFSETS_SIZE, :MODES, :OVERRIDABLE, :CHART_OFFSET_RANGE, :ALPHA_VARIABLES
 
   params do
     required(:primary).filled(:string)
     optional(:tint).filled(:float, gteq?: 0, lteq?: 1)
-    optional(:primary_hex).filled(:string, format?: PRIMARY_HEX)
+    optional(:primary_hex).filled(:string, format?: TYPED_HEX_FORMAT)
     optional(:radius).filled(:string, format?: RADIUS)
     optional(:chart_offsets).array(:float).value(size?: CHART_OFFSETS_SIZE)
     optional(:overrides).value(:hash)

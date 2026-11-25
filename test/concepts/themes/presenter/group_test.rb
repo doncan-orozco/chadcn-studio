@@ -104,7 +104,6 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     group = Themes::Presenter::Group.new(@theme, key: "brand")
 
     assert_equal "#1d4ed8", group.hex
-    assert_equal "background-color: #1d4ed8", group.hex_swatch_style
 
     @theme.inputs = { "primary" => "oklch(0.55 0.2 250)", "primary_hex" => "#1d4ed8" }
 
