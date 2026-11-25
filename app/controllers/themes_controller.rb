@@ -1,6 +1,6 @@
 class ThemesController < ApplicationController
   def index
-    render Views::Themes::Index.new(Themes::Presenter::List.new(Themes::Query::Recent.call))
+    render Views::Themes::Index.new(Themes::Presenter::List.new(Themes::Query::Recent.call), deleted: flash[:deleted])
   end
 
   def show
@@ -40,6 +40,8 @@ class ThemesController < ApplicationController
     result = Themes::Operation::Destroy.new.call(model: theme)
 
     if result.success?
+      # The toast says it for a moment; `deleted` is the lasting line the list keeps showing (the layout keeps it out of the toaster).
+      flash[:deleted] = "#{result.value![:model].name} deleted"
       redirect_to themes_path, notice: "Theme deleted", status: :see_other
     else
       redirect_to theme_path(result.failure[:model]), alert: "Theme could not be deleted", status: :see_other
