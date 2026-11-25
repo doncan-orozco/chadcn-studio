@@ -20,7 +20,16 @@ class ThemesTest < ApplicationSystemTestCase
 
     assert_text "Theme created"
     assert_selector "#summary-brand", text: "Blue"
+    assert_selector :testid, "brand-hex", text: "#1d4ed8"
     assert_equal "oklch(0.488 0.217 264.376)", Theme.find_by!(slug: "acme").light["primary"]
+  end
+
+  test "the Themes list links to describing a theme" do
+    visit themes_path
+    click_on "Describe a theme"
+
+    assert_current_path new_theme_path
+    assert_field "Describe a theme", disabled: :all
   end
 
   test "the header's Themes link opens the list from home" do
@@ -120,5 +129,30 @@ class ThemesTest < ApplicationSystemTestCase
     assert_selector "#theme-name-error"
     assert_selector "#theme-name[aria-invalid='true']"
     assert_field "Brand color", with: "oklch(0.488 0.217 264.376)"
+  end
+
+  test "home's theme rows are links at least 24 px tall with a resting underline" do
+    visit root_path
+    row = "document.querySelector(\"ul[aria-label='Your themes'] a\")"
+
+    assert_operator evaluate_script("#{row}.getBoundingClientRect().height"), :>=, 24
+    assert_includes evaluate_script("getComputedStyle(#{row}.querySelector('[data-link-name]')).textDecorationLine"), "underline"
+  end
+
+  test "home lists the saved themes above the Create theme button, the only default button on the page" do
+    visit root_path
+    list_top = evaluate_script("document.querySelector(\"ul[aria-label='Your themes']\").getBoundingClientRect().top")
+    create_top = evaluate_script("Array.from(document.querySelectorAll('main a')).find(function(a){return a.textContent.trim() === 'Create theme'}).getBoundingClientRect().top")
+
+    assert_operator list_top, :<, create_top
+    assert_selector "main a[data-variant=default]", count: 1
+  end
+
+  test "a card's title reads as a link at rest" do
+    visit themes_path
+
+    title = find(:testid, "theme-card", text: "Zinc").find("a", text: "Zinc", match: :first)
+
+    assert_includes title.evaluate_script("getComputedStyle(this).textDecorationLine"), "underline"
   end
 end

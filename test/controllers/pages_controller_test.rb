@@ -17,7 +17,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "home lists existing themes under the buttons, each name linking to its editor" do
+  test "home lists existing themes above the buttons, each name linking to its editor" do
     get root_path
 
     assert_response :success
@@ -27,10 +27,21 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "home puts Your themes before Create theme in document order, so tab and heading order follow" do
+    get root_path
+
+    nodes = css_select("main h1, main h2, main a")
+    heading = nodes.index { |node| node.name == "h2" && node.text.strip == "Your themes" }
+    create = nodes.index { |node| node.name == "a" && node.text.strip == "Create theme" }
+
+    assert_operator nodes.index { |node| node.name == "h1" }, :<, heading
+    assert_operator heading, :<, create
+  end
+
   test "home theme links carry a visible focus style" do
     get root_path
 
-    assert_select "main ul[aria-label='Your themes'] a.focus-visible\\:underline"
+    assert_select "main ul[aria-label='Your themes'] a.focus-visible\\:ring-\\[3px\\].focus-visible\\:outline-none"
   end
 
   test "home theme links are full-width rows at least 24 px tall, spaced apart" do
@@ -58,5 +69,6 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "main h2", text: "Your themes", count: 0
+    assert_select "main a[href=?]", new_theme_path, text: "Create theme"
   end
 end

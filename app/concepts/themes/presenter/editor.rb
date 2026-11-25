@@ -53,6 +53,7 @@ class Themes::Presenter::Editor < Core::Presenter::Base
   def failed? = failures.any?
 
   def primary = group("brand").primary
+  def primary_hex = group("brand").hex
   def tint = group("brand").tint
   def radius = light["radius"].to_s
 

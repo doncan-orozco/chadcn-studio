@@ -14,6 +14,7 @@ class Components::Editor::Derived < Components::Base
     replace("editor-errors") { plain "" }
     replace("editor-palette") { render Components::Editor::PaletteSource.new(palette: @editor.palette_json) }
     @editor.groups.each { |group| group_streams(group) }
+    replace(@editor.group("brand").swatch_id) { render Components::Editor::BrandSwatch.new(group: @editor.group("brand")) }
     replace(@editor.group("brand").controls_id) { render Components::Editor::BrandControls.new(group: @editor.group("brand")) } if @controls
   end
 
