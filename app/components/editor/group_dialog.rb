@@ -39,6 +39,7 @@ class Components::Editor::GroupDialog < Components::Base
         p(id: @group.summary_id, class: "truncate") { @group.summary }
       end
       div(id: @group.controls_id) { render Components::Editor::BrandControls.new(group: @group) }
+      p(class: "text-xs text-muted-foreground", data: { testid: "brand-live-note" }) { "Changes show live; Save keeps them." }
       details(class: "text-sm") do
         summary(class: "cursor-pointer text-muted-foreground") { "All brand variables" }
         rows
