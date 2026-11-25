@@ -26,6 +26,10 @@ class Themes::Presenter::Group < Core::Presenter::Base
   # Upper bound of each hue name on the oklch wheel; pink also owns the wrap-around above the last bound.
   HUE_NAMES = [ [ 15, "pink" ], [ 40, "red" ], [ 75, "orange" ], [ 115, "yellow" ], [ 170, "green" ], [ 210, "teal" ], [ 275, "blue" ], [ 335, "purple" ] ].freeze
   GRAY_CHROMA = 0.03
+  DARK_LIGHTNESS = 0.4
+  LIGHT_LIGHTNESS = 0.8
+  BLACK_LIGHTNESS = 0.3
+  WHITE_LIGHTNESS = 0.9
 
   Row = Data.define(:name, :light, :light_style, :dark, :dark_style)
   Override = Data.define(:mode, :name, :derived, :value, :style, :field_name, :field_id) do
@@ -71,16 +75,6 @@ class Themes::Presenter::Group < Core::Presenter::Base
   def tint = Float(inputs.to_h.fetch("tint") { Themes::Service::Harmony::DEFAULTS[:tint] })
   def radius_rem = Float(light["radius"].to_s.delete_suffix("rem"), exception: false) || 0.0
 
-  # "Blue", "Dark blue", "Light yellow", "Gray": the primary in words a user would say.
-  def color_name
-    return neutral_name if chroma < GRAY_CHROMA
-
-    hue_name = HUE_NAMES.find { |bound, _name| hue < bound }&.last || "pink"
-    return hue_name.capitalize unless lightness < 0.4 || lightness > 0.8
-
-    "#{lightness < 0.4 ? 'Dark' : 'Light'} #{hue_name}"
-  end
-
   def variables = definition[:variables]
   def modes = MODES
 
@@ -107,9 +101,19 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   def definition = DEFINITIONS.fetch(key)
 
+  # "Blue", "Dark blue", "Light yellow", "Gray": the primary in words a user would say.
+  def color_name
+    return neutral_name if chroma < GRAY_CHROMA
+
+    hue_name = (HUE_NAMES.find { |bound, _name| hue < bound } || HUE_NAMES.first).last
+    return hue_name.capitalize unless lightness < DARK_LIGHTNESS || lightness > LIGHT_LIGHTNESS
+
+    "#{lightness < DARK_LIGHTNESS ? 'Dark' : 'Light'} #{hue_name}"
+  end
+
   def neutral_name
-    if lightness < 0.3 then "Black"
-    elsif lightness > 0.9 then "White"
+    if lightness < BLACK_LIGHTNESS then "Black"
+    elsif lightness > WHITE_LIGHTNESS then "White"
     else "Gray"
     end
   end
