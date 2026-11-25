@@ -39,7 +39,6 @@ class Themes::Presenter::ListTest < ActiveSupport::TestCase
   end
 
   test "labels" do
-    assert_equal "Edit Zinc", show.edit_label
     assert_equal "Delete Zinc", show.delete_label
   end
 end

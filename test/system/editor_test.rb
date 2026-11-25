@@ -39,9 +39,11 @@ class EditorTest < ApplicationSystemTestCase
 
   test "the dark switch toggles the dark class on the preview root only" do
     shell_dark = evaluate_script("document.documentElement.classList.contains('dark')")
-    open_group "dark"
+
+    assert_no_selector :testid, "dark-preview-badge", visible: true
     find(:testid, "preview-dark").click
 
+    assert_selector :testid, "dark-preview-badge", text: "Dark preview"
     assert_selector "[data-testid=preview-root].dark"
     assert_equal shell_dark, evaluate_script("document.documentElement.classList.contains('dark')")
     assert_no_selector "[data-testid=shell].dark"
@@ -49,6 +51,7 @@ class EditorTest < ApplicationSystemTestCase
 
     find(:testid, "preview-dark").click
 
+    assert_no_selector :testid, "dark-preview-badge", visible: true
     assert_no_selector "[data-testid=preview-root].dark"
     assert_equal @theme.light["background"], property("--background")
   end

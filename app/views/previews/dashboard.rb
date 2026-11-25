@@ -7,7 +7,7 @@ class Views::Previews::Dashboard < Views::Base
 
   def view_template
     div(class: "space-y-6 p-6") do
-      h1(class: "text-2xl font-semibold tracking-tight") { @presenter.title }
+      h2(class: "text-2xl font-semibold tracking-tight") { @presenter.title }
       stats
       div(class: "grid gap-6 lg:grid-cols-2") do
         traffic

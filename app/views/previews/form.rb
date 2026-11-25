@@ -7,7 +7,7 @@ class Views::Previews::Form < Views::Base
 
   def view_template
     div(class: "mx-auto max-w-xl space-y-6 p-6") do
-      h1(class: "text-2xl font-semibold tracking-tight") { @presenter.title }
+      h2(class: "text-2xl font-semibold tracking-tight") { @presenter.title }
       render Chadcn::Card.new do |card|
         card.header do
           card.title { "Create account" }
@@ -16,7 +16,7 @@ class Views::Previews::Form < Views::Base
         card.content { fields }
         card.footer(class: "justify-between") do
           render Chadcn::Button.new(variant: "outline") { "Cancel" }
-          render Chadcn::Button.new { "Save" }
+          render Chadcn::Button.new { "Create account" }
         end
       end
       danger

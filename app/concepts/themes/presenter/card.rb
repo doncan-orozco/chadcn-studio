@@ -21,7 +21,6 @@ class Themes::Presenter::Card < Core::Presenter::Base
     end
   end
 
-  def path = helpers.theme_path(__getobj__)
   def edit_path = helpers.edit_theme_path(__getobj__)
   def created_label = "Created #{created_at.to_date.to_fs(:long)}"
   def status_label = published? ? "Published" : "Draft"

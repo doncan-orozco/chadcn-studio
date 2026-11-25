@@ -6,6 +6,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-testid=theme-card]", Theme.count
+    assert_select "[data-testid=theme-card] a[href=?]", edit_theme_path(themes(:zinc)), text: "Zinc"
     assert_select "[data-testid=theme-card] [role=img] span", Theme.count * Themes::Presenter::Card::SWATCHES.size
   end
 
@@ -97,12 +98,29 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "label[for='theme-name'] span[aria-hidden='true']", text: "*"
   end
 
+  test "GET /themes/:id/edit names the page with one h1 and the fixtures with h2" do
+    get edit_theme_path(themes(:zinc))
+
+    assert_response :success
+    assert_select "h1", count: 1, text: "Edit Zinc"
+    assert_select "[data-testid=preview-root] h2", minimum: 1
+  end
+
   test "GET /themes/:id shows the palette, light and dark" do
     get theme_path(themes(:zinc))
 
     assert_response :success
     assert_select "h1", "Zinc"
+    assert_select "a[href='#{edit_theme_path(themes(:zinc))}'][data-variant=default]", "Preview and edit"
+    assert_select "button[data-variant=destructive]", false
+    assert_select "button[aria-label='Delete Zinc'][data-variant=outline].text-destructive", "Delete"
     assert_select "[data-testid=palette] tbody tr", Chadcn::Theme::REQUIRED.size + Chadcn::Theme::ROOT_ONLY.size
+  end
+
+  test "GET /themes/:id swatches carry a border that shows on both backgrounds" do
+    get theme_path(themes(:zinc))
+
+    assert_select "[data-testid=palette] span.border.border-foreground\\/40[aria-hidden=true]"
   end
 
   test "GET /themes/:id for an unknown id is 404" do

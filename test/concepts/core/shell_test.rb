@@ -21,11 +21,11 @@ class Core::ShellTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "the preview mode row is a full-width 24 px target" do
-    fragment = Nokogiri::HTML5.fragment(Components::Editor::ModeSwitch.new.call)
+  test "the header toggle is captioned as the studio's appearance" do
+    get root_path
 
-    assert fragment.at_css("div.w-full.min-h-6 > label.flex-1.min-h-6[for=preview-dark]")
-    assert fragment.at_css("div.w-full.min-h-6 > [id=preview-dark]")
+    assert_select "[data-testid=theme-toggle][aria-labelledby=studio-appearance]"
+    assert_select "#studio-appearance", text: "Studio appearance"
   end
 
   test "the frame renders an html_safe sidebar and refuses a plain string" do

@@ -10,8 +10,11 @@ class Views::Themes::Edit::Preview < Views::Base
     div(class: "min-w-0 flex-1 space-y-3 p-3") do
       div(id: "editor-palette") { render Components::Editor::PaletteSource.new(palette: @presenter.palette_json) }
       render Chadcn::Tabs.new(default_value: @presenter.first_page) do |tabs|
-        tabs.list(aria: { label: "Preview page" }) do
-          @presenter.pages.each { |page| tabs.trigger(value: page.key, data: { testid: "page-#{page.key}" }) { page.label } }
+        div(class: "flex flex-wrap items-center justify-between gap-2") do
+          tabs.list(aria: { label: "Preview page" }) do
+            @presenter.pages.each { |page| tabs.trigger(value: page.key, data: { testid: "page-#{page.key}" }) { page.label } }
+          end
+          render Components::Editor::ModeSwitch.new
         end
         render Components::Editor::PreviewRoot.new(variables: @presenter.variables("light"), class: "rounded-lg border") do
           @presenter.pages.each { |page| tabs.content(value: page.key) { render page.view_class.new(page.presenter) } }
