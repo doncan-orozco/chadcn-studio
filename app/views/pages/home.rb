@@ -13,17 +13,22 @@ class Views::Pages::Home < Views::Base
         h1(class: "text-2xl font-semibold tracking-tight") { "Chadcn Studio" }
         p(class: "text-muted-foreground") { "Pick a color, or describe a theme, and get a whole shadcn theme." }
       end
-      div(class: "flex flex-wrap items-center gap-3") do
-        render Chadcn::Button.new(as_child: :a, href: new_theme_path) { "Create theme" }
-        render Chadcn::Button.new(as_child: :a, href: new_theme_path(anchor: "describe"), variant: "outline") { "Describe a theme" }
-        render Chadcn::Button.new(as_child: :a, href: themes_path, variant: "outline") { "Browse themes" }
-        render Chadcn::Button.new(as_child: :a, href: gallery_path, variant: "outline") { "Browse components" }
-      end
       your_themes unless @presenter.empty?
+      actions
     end
   end
 
   private
+
+  # Below the saved themes when there are any: reopening one is the top task, Create theme the one default button.
+  def actions
+    div(class: "flex flex-wrap items-center gap-3") do
+      render Chadcn::Button.new(as_child: :a, href: new_theme_path) { "Create theme" }
+      render Chadcn::Button.new(as_child: :a, href: new_theme_path(anchor: "describe"), variant: "outline") { "Describe a theme" }
+      render Chadcn::Button.new(as_child: :a, href: themes_path, variant: "outline") { "Browse themes" }
+      render Chadcn::Button.new(as_child: :a, href: gallery_path, variant: "outline") { "Browse components" }
+    end
+  end
 
   def your_themes
     section(class: "space-y-3") do
