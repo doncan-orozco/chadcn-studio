@@ -169,7 +169,7 @@ class EditorTest < ApplicationSystemTestCase
     open_group "brand"
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
-    assert_selector "#summary-brand", text: "oklch(0.215"
+    assert_selector "#summary-brand", text: "Black"
     panel = find(:testid, "group-brand-panel")
 
     assert panel.has_selector?(:testid, "variable-rows")
