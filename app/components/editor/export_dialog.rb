@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # Getting the theme out: download the CSS or JSON and read the command that imports the public URL. A draft has no URL
-# yet, so the dialog says to publish first.
+# yet, so the dialog asks to share a link first.
 class Components::Editor::ExportDialog < Components::Base
   def initialize(presenter:)
     @presenter = presenter
