@@ -155,6 +155,23 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_redirected_to themes_path
   end
 
+  test "after DELETE the list names the deleted theme in a status, once" do
+    delete theme_path(themes(:zinc))
+    follow_redirect!
+
+    assert_select "[role=status][data-testid=deleted-status]", text: "Zinc deleted"
+
+    get themes_path
+
+    assert_select "[data-testid=deleted-status]", count: 0
+  end
+
+  test "the list has no deleted status by default" do
+    get themes_path
+
+    assert_select "[data-testid=deleted-status]", count: 0
+  end
+
   test "PATCH /themes/:id names the saved theme in the toast" do
     theme = themes(:zinc)
     patch theme_path(theme), params: { theme: { name: "Ocean" } }

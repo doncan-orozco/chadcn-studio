@@ -27,7 +27,7 @@ class Views::Layouts::Application < Views::Base
 
       body(class: "bg-background text-foreground antialiased") do
         render Components::Shell::Frame.new(sidebar: content_for(:sidebar).presence) { yield }
-        render Chadcn::Toaster.new(flash: flash.to_h, close_button: true)
+        render Chadcn::Toaster.new(flash: flash.to_h.except("deleted"), close_button: true)
       end
     end
   end

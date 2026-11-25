@@ -89,6 +89,16 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal before, property("--foreground")
   end
 
+  test "Save theme is disabled while the save is submitting" do
+    evaluate_script(<<~JS)
+      document.addEventListener("turbo:submit-start", () => { window.saveDisabledAtStart = document.querySelector("[data-testid=save]").disabled })
+    JS
+    click_on "Save theme"
+
+    assert_text "saved"
+    assert evaluate_script("window.saveDisabledAtStart"), "Save theme should be disabled once the submit starts"
+  end
+
   test "the toolbar offers Save theme and shows Unsaved changes only once the editor differs" do
     assert_button "Save theme"
     assert_no_selector :testid, "unsaved"

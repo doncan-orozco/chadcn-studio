@@ -107,7 +107,7 @@ class ThemesTest < ApplicationSystemTestCase
     accept_confirm { click_on "Delete" }
 
     assert_current_path themes_path
-    assert_no_text "Zinc"
+    assert_no_selector :testid, "theme-card", text: "Zinc"
   end
 
   test "the new theme form marks Name and Brand color as required" do
@@ -154,5 +154,15 @@ class ThemesTest < ApplicationSystemTestCase
     title = find(:testid, "theme-card", text: "Zinc").find("a", text: "Zinc", match: :first)
 
     assert_includes title.evaluate_script("getComputedStyle(this).textDecorationLine"), "underline"
+  end
+
+  test "after a delete the list keeps a status that names the theme" do
+    visit theme_path(themes(:zinc))
+    accept_confirm { click_on "Delete" }
+
+    assert_selector "[role=status][data-testid=deleted-status]", text: "Zinc deleted"
+    sleep 6 # past the toast: the status is the lasting one
+
+    assert_selector "[role=status]", text: "Zinc deleted"
   end
 end
