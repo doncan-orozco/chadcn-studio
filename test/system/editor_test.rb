@@ -65,14 +65,12 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "oklch(0.6 0.1 30)", property("--ring")
 
     close_group
-    open_group "brand"
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
     assert_selector "#summary-brand", text: "oklch(0.215"
     assert_selector :testid, "overridden", count: 1, visible: :all
     assert_equal "oklch(0.6 0.1 30)", property("--ring")
 
-    close_group
     open_group "advanced"
     fill_in "override-light-ring", with: ""
     find_field("override-light-ring").send_keys(:enter)
@@ -107,6 +105,14 @@ class EditorTest < ApplicationSystemTestCase
     page.driver.browser.mouse.move(x: x, y: y).down.move(x: x + 60, y: y, steps: 4).up
 
     assert_selector :testid, "unsaved", text: "Unsaved changes"
+  end
+
+  test "name, Save, Publish and Export share one row and the brand color is in the first viewport" do
+    tops = %w[theme-name save publish-toggle export].map { |id| evaluate_script("document.querySelector('[data-testid=#{id}], ##{id}').getBoundingClientRect().top").round }
+
+    assert_equal 1, tops.uniq.size
+    assert evaluate_script("document.querySelector('[data-testid=brand-color]').getBoundingClientRect().bottom < window.innerHeight")
+    assert_selector :testid, "brand-color", visible: :visible
   end
 
   test "Save persists the name and the derived palette" do
@@ -155,6 +161,27 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "Zinc", @theme.reload.name
   end
 
+  test "a group panel shows the light and dark values as text and links to all values" do
+    open_group "brand"
+    row = find(:testid, "group-brand-panel").find(:testid, "variable-rows").find("li", text: /\A--primary\n/)
+
+    assert_equal @theme.light["primary"], row.find("[data-value=light]").text
+    assert_equal @theme.dark["primary"], row.find("[data-value=dark]").text
+    assert_selector :testid, "all-values-link"
+    assert_equal "#{theme_path(@theme)}#all-values", URI(find(:testid, "all-values-link")[:href]).then { |uri| [ uri.path, uri.fragment ].join("#") }
+  end
+
+  test "the All values link survives a derivation" do
+    open_group "brand"
+    find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
+
+    assert_selector "#summary-brand", text: "oklch(0.215"
+    panel = find(:testid, "group-brand-panel")
+
+    assert panel.has_selector?(:testid, "variable-rows")
+    assert panel.has_selector?(:testid, "all-values-link")
+  end
+
   test "the page switcher renders the other preview pages inside the preview root" do
     click_on "Settings"
 
@@ -163,10 +190,18 @@ class EditorTest < ApplicationSystemTestCase
 
   private
 
+  # The brand group is not a dialog: it sits open in the sidebar, its variable rows behind a disclosure.
   def open_group(key)
+    return open_brand_variables if key == "brand"
+
     find(:testid, "group-#{key}").click
 
     assert_selector :testid, "group-#{key}-panel"
+  end
+
+  def open_brand_variables
+    assert_selector :testid, "group-brand-panel"
+    find(:testid, "group-brand-panel").find("summary", text: "All brand variables").click
   end
 
   # The panel scrolls to the field that was filled; its Close button is at the top.

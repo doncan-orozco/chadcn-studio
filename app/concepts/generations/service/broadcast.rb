@@ -4,7 +4,7 @@
 module Generations::Service::Broadcast
   def self.status(generation)
     Turbo::StreamsChannel.broadcast_replace_to(
-      generation.theme, target: "generation_status",
+      generation.theme, target: "generation_status", layout: false,
       renderable: Components::Editor::GenerationStatus.new(status: Generations::Presenter::Status.new(generation))
     )
   end

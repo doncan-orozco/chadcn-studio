@@ -17,6 +17,8 @@ class Components::Editor::GroupDialog < Components::Base
   end
 
   def view_template
+    return inline_brand if @group.key == "brand"
+
     render Chadcn::Sidebar::MenuItem.new do
       render Chadcn::Dialog.new(id: @group.panel_id, modal: false) do
         render Chadcn::Dialog::Trigger.new(as_child: Chadcn::Sidebar::MenuButton.new(size: "lg", class: "group/menu-button", data: { testid: @group.panel_id })) { entry }
@@ -26,6 +28,20 @@ class Components::Editor::GroupDialog < Components::Base
   end
 
   private
+
+  # The brand color is the first thing a person changes, so it is never behind a click: its swatch and sliders sit open at
+  # the top of the sidebar, under the same ids the streams update.
+  def inline_brand
+    section(class: "grid gap-3 border-b p-2", aria: { labelledby: "#{@group.panel_id}-heading" }, data: { testid: "#{@group.panel_id}-panel" }) do
+      h2(id: "#{@group.panel_id}-heading", class: "text-sm font-medium") { @group.label }
+      p(id: @group.summary_id, class: "truncate text-xs text-muted-foreground") { @group.summary }
+      div(id: @group.controls_id) { render Components::Editor::BrandControls.new(group: @group) }
+      details(class: "text-sm") do
+        summary(class: "cursor-pointer text-muted-foreground") { "All brand variables" }
+        rows
+      end
+    end
+  end
 
   def entry
     span(class: "grid flex-1 text-left leading-tight") do
@@ -46,18 +62,12 @@ class Components::Editor::GroupDialog < Components::Base
 
   def body
     case @group.key
-    when "brand" then brand
     when "surfaces" then surfaces
     when "radius" then radius
     when "dark" then render Components::Editor::ModeSwitch.new
     when "advanced" then div(id: @group.controls_id) { render Components::Editor::AdvancedOverrides.new(group: @group) }
     else rows
     end
-  end
-
-  def brand
-    div(id: @group.controls_id) { render Components::Editor::BrandControls.new(group: @group) }
-    rows
   end
 
   def surfaces
@@ -72,5 +82,15 @@ class Components::Editor::GroupDialog < Components::Base
 
   def rows
     div(id: @group.rows_id) { render Components::Editor::VariableRows.new(rows: @group.rows) }
+    all_values_link
+  end
+
+  # Outside the stream target: a derivation (always an unsaved theme) must not erase it.
+  def all_values_link
+    return unless @group.values_path
+
+    p(class: "pt-2 text-xs") do
+      a(href: @group.values_path, class: "underline underline-offset-4", data: { testid: "all-values-link" }) { "See all values" }
+    end
   end
 end

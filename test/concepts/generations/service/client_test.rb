@@ -48,4 +48,10 @@ class Generations::Service::ClientTest < ActiveSupport::TestCase
 
     assert_equal :unavailable, Generations::Service::Client.new(client: FakeGenerationClient::Sdk.new(error: error)).palette_inputs(prompt: "x").status
   end
+
+  test "configured? is true only when an API key is present" do
+    assert Generations::Service::Client.configured?(env: { "ANTHROPIC_API_KEY" => "sk-test" })
+    refute Generations::Service::Client.configured?(env: { "ANTHROPIC_API_KEY" => " " })
+    refute Generations::Service::Client.configured?(env: {})
+  end
 end

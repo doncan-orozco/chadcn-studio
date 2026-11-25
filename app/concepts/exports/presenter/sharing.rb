@@ -11,6 +11,8 @@ class Exports::Presenter::Sharing < Core::Presenter::Base
   def publication_path = helpers.theme_publication_path(__getobj__)
   def publication_label = published? ? "Stop sharing" : "Share link"
   def unpublish? = published?
+  def publication_state = published? ? "Published" : "Not published"
+  def public_path = published? ? css.path : nil
   def dialog_title = "Export #{name}"
   def css = @css ||= Exports::Presenter::Css.new(__getobj__, base_url: @base_url)
   def json = @json ||= Exports::Presenter::Json.new(__getobj__)

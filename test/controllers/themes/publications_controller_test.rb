@@ -8,6 +8,26 @@ class Themes::PublicationsControllerTest < ActionDispatch::IntegrationTest
     assert_predicate themes(:zinc).reload, :published?
   end
 
+  test "POST as a Turbo Stream swaps the Export dialog body and the toggle and publishes" do
+    post theme_publication_path(themes(:zinc)), params: { from: "export_dialog" }, as: :turbo_stream
+
+    assert_response :success
+    assert_predicate themes(:zinc).reload, :published?
+    assert_select "turbo-stream[action=replace][target=export-dialog-host] [data-testid=import-command]"
+    assert_select "turbo-stream[action=replace][target=publish-toggle-form] [data-testid=publish-toggle]", /Unpublish/
+  end
+
+  test "publishing an invalid theme from the Export dialog answers 422 HTML with the errors" do
+    themes(:zinc).update_column(:light, themes(:zinc).light.except("primary"))
+
+    post theme_publication_path(themes(:zinc)), params: { from: "export_dialog" }, as: :turbo_stream
+
+    assert_response :unprocessable_entity
+    assert_equal "text/html", response.media_type
+    assert_select "[data-testid=editor-errors]", /primary/i
+    assert_not_predicate themes(:zinc).reload, :published?
+  end
+
   test "DELETE unpublishes and the public URL answers 404" do
     delete theme_publication_path(themes(:slate))
 
