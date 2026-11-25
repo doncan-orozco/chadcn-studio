@@ -26,17 +26,22 @@ class Components::Editor::ExportDialog::Body < Components::Base
   end
 
   def download_links
-    div(class: "grid gap-4") do
-      div(class: "flex gap-2") do
-        render Chadcn::Button.new(as_child: :a, href: @presenter.css.path, download: @presenter.css.filename, data: { testid: "download-css" }) { "Download CSS" }
-        render Chadcn::Button.new(as_child: :a, href: @presenter.json.path, download: @presenter.json.filename, variant: "outline", data: { testid: "download-json" }) { "Download JSON" }
+    div(class: "grid gap-4", data: { controller: "editor--export", editor__export_downloaded_label_value: @presenter.css.downloaded_label, editor__export_copied_label_value: "Copied" }) do
+      div(class: "grid gap-2") do
+        div(class: "flex gap-2") { download_buttons }
+        span(class: "text-sm text-muted-foreground", role: "status", data: { testid: "download-css-status", editor__export_target: "downloadStatus" })
       end
       import_command
     end
   end
 
+  def download_buttons
+    render Chadcn::Button.new(as_child: :a, href: @presenter.css.path, download: @presenter.css.filename, data: { testid: "download-css", action: "editor--export#downloaded" }) { @presenter.css.download_label }
+    render Chadcn::Button.new(as_child: :a, href: @presenter.json.path, download: @presenter.json.filename, variant: "outline", data: { testid: "download-json" }) { "Download JSON" }
+  end
+
   def import_command
-    div(class: "grid gap-1", role: "group", aria: { labelledby: "import-command-label" }, data: { controller: "editor--export", editor__export_copied_label_value: "Copied" }) do
+    div(class: "grid gap-1", role: "group", aria: { labelledby: "import-command-label" }) do
       p(id: "import-command-label", class: "text-sm font-medium leading-none") { "Import into a chadcn app" }
       div(class: "flex items-start gap-2") do
         code(class: "flex-1 break-all rounded-md border bg-muted px-3 py-2 font-mono text-xs", data: { testid: "import-command", editor__export_target: "source" }) { @presenter.css.import_command }
