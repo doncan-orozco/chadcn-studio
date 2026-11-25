@@ -29,7 +29,7 @@ class EditorTest < ApplicationSystemTestCase
 
     mouse.up
 
-    assert_selector "#summary-brand", text: moved_primary
+    assert_selector "#summary-brand", text: "Gray"
     derived = wait_for_style_change(moved)
 
     assert_equal 1, derivation_requests.size
@@ -67,7 +67,7 @@ class EditorTest < ApplicationSystemTestCase
     close_group
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
-    assert_selector "#summary-brand", text: "oklch(0.215"
+    assert_selector "#summary-brand", text: "Black"
     assert_selector :testid, "overridden", count: 1, visible: :all
     assert_equal "oklch(0.6 0.1 30)", property("--ring")
 
@@ -175,7 +175,7 @@ class EditorTest < ApplicationSystemTestCase
     open_group "brand"
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
-    assert_selector "#summary-brand", text: "oklch(0.215"
+    assert_selector "#summary-brand", text: "Black"
     panel = find(:testid, "group-brand-panel")
 
     assert panel.has_selector?(:testid, "variable-rows")

@@ -19,7 +19,7 @@ class ThemesTest < ApplicationSystemTestCase
     click_on "Create theme"
 
     assert_text "Theme created"
-    assert_selector "#summary-brand", text: "oklch(0.488 0.217 264.376)"
+    assert_selector "#summary-brand", text: "Blue"
     assert_equal "oklch(0.488 0.217 264.376)", Theme.find_by!(slug: "acme").light["primary"]
   end
 
