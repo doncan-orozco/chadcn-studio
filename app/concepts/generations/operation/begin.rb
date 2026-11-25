@@ -1,0 +1,48 @@
+# frozen_string_literal: true
+
+# A prompt and no theme yet -> a placeholder theme and a pending generation for it, job enqueued. The placeholder holds the
+# default palette until the generation replaces it, and is removed again when the generation cannot start, so a refused
+# prompt leaves nothing behind. Failures: :not_configured and :invalid (a blank prompt or a placeholder that cannot be saved),
+# then `Request`'s :busy and :capped; the failure's model is always the generation, the form being re-rendered.
+class Generations::Operation::Begin < Core::Operation
+  PLACEHOLDER_PRIMARY = "#71717a"
+  NAME_LIMIT = 40
+  private_constant :PLACEHOLDER_PRIMARY, :NAME_LIMIT
+
+  def initialize(create: Themes::Operation::Create.new, request: Generations::Operation::Request.new)
+    @create = create
+    @request = request
+    super()
+  end
+
+  def call(prompt:, configured:, hourly_cap: nil)
+    text = prompt.to_s.strip
+    fail_with_model!(Generation.new(prompt: text), code: :not_configured) unless configured
+    fail_with_model!(Generation.new(prompt: text), code: :invalid) if text.empty?
+
+    theme = step placeholder(text)
+    generation = step request(theme, text, hourly_cap)
+
+    { model: theme, generation: generation }
+  end
+
+  private
+
+  def placeholder(text)
+    created = @create.call(name: text.truncate(NAME_LIMIT), primary: PLACEHOLDER_PRIMARY)
+    return Success(created.value![:model]) if created.success?
+
+    Failure(model: Generation.new(prompt: text), code: :invalid)
+  end
+
+  def request(theme, text, hourly_cap)
+    requested = @request.call(theme: theme, prompt: text, hourly_cap: hourly_cap)
+    return Success(requested.value![:model]) if requested.success?
+
+    theme.destroy!
+    requested
+  rescue StandardError
+    Rails.logger.error("placeholder theme #{theme.id} left behind") unless theme.destroy
+    raise
+  end
+end
