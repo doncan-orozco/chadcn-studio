@@ -16,7 +16,9 @@ class Components::Gallery::Entry < Components::Base
         h3(class: "text-lg font-medium") { @entry.title }
         span(class: "text-xs text-muted-foreground") { @scenario_label }
       end
-      div(class: "rounded-xl border bg-card p-6 text-card-foreground") { demo }
+      # `transform-gpu` makes the card the containing block of `position: fixed` demos (the Sidebar), and `overflow-hidden`
+      # clips them, so no demo can cover the gallery index or the header.
+      div(class: "relative transform-gpu overflow-hidden rounded-xl border bg-card p-6 text-card-foreground") { demo }
     end
   end
 

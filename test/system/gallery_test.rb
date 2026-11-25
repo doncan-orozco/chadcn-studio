@@ -22,4 +22,30 @@ class GalleryTest < ApplicationSystemTestCase
     assert_includes link[:class], "hover:bg-accent"
     assert_includes link[:class], "focus-visible:ring-[3px]"
   end
+
+  test "the Sidebar demo stays inside its card and leaves the index and header links uncovered" do
+    visit gallery_path
+
+    assert_selector "[data-slot='sidebar-container']", visible: :all
+    escaped = evaluate_script(<<~JS)
+      [...document.querySelectorAll("[data-slot='sidebar-container']")].filter((sidebar) => {
+        const card = sidebar.closest("[data-testid='gallery-entry'] > div:last-child").getBoundingClientRect()
+        const box = sidebar.getBoundingClientRect()
+        return box.left < card.left - 1 || box.right > card.right + 1 || box.top < card.top - 1 || box.bottom > card.bottom + 1
+      }).length
+    JS
+
+    assert_equal 0, escaped
+
+    links = evaluate_script(<<~JS)
+      [...document.querySelectorAll("nav a, header a")].filter((link) => {
+        const box = link.getBoundingClientRect()
+        if (box.width === 0 || box.height === 0) return false
+        const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)
+        return hit && !link.contains(hit) && !hit.contains(link)
+      }).length
+    JS
+
+    assert_equal 0, links
+  end
 end
