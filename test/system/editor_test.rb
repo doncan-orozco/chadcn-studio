@@ -162,7 +162,7 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "false", find(:testid, "describe")[:"aria-expanded"]
   end
 
-  test "the describe dialog opens from the keyboard, lands on the prompt, keeps Tab inside and returns focus on Escape" do
+  test "the describe dialog opens from the keyboard, lands on the prompt, tabs to Generate and returns focus on Escape" do
     evaluate_script("document.querySelector('[data-testid=describe]').focus()")
     page.driver.browser.keyboard.type(:enter)
 

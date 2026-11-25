@@ -21,7 +21,7 @@ class Components::Editor::GenerationPanel < Components::Base
     turbo_stream_from @panel.stream_source
     div(class: "contents", data: controller_data) do
       render Chadcn::Dialog.new(id: DIALOG_ID, modal: false) do
-        render Chadcn::Dialog::Trigger.new(as_child: Chadcn::Button.new(variant: "outline", data: { testid: "describe" })) { "Describe a theme" }
+        render Chadcn::Dialog::Trigger.new(as_child: Chadcn::Button.new(variant: "outline", data: { testid: "describe", editor__describe_target: "trigger" })) { "Describe a theme" }
         render Chadcn::Dialog::Portal.new(force_mount: true) do
           render Chadcn::Dialog::Content.new(class: PANEL, data: { testid: "generation-panel" }) do
             heading
