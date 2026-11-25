@@ -74,8 +74,8 @@ class EditorRadiusTest < ApplicationSystemTestCase
 
   test "the number box never blocks Save, whatever the stored radius is" do
     fill_in "Name", with: "Renamed"
-    click_on "Save"
+    click_on "Save theme"
 
-    assert_text "Theme saved"
+    assert_text "Renamed saved"
   end
 end
