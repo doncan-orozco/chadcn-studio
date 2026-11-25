@@ -4,12 +4,14 @@
 class Components::Editor::ExportDialog::Body < Components::Base
   include Phlex::Rails::Helpers::FormAuthenticityToken
 
+  ORIGIN = "export_dialog"
+
   def initialize(presenter:)
     @presenter = presenter
   end
 
   def view_template
-    div(id: "export-body") { @presenter.published? ? download_links : draft_offer }
+    div { @presenter.published? ? download_links : draft_offer }
   end
 
   private
@@ -17,7 +19,7 @@ class Components::Editor::ExportDialog::Body < Components::Base
   def draft_offer
     form(action: @presenter.publication_path, method: "post", class: "grid gap-3", data: { testid: "export-draft" }) do
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
-      input(type: "hidden", name: "from", value: "export_dialog")
+      input(type: "hidden", name: "from", value: ORIGIN)
       p(class: "text-sm text-muted-foreground") { "This theme is a draft. Publish it to get its download links and import command." }
       render Chadcn::Button.new(type: "submit", data: { testid: "export-publish" }) { "Publish and show import command" }
     end

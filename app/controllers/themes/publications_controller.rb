@@ -14,7 +14,7 @@ class Themes::PublicationsController < ApplicationController
 
   def theme = @theme ||= Theme.find(params[:theme_id])
 
-  def from_export_dialog? = request.format.turbo_stream? && params[:from] == "export_dialog"
+  def from_export_dialog? = request.format.turbo_stream? && params[:from] == Components::Editor::ExportDialog::Body::ORIGIN
 
   def respond_to_result(result, notice:)
     if result.success?
@@ -24,12 +24,12 @@ class Themes::PublicationsController < ApplicationController
     end
   end
 
-  # Publishing from inside the Export dialog: swap the dialog body and the toggle, the dialog stays open.
+  # Publishing from inside the Export dialog: the dialog comes back open on the published body, the toggle follows.
   def render_dialog(model)
     sharing = Exports::Presenter::Sharing.new(model, base_url: request.base_url)
     render turbo_stream: [
-      turbo_stream.replace("export-body", Components::Editor::ExportDialog::Body.new(presenter: sharing)),
-      turbo_stream.replace("publish-toggle-form", Components::Editor::PublishToggle.new(presenter: sharing))
+      turbo_stream.replace(Components::Editor::ExportDialog::HOST_ID, Components::Editor::ExportDialog.new(presenter: sharing, open: true)),
+      turbo_stream.replace(Components::Editor::PublishToggle::FORM_ID, Components::Editor::PublishToggle.new(presenter: sharing))
     ]
   end
 end

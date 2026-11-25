@@ -34,7 +34,13 @@ class ExportsTest < ApplicationSystemTestCase
     assert_predicate themes(:zinc).reload, :published?
     send_keys :escape
 
+    assert_no_selector :testid, "export-panel"
     assert_selector :testid, "publish-toggle", text: "Unpublish"
+
+    click_on "Export"
+
+    assert_selector :testid, "download-css"
+    assert_no_selector :testid, "export-draft"
   end
 
   test "unpublishing takes the theme off its URL" do
