@@ -12,6 +12,7 @@ class Themes::DerivationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal Mime[:turbo_stream], response.media_type
     assert_select "turbo-stream[action=update][target=editor-palette]"
     assert_select "turbo-stream[target=summary-brand] template", text: Themes::Oklch.parse("oklch(0.55 0.2 250)").to_hex
+    assert_select "turbo-stream[target=summary-brand] template span[aria-hidden=true][style^=background-color]"
     assert_select "turbo-stream[target=summary-radius] template", text: "0.5rem"
     assert_select "turbo-stream[target=rows-charts] template li", count: 5
     assert_select "turbo-stream[target=advanced-overrides] template [data-testid=override-row]", minimum: 30

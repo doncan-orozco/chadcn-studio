@@ -48,7 +48,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   def summary
     case key
-    when "brand" then brand_color.to_hex
+    when "brand" then summary_style ? brand_color.to_hex : primary.to_s
     when "radius" then light["radius"].to_s
     when "advanced" then override_count.zero? ? "No overrides" : "#{override_count} overridden"
     else "#{variables.size} colors"

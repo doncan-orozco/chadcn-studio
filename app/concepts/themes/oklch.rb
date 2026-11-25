@@ -48,11 +48,26 @@ class Themes::Oklch
     new(lightness.clamp(LIGHTNESS.begin, LIGHTNESS.end), chroma < ACHROMATIC ? 0.0 : chroma, hue)
   end
 
+  # oklch -> the three 0..255 sRGB channels, the inverse of `from_hex`; out-of-gamut channels are clamped.
+  def self.to_srgb(lightness, chroma, hue)
+    radians = hue * Math::PI / 180
+    cones = CONES.map { |row| weigh(row, [ lightness, chroma * Math.cos(radians), chroma * Math.sin(radians) ])**3 }
+
+    LINEAR_RGB.map { |row| srgb_channel(weigh(row, cones)) }
+  end
+
+  def self.srgb_channel(linear)
+    linear = linear.clamp(0.0, 1.0)
+    gamma = linear <= 0.0031308 ? linear * 12.92 : (1.055 * (linear**(1 / 2.4))) - 0.055
+
+    (gamma * 255).round.clamp(0, 255)
+  end
+
   def self.linearize(channel) = channel <= 0.04045 ? channel / 12.92 : ((channel + 0.055) / 1.055)**2.4
 
   def self.weigh(row, values) = row.zip(values).sum { |weight, value| weight * value }
 
-  private_class_method :from_hex, :linearize, :weigh
+  private_class_method :from_hex, :linearize, :weigh, :srgb_channel
 
   def initialize(lightness, chroma, hue, alpha = nil)
     @lightness = number!(:lightness, lightness, LIGHTNESS)
@@ -73,13 +88,7 @@ class Themes::Oklch
   end
 
   # The sRGB hex spelling (`#rrggbb`), out-of-gamut channels clamped; the alpha is not part of it.
-  def to_hex
-    radians = hue * Math::PI / 180
-    cones = CONES.map { |row| weigh_color(row, [ lightness, chroma * Math.cos(radians), chroma * Math.sin(radians) ])**3 }
-    channels = LINEAR_RGB.map { |row| encode(weigh_color(row, cones)) }
-
-    format("#%02x%02x%02x", *channels)
-  end
+  def to_hex = format("#%02x%02x%02x", *self.class.to_srgb(lightness, chroma, hue))
 
   def ==(other) = other.is_a?(self.class) && to_s == other.to_s
   alias_method :eql?, :==
@@ -87,15 +96,6 @@ class Themes::Oklch
   def hash = to_s.hash
 
   private
-
-  def weigh_color(row, values) = row.zip(values).sum { |weight, value| weight * value }
-
-  def encode(linear)
-    linear = linear.clamp(0.0, 1.0)
-    gamma = linear <= 0.0031308 ? linear * 12.92 : (1.055 * (linear**(1 / 2.4))) - 0.055
-
-    (gamma * 255).round.clamp(0, 255)
-  end
 
   def number!(name, value, range)
     number = begin
