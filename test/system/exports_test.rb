@@ -10,9 +10,12 @@ class ExportsTest < ApplicationSystemTestCase
     assert_no_selector :testid, "download-css"
     send_keys :escape
 
+    assert_selector :testid, "publication-state", text: "Not published"
     click_on "Publish"
 
     assert_text "Theme published"
+    assert_selector :testid, "publication-state", text: "Published"
+    assert_selector :testid, "publication-link"
     assert_selector :testid, "publish-toggle", text: "Unpublish"
 
     click_on "Export"
@@ -49,6 +52,7 @@ class ExportsTest < ApplicationSystemTestCase
     click_on "Unpublish"
 
     assert_text "Theme unpublished"
+    assert_selector :testid, "publication-state", text: "Not published"
     click_on "Export"
 
     assert_selector :testid, "export-draft"
