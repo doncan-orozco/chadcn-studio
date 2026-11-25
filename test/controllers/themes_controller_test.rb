@@ -10,10 +10,10 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid=theme-card] [role=img] span", Theme.count * Themes::Presenter::Card::SWATCHES.size
   end
 
-  test "GET /themes makes New theme secondary while themes exist" do
+  test "GET /themes makes New theme the primary while themes exist" do
     get themes_path
 
-    assert_select "main a[href=?][data-variant=outline]", new_theme_path, text: "New theme"
+    assert_select "main a[href=?][data-variant=default]", new_theme_path, text: "New theme"
   end
 
   test "GET /themes keeps New theme primary on the empty state" do
@@ -106,6 +106,26 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid=preview-root] h2", minimum: 1
   end
 
+  test "GET /themes/:id/edit says a draft is not published" do
+    get edit_theme_path(themes(:zinc))
+
+    assert_select "[data-testid=publication-state]", text: /Not published/
+    assert_select "[data-testid=publication-link]", 0
+  end
+
+  test "GET /themes/:id/edit says a published theme is published and links its public URL" do
+    get edit_theme_path(themes(:slate))
+
+    assert_select "[data-testid=publication-state]", text: /Published/
+    assert_select "[data-testid=publication-link][href=?]", "/t/slate.css"
+  end
+
+  test "GET /themes/:id/edit puts the theme name in the document title" do
+    get edit_theme_path(themes(:zinc))
+
+    assert_select "title", text: "Edit Zinc - Chadcn Studio"
+  end
+
   test "GET /themes/:id shows the palette, light and dark" do
     get theme_path(themes(:zinc))
 
@@ -133,5 +153,36 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_difference("Theme.count", -1) { delete theme_path(themes(:zinc)) }
 
     assert_redirected_to themes_path
+  end
+
+  test "PATCH /themes/:id names the saved theme in the toast" do
+    theme = themes(:zinc)
+    patch theme_path(theme), params: { theme: { name: "Ocean" } }
+
+    assert_redirected_to edit_theme_path(theme)
+    assert_equal "Ocean saved", flash[:notice]
+  end
+
+  test "GET /themes/:id/edit reads Save theme and renders the unsaved marker hidden" do
+    get edit_theme_path(themes(:zinc))
+
+    assert_select "button[data-testid=save]", text: "Save theme"
+    assert_select "[role=status] [data-testid=unsaved][hidden]", text: "Unsaved changes"
+  end
+
+  test "PATCH /themes/:id rejected re-renders the editor with the unsaved marker visible" do
+    patch theme_path(themes(:zinc)), params: { theme: { name: "Zinc", inputs: { primary: "oklch(2 0.2 250)" } } }
+
+    assert_response :unprocessable_entity
+    assert_select "[data-testid=unsaved]:not([hidden])", text: "Unsaved changes"
+  end
+
+  test "PATCH /themes/:id escapes a markup name in the toast" do
+    theme = themes(:zinc)
+    patch theme_path(theme), params: { theme: { name: "<b>x</b>" } }
+    follow_redirect!
+
+    assert_includes response.body, "&lt;b&gt;x&lt;/b&gt; saved"
+    assert_select "b", 0
   end
 end

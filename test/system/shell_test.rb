@@ -44,4 +44,14 @@ class ShellTest < ApplicationSystemTestCase
     assert_selector "[data-testid=theme-dark][aria-pressed=true]"
     assert_selector "[data-testid=theme-system][aria-pressed=false]"
   end
+
+  test "the header brand link is at least 24 px tall on every screen of the create path" do
+    [ root_path, new_theme_path, edit_theme_path(themes(:zinc)) ].each do |screen|
+      visit screen
+      brand = find("header a[href='#{root_path}']")
+      height = brand.evaluate_script("this.getBoundingClientRect().height")
+
+      assert_operator height, :>=, 24, "brand link on #{screen} is #{height}px tall"
+    end
+  end
 end

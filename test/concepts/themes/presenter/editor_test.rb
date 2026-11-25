@@ -67,4 +67,8 @@ class Themes::Presenter::EditorTest < ActiveSupport::TestCase
     assert_equal "/derivations", @editor.derivations_path
     assert_equal "/derivations?controls=1", @editor.refresh_path
   end
+
+  test "the document title carries the theme name" do
+    assert_equal "Edit Zinc - Chadcn Studio", @editor.document_title
+  end
 end

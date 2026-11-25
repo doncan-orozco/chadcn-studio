@@ -6,6 +6,7 @@ class Views::Themes::Show::Palette < Views::Base
   end
 
   def view_template
+    h2(id: "all-values", class: "mb-2 scroll-mt-6 text-lg font-semibold") { "All values" }
     render Chadcn::Table.new(data: { testid: "palette" }) do |table|
       table.caption { "Every variable of the theme, light and dark." }
       table.header do

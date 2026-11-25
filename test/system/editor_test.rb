@@ -38,7 +38,7 @@ class EditorTest < ApplicationSystemTestCase
   end
 
   test "the page title and the sidebar summaries name things in words, not oklch" do
-    assert_title "Edit Zinc · Chadcn Studio"
+    assert_title "Edit Zinc - Chadcn Studio"
     assert_selector "h1", text: "Edit Zinc"
     assert_selector "#summary-brand", text: /\A#\h{6}\z/
     assert_no_selector "[id^=summary-]", text: "oklch"
@@ -72,14 +72,12 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "oklch(0.6 0.1 30)", property("--ring")
 
     close_group
-    open_group "brand"
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
     assert_selector "#summary-brand", text: /\A#\h{6}\z/
     assert_selector :testid, "overridden", count: 1, visible: :all
     assert_equal "oklch(0.6 0.1 30)", property("--ring")
 
-    close_group
     open_group "advanced"
     fill_in "override-light-ring", with: ""
     find_field("override-light-ring").send_keys(:enter)
@@ -98,11 +96,37 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal before, property("--foreground")
   end
 
+  test "the toolbar offers Save theme and shows Unsaved changes only once the editor differs" do
+    assert_button "Save theme"
+    assert_no_selector :testid, "unsaved"
+
+    fill_in "Name", with: "Renamed"
+
+    assert_selector :testid, "unsaved", text: "Unsaved changes"
+  end
+
+  test "moving a slider marks the editor unsaved" do
+    open_group "brand"
+    thumb = find(:testid, "primary-lightness").find("[role=slider]")
+    x, y = center_of(thumb)
+    page.driver.browser.mouse.move(x: x, y: y).down.move(x: x + 60, y: y, steps: 4).up
+
+    assert_selector :testid, "unsaved", text: "Unsaved changes"
+  end
+
+  test "name, Save, Publish and Export share one row and the brand color is in the first viewport" do
+    tops = %w[theme-name save publish-toggle export].map { |id| evaluate_script("document.querySelector('[data-testid=#{id}], ##{id}').getBoundingClientRect().top").round }
+
+    assert_equal 1, tops.uniq.size
+    assert evaluate_script("document.querySelector('[data-testid=brand-color]').getBoundingClientRect().bottom < window.innerHeight")
+    assert_selector :testid, "brand-color", visible: :visible
+  end
+
   test "Save persists the name and the derived palette" do
     fill_in "Name", with: "Renamed"
-    click_on "Save"
+    click_on "Save theme"
 
-    assert_text "Theme saved"
+    assert_text "Renamed saved"
     assert_equal "Renamed", @theme.reload.name
   end
 
@@ -114,9 +138,9 @@ class EditorTest < ApplicationSystemTestCase
     assert_selector :testid, "overridden", count: 1
     assert_equal "oklch(0.714 0.019 261.325)", property("--border")
 
-    click_on "Save"
+    click_on "Save theme"
 
-    assert_text "Theme saved"
+    assert_text "Zinc saved"
     assert_equal({ "light" => { "border" => "oklch(0.714 0.019 261.325)" } }, @theme.reload.inputs["overrides"])
   end
 
@@ -127,20 +151,42 @@ class EditorTest < ApplicationSystemTestCase
 
     assert_selector :testid, "overridden", count: 1
     close_group
-    click_on "Save"
+    click_on "Save theme"
 
-    assert_text "Theme saved"
+    assert_text "Zinc saved"
     assert_equal({ "light" => { "ring" => "oklch(0.6 0.1 30)" } }, @theme.reload.inputs["overrides"])
     assert_equal "oklch(0.6 0.1 30)", @theme.light["ring"]
   end
 
   test "a rejected Save re-renders the editor with the errors" do
     page.execute_script("document.querySelector('[name=\"theme[inputs][primary]\"]').value = 'oklch(2 0.2 250)'")
-    click_on "Save"
+    click_on "Save theme"
 
     assert_selector :testid, "editor-errors", text: "Primary must be"
+    assert_selector :testid, "unsaved", text: "Unsaved changes"
     assert_selector :testid, "preview-root"
     assert_equal "Zinc", @theme.reload.name
+  end
+
+  test "a group panel shows the light and dark values as text and links to all values" do
+    open_group "brand"
+    row = find(:testid, "group-brand-panel").find(:testid, "variable-rows").find("li", text: /\A--primary\n/)
+
+    assert_equal @theme.light["primary"], row.find("[data-value=light]").text
+    assert_equal @theme.dark["primary"], row.find("[data-value=dark]").text
+    assert_selector :testid, "all-values-link"
+    assert_equal "#{theme_path(@theme)}#all-values", URI(find(:testid, "all-values-link")[:href]).then { |uri| [ uri.path, uri.fragment ].join("#") }
+  end
+
+  test "the All values link survives a derivation" do
+    open_group "brand"
+    find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
+
+    assert_selector "#summary-brand", text: "#19191c"
+    panel = find(:testid, "group-brand-panel")
+
+    assert panel.has_selector?(:testid, "variable-rows")
+    assert panel.has_selector?(:testid, "all-values-link")
   end
 
   test "the page switcher renders the other preview pages inside the preview root" do
@@ -151,10 +197,18 @@ class EditorTest < ApplicationSystemTestCase
 
   private
 
+  # The brand group is not a dialog: it sits open in the sidebar, its variable rows behind a disclosure.
   def open_group(key)
+    return open_brand_variables if key == "brand"
+
     find(:testid, "group-#{key}").click
 
     assert_selector :testid, "group-#{key}-panel"
+  end
+
+  def open_brand_variables
+    assert_selector :testid, "group-brand-panel"
+    find(:testid, "group-brand-panel").find("summary", text: "All brand variables").click
   end
 
   # The panel scrolls to the field that was filled; its Close button is at the top.

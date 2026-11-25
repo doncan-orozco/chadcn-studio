@@ -77,6 +77,9 @@ class Themes::Presenter::Group < Core::Presenter::Base
     end
   end
 
+  # The theme page's full table; nil while the theme is unsaved (a derivation never has an id).
+  def values_path = persisted? ? "#{helpers.theme_path(__getobj__)}#all-values" : nil
+
   # One field per overridable variable of the mode; a blank field is not an override.
   def overrides(mode)
     palette = mode == "dark" ? dark : light
