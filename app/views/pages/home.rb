@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Views::Pages::Home < Views::Base
+  ROW_LINK = "flex min-h-8 w-full items-center gap-3 rounded-md px-2 text-sm font-medium hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+
   def initialize(presenter)
     @presenter = presenter
   end
@@ -26,10 +28,17 @@ class Views::Pages::Home < Views::Base
     section(class: "space-y-3") do
       h2(class: "text-lg font-semibold tracking-tight") { "Your themes" }
       ul(class: "space-y-2", aria: { label: "Your themes" }) do
-        @presenter.cards.each do |card|
-          li { a(href: card.edit_path, class: "flex min-h-8 w-full items-center rounded-md px-2 text-sm font-medium underline-offset-4 hover:underline focus-visible:underline focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none") { card.name } }
-        end
+        @presenter.cards.each { |card| li { theme_row(card) } }
       end
+    end
+  end
+
+  # The whole row is the link: a swatch, the name underlined at rest, a chevron.
+  def theme_row(card)
+    a(href: card.edit_path, class: ROW_LINK) do
+      span(class: "size-4 shrink-0 rounded-full border", style: card.swatches.find { |swatch| swatch.name == "primary" }&.style, aria: { hidden: "true" })
+      span(class: "flex-1 text-primary underline underline-offset-4", data: { link_name: true }) { card.name }
+      span(class: "text-muted-foreground after:content-['›']", aria: { hidden: "true" })
     end
   end
 end

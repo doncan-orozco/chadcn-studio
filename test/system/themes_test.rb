@@ -121,4 +121,20 @@ class ThemesTest < ApplicationSystemTestCase
     assert_selector "#theme-name[aria-invalid='true']"
     assert_field "Brand color", with: "oklch(0.488 0.217 264.376)"
   end
+
+  test "home's theme rows are links at least 24 px tall with a resting underline" do
+    visit root_path
+    row = "document.querySelector(\"ul[aria-label='Your themes'] a\")"
+
+    assert_operator evaluate_script("#{row}.getBoundingClientRect().height"), :>=, 24
+    assert_includes evaluate_script("getComputedStyle(#{row}.querySelector('[data-link-name]')).textDecorationLine"), "underline"
+  end
+
+  test "a card's title reads as a link at rest" do
+    visit themes_path
+
+    title = find(:testid, "theme-card", text: "Zinc").find("a", text: "Zinc", match: :first)
+
+    assert_includes title.evaluate_script("getComputedStyle(this).textDecorationLine"), "underline"
+  end
 end
