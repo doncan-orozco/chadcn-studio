@@ -33,7 +33,7 @@ class Components::Editor::VariableRows < Components::Base
   end
 
   def all_values_link
-    path = @rows.first&.values_path
+    path = @rows.values_path
     return unless path
 
     p(class: "pt-2 text-xs") do
