@@ -13,14 +13,15 @@ export default class extends Controller {
 
   paint() {
     const typed = this.inputTarget.value.trim()
-    const color = typed && parse(typed)
+    const color = typed ? parse(typed) : undefined
+
     if (color) {
-      this.swatchTarget.style.backgroundColor = formatCss(color)
+      this.swatchTarget.style.cssText = `background-color: ${formatCss(color)}`
       this.swatchTarget.dataset.state = "typed"
-    } else {
-      this.swatchTarget.removeAttribute("style")
-      this.swatchTarget.style.cssText = this.swatchTarget.dataset.derived || ""
-      this.swatchTarget.dataset.state = typed ? "invalid" : "derived"
+      return
     }
+
+    this.swatchTarget.style.cssText = this.swatchTarget.dataset.derived || ""
+    this.swatchTarget.dataset.state = typed ? "invalid" : "derived"
   }
 }

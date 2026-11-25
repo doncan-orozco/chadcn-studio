@@ -12,15 +12,22 @@ class Components::Editor::AdvancedOverridesTest < ActiveSupport::TestCase
     assert_equal @group.overrides("light").size + @group.overrides("dark").size, names.size
   end
 
-  test "each field shows a swatch beside it, the derived color as hex in the placeholder, and says Close keeps what was typed" do
-    html = Components::Editor::AdvancedOverrides.new(group: @group).call
+  test "each field has a decorative swatch wired to the swatch controller" do
+    page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
     rows = @group.overrides("light").size + @group.overrides("dark").size
 
-    assert_equal rows, html.scan('data-testid="override-swatch"').size
-    assert_equal rows, html.scan('data-controller="editor--override-swatch"').size
-    assert_equal rows, html.scan(/aria-hidden="true"[^>]*data-testid="override-swatch"|data-testid="override-swatch"[^>]*aria-hidden="true"/).size
+    assert page.has_css?("[data-controller='editor--override-swatch'] [data-testid='override-swatch'][aria-hidden='true']", count: rows)
+    assert page.has_css?("input[data-editor--override-swatch-target='input']", count: rows)
+  end
+
+  test "placeholders are the derived color as hex, never oklch" do
+    html = Components::Editor::AdvancedOverrides.new(group: @group).call
+
     assert_match(/placeholder="#\h{6}"/, html)
     refute_match(/placeholder="oklch/, html)
-    assert_includes html, "Closing this panel keeps what you typed"
+  end
+
+  test "the panel says that closing keeps what was typed" do
+    assert_includes Components::Editor::AdvancedOverrides.new(group: @group).call, "Closing this panel keeps what you typed"
   end
 end

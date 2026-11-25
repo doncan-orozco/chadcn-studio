@@ -37,6 +37,13 @@ class Themes::Presenter::Group < Core::Presenter::Base
   Row = Data.define(:name, :light, :light_style, :dark, :dark_style)
   Override = Data.define(:mode, :name, :derived, :value, :style, :field_name, :field_id) do
     def overridden? = value.present?
+
+    # The derived value in the hex a person would type; the oklch string when it cannot be converted.
+    def placeholder
+      Themes::Oklch.parse(derived).to_hex
+    rescue Themes::Oklch::Invalid
+      derived
+    end
   end
 
   # The sidebar entry that opens a group's panel; links between panels name it.

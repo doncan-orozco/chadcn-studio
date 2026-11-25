@@ -33,7 +33,7 @@ class Components::Editor::AdvancedOverrides < Components::Base
       div(class: "flex items-center gap-2") do
         swatch(override)
         render Chadcn::Input.new(
-          id: override.field_id, name: override.field_name, default_value: override.value, placeholder: placeholder(override),
+          id: override.field_id, name: override.field_name, default_value: override.value, placeholder: override.placeholder,
           autocomplete: "off", spellcheck: "false", class: "font-mono text-xs",
           data: { editor__override_swatch_target: "input", action: "input->editor--override-swatch#paint change->editor--preview#commit keydown.enter->editor--preview#confirm:prevent" }
         )
@@ -45,12 +45,5 @@ class Components::Editor::AdvancedOverrides < Components::Base
   def swatch(override)
     span(class: "size-6 shrink-0 rounded-md border", style: override.style, aria: { hidden: "true" },
          data: { testid: "override-swatch", editor__override_swatch_target: "swatch", derived: override.style })
-  end
-
-  # The derived value in the hex a person would type, so the placeholder shows what to type; oklch when it cannot be converted.
-  def placeholder(override)
-    ::Themes::Oklch.parse(override.derived).to_hex
-  rescue ::Themes::Oklch::Invalid
-    override.derived
   end
 end
