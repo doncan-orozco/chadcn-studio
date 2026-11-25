@@ -29,7 +29,8 @@ class GenerationTest < ApplicationSystemTestCase
 
     # The success broadcasts a refresh that re-renders the page (and the dialog): wait for the palette, then look at the status.
     assert_selector :testid, "preview-root", visible: :all, style: /--primary: oklch\(0\.55 0\.2 250\)/
-    click_on "Describe a theme" unless page.has_selector?(:testid, "generation-panel", wait: 1)
+    assert_no_selector :testid, "generation-panel"
+    click_on "Describe a theme"
 
     assert_selector :testid, "generation-status", text: "A confident blue with soft corners."
     assert_equal "oklch(0.55 0.2 250)", themes(:slate).reload.inputs["primary"]

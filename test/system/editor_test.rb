@@ -144,7 +144,6 @@ class EditorTest < ApplicationSystemTestCase
     assert_operator header_bottom - editor_top, :<=, 100
   end
 
-  # Focus return on close is not asserted: a force-mounted gem dialog never releases its focus scope (UPSTREAM, chadcn).
   test "the describe trigger announces a dialog, points at its panel while open and drops the pointer on Escape" do
     trigger = find(:testid, "describe")
 
@@ -161,6 +160,24 @@ class EditorTest < ApplicationSystemTestCase
     assert_no_selector :testid, "generation-panel"
     assert_nil find(:testid, "describe")[:"aria-controls"]
     assert_equal "false", find(:testid, "describe")[:"aria-expanded"]
+  end
+
+  test "the describe dialog opens from the keyboard, lands on the prompt, keeps Tab inside and returns focus on Escape" do
+    evaluate_script("document.querySelector('[data-testid=describe]').focus()")
+    page.driver.browser.keyboard.type(:enter)
+
+    assert_selector :testid, "generation-panel"
+    assert_equal "generation-prompt", evaluate_script("document.activeElement.id")
+
+    page.driver.browser.keyboard.type("calm blue", :tab)
+
+    assert_equal "generate", evaluate_script("document.activeElement.dataset.testid")
+    assert_selector :testid, "generation-panel"
+
+    page.driver.browser.keyboard.type(:escape)
+
+    assert_no_selector :testid, "generation-panel"
+    assert_equal "describe", evaluate_script("document.activeElement.dataset.testid")
   end
 
   test "the page switcher renders the other preview pages inside the preview root" do

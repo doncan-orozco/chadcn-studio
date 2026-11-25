@@ -5,11 +5,13 @@
 # The portal is force-mounted (in the body, outside the toolbar form) so `#generation_status` exists while the dialog is
 # closed and a broadcast that lands then is not lost. A force-mounted modal would also mount its overlay and scroll lock
 # while closed, so the dialog is non-modal (like the group panels) and the closed content is hidden by a class.
+# That dialog never moves focus in on open nor back on close (UPSTREAM chadcn), so `editor--describe` bridges the keyboard.
 class Components::Editor::GenerationPanel < Components::Base
   include Phlex::Rails::Helpers::FormAuthenticityToken
   include Phlex::Rails::Helpers::TurboStreamFrom
 
   PANEL = "data-[state=closed]:hidden"
+  DIALOG_ID = "generation-dialog"
 
   def initialize(panel:)
     @panel = panel
@@ -17,13 +19,15 @@ class Components::Editor::GenerationPanel < Components::Base
 
   def view_template
     turbo_stream_from @panel.stream_source
-    render Chadcn::Dialog.new(id: "generation-dialog", modal: false) do
-      render Chadcn::Dialog::Trigger.new(as_child: Chadcn::Button.new(variant: "outline", data: { testid: "describe" })) { "Describe a theme" }
-      render Chadcn::Dialog::Portal.new(force_mount: true) do
-        render Chadcn::Dialog::Content.new(class: PANEL, data: { testid: "generation-panel" }) do
-          heading
-          prompt_form
-          render Components::Editor::GenerationStatus.new(status: status)
+    div(class: "contents", data: controller_data) do
+      render Chadcn::Dialog.new(id: DIALOG_ID, modal: false) do
+        render Chadcn::Dialog::Trigger.new(as_child: Chadcn::Button.new(variant: "outline", data: { testid: "describe" })) { "Describe a theme" }
+        render Chadcn::Dialog::Portal.new(force_mount: true) do
+          render Chadcn::Dialog::Content.new(class: PANEL, data: { testid: "generation-panel" }) do
+            heading
+            prompt_form
+            render Components::Editor::GenerationStatus.new(status: status)
+          end
         end
       end
     end
@@ -32,6 +36,13 @@ class Components::Editor::GenerationPanel < Components::Base
   private
 
   def status = @panel.status
+
+  def controller_data
+    {
+      controller: "editor--describe", action: "chadcn--dialog:open-change->editor--describe#toggled",
+      editor__describe_prompt_value: "generation-prompt", editor__describe_panel_value: DIALOG_ID
+    }
+  end
 
   def heading
     render Chadcn::Dialog::Header.new do
