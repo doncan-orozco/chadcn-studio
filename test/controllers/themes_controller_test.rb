@@ -98,6 +98,14 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "label[for='theme-name'] span[aria-hidden='true']", text: "*"
   end
 
+  test "GET /themes/:id/edit names the page with one h1 and the fixtures with h2" do
+    get edit_theme_path(themes(:zinc))
+
+    assert_response :success
+    assert_select "h1", count: 1, text: "Edit Zinc"
+    assert_select "[data-testid=preview-root] h2", minimum: 1
+  end
+
   test "GET /themes/:id shows the palette, light and dark" do
     get theme_path(themes(:zinc))
 

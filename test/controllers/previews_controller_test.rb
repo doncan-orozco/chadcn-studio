@@ -2,12 +2,12 @@ require "test_helper"
 
 class PreviewsControllerTest < ActionDispatch::IntegrationTest
   Views::Previews::PAGES.each_key do |page|
-    test "GET /previews/#{page} renders the page inside the preview root with an h1" do
+    test "GET /previews/#{page} renders the page inside the preview root with a heading" do
       get preview_path(page)
 
       assert_response :success
       assert_select "[data-testid=preview-root]"
-      assert_select "h1", minimum: 1
+      assert_select "h1, h2", minimum: 1
     end
   end
 
