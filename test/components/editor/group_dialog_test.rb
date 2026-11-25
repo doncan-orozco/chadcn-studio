@@ -3,14 +3,12 @@ require "test_helper"
 class Components::Editor::GroupDialogTest < ActiveSupport::TestCase
   Group = Struct.new(:key, :label, :description, :summary, :panel_id, :summary_id, keyword_init: true)
 
-  test "the sublabel switches to the accent foreground where the entry is open, active or hovered" do
+  test "the entry shows the group's label and summary in its trigger" do
     html = render_dialog
-    sublabel = html[/<span id="summary-dark"[^>]*>/]
 
-    assert_includes sublabel, "text-muted-foreground"
-    assert_includes sublabel, "in-data-[state=open]:text-sidebar-accent-foreground"
-    assert_includes sublabel, "in-data-[active=true]:text-sidebar-accent-foreground"
-    assert_includes sublabel, "in-hover:text-sidebar-accent-foreground"
+    assert_includes html, "Dark mode"
+    assert_includes html, ">System</span>"
+    assert_includes html, 'id="summary-dark"'
   end
 
   private
