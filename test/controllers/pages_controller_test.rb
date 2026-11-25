@@ -30,7 +30,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
   test "home theme links carry a visible focus style" do
     get root_path
 
-    assert_select "main ul[aria-label='Your themes'] a.focus-visible\\:outline-none"
+    assert_select "main ul[aria-label='Your themes'] a.focus-visible\\:ring-\\[3px\\].focus-visible\\:outline-none"
   end
 
   test "home theme links are full-width rows at least 24 px tall, spaced apart" do
