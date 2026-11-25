@@ -10,6 +10,9 @@ class Themes::Presenter::Group < Core::Presenter::Base
   SURFACES = (COLORS - BRAND - CHARTS - SIDEBAR).freeze
   RADIUS = Chadcn::Theme::ROOT_ONLY
   MODES = %w[light dark].freeze
+  # The variables a person reaches for most when pinning one, listed first in Advanced.
+  PINNED_FIRST = %w[primary border ring].freeze
+  PINNABLE = %w[surfaces charts sidebar].freeze
 
   DEFINITIONS = {
     "brand" => { label: "Brand color", description: "Pick the primary color; the rest of the palette follows.", variables: BRAND },
@@ -17,7 +20,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
     "radius" => { label: "Radius", description: "How round corners are.", variables: RADIUS },
     "charts" => { label: "Charts", description: "The five chart colors.", variables: CHARTS },
     "sidebar" => { label: "Sidebar", description: "The sidebar mirror of the palette.", variables: SIDEBAR },
-    "advanced" => { label: "Advanced", description: "Pin a single variable; the others keep following the rule.", variables: COLORS + RADIUS }
+    "advanced" => { label: "Advanced", description: "Pin a single variable; the others keep following the rule.", variables: PINNED_FIRST + (COLORS - PINNED_FIRST) + RADIUS }
   }.freeze
   KEYS = DEFINITIONS.keys.freeze
 
@@ -36,6 +39,9 @@ class Themes::Presenter::Group < Core::Presenter::Base
     def overridden? = value.present?
   end
 
+  # The sidebar entry that opens a group's panel; links between panels name it.
+  def self.trigger_id(key) = "group-#{key}-trigger"
+
   def self.all(theme) = KEYS.map { |key| new(theme, key: key) }
 
   def initialize(theme, key:)
@@ -52,6 +58,8 @@ class Themes::Presenter::Group < Core::Presenter::Base
   def summary_id = "summary-#{key}"
   def rows_id = "rows-#{key}"
   def panel_id = "group-#{key}"
+  def trigger_id = self.class.trigger_id(key)
+  def advanced_trigger_id = self.class.trigger_id("advanced")
 
   # The element the derivation stream updates with the brand swatch and its hex.
   def swatch_id = "#{key}-swatch"
@@ -63,7 +71,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
     case key
     when "brand" then color_name
     when "radius" then light["radius"].to_s
-    when "advanced" then override_count.zero? ? "No overrides" : "#{override_count} overridden"
+    when "advanced" then override_count.zero? ? "Set one color by hex" : "#{override_count} overridden"
     else SUMMARIES.fetch(key)
     end
   end
@@ -85,6 +93,9 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   def tint = Float(inputs.to_h.fetch("tint") { Themes::Service::Harmony::DEFAULTS[:tint] })
   def radius_rem = Float(light["radius"].to_s.delete_suffix("rem"), exception: false) || 0.0
+
+  # Whether the panel offers a way to Advanced: the groups whose variables are shown as read-only rows.
+  def pinnable? = PINNABLE.include?(key)
 
   def variables = definition[:variables]
   def modes = MODES
