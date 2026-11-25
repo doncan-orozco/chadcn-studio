@@ -1,6 +1,9 @@
 class Themes::PublicationsController < ApplicationController
   def create
-    respond_to_result Themes::Operation::Publish.new.call(model: theme), notice: "Theme published", dialog: true
+    result = Themes::Operation::Publish.new.call(model: theme)
+    return render_dialog(result.value![:model]) if result.success? && from_export_dialog?
+
+    respond_to_result result, notice: "Theme published"
   end
 
   def destroy
@@ -11,10 +14,10 @@ class Themes::PublicationsController < ApplicationController
 
   def theme = @theme ||= Theme.find(params[:theme_id])
 
-  def respond_to_result(result, notice:, dialog: false)
-    if result.success?
-      return render_dialog(result.value![:model]) if dialog && params[:from] == "export_dialog" && request.format.turbo_stream?
+  def from_export_dialog? = request.format.turbo_stream? && params[:from] == "export_dialog"
 
+  def respond_to_result(result, notice:)
+    if result.success?
       redirect_to edit_theme_path(result.value![:model]), notice: notice, status: :see_other
     else
       render Views::Themes::Edit.new(Themes::Presenter::Editor.new(result.failure[:model])), status: :unprocessable_entity
