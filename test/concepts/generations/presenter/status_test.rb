@@ -68,8 +68,8 @@ class Generations::Presenter::StatusTest < ActiveSupport::TestCase
 
   test "a failure of the generation can be retried; one that never started or a limit cannot" do
     assert_predicate Generations::Presenter::Status.new(generations(:failed)), :retryable?
-    assert_predicate Generations::Presenter::Status.new(Generation.new, failure: :throttled), :retryable?
-    %i[not_configured capped busy prompt].each do |code|
+    assert_predicate Generations::Presenter::Status.new(Generation.new, failure: :unavailable), :retryable?
+    %i[not_configured capped throttled busy prompt].each do |code|
       refute_predicate Generations::Presenter::Status.new(Generation.new, failure: code), :retryable?, code
     end
     refute_predicate Generations::Presenter::Status.new(generations(:pending)), :retryable?

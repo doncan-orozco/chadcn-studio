@@ -8,6 +8,8 @@ class Components::Editor::GenerationStatusTest < ActiveSupport::TestCase
     assert_includes html, "Your description is kept in the field."
     assert_includes html, "Try again"
     assert_includes html, "Pick a primary color instead"
+    assert_includes html, 'aria-haspopup="dialog"'
+    assert_includes html, 'aria-controls="group-brand"'
     assert_includes html, "<svg"
     assert_equal 1, html.scan('role="alert"').size
   end

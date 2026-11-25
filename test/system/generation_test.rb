@@ -85,6 +85,7 @@ class GenerationTest < ApplicationSystemTestCase
     click_on "Try again"
 
     assert_selector :testid, "generation-status", text: "Generating a theme"
+    assert_equal "generation-prompt", evaluate_script("document.activeElement.id")
     perform_enqueued_jobs
 
     assert_selector :testid, "generation-status", text: "A confident blue with soft corners."
@@ -97,6 +98,8 @@ class GenerationTest < ApplicationSystemTestCase
     fill_in "Describe a theme", with: "calm blue"
     click_on "Generate"
     perform_enqueued_jobs
+
+    assert_equal "dialog", find(:testid, "generation-pick-color")["aria-haspopup"]
     click_button "Pick a primary color instead"
 
     assert_selector :testid, "group-brand-panel", visible: :visible

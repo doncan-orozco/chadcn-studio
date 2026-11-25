@@ -17,8 +17,8 @@ class Generations::Presenter::Status < Core::Presenter::Base
   }.freeze
   private_constant :MESSAGES
 
-  # Failures where sending the same description again cannot help (nothing is set up, the limit is hit, a run is going, or the text itself is rejected).
-  UNRETRYABLE = %w[not_configured capped busy prompt].freeze
+  # Failures where sending the same description again now cannot help (nothing is set up, a limit is hit, a run is going, or the text itself is rejected).
+  UNRETRYABLE = %w[not_configured capped throttled busy prompt].freeze
   private_constant :UNRETRYABLE
 
   # `failure` is a code for a generation that never started (a prompt that was refused by the form).

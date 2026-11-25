@@ -4,10 +4,12 @@
 # so a stream can replace it. The model's text is plain text (llm-generation R8). A failure is a destructive alert under
 # the field that keeps the description and offers the way on: try again, or pick the primary color by hand. Both actions are buttons that forward to the control that already exists.
 class Components::Editor::GenerationStatus < Components::Base
-  # The prompt field's form and the Brand group's trigger, which the two actions hand the click to (the status sits
-  # outside the form, and a streamed fragment cannot carry a form's CSRF token).
+  # The prompt field (its form holds the CSRF token a streamed fragment cannot carry) and the Brand group's dialog
+  # trigger (Components::Editor::GroupDialog, keyed by the group's panel_id), which the two actions hand the click to.
   PROMPT_FIELD = "#generation-prompt"
   BRAND_TRIGGER = "[data-testid='group-brand']"
+  BRAND_PANEL = "group-brand"
+  BASE = "min-h-5 text-sm empty:hidden"
 
   def initialize(status: nil)
     @status = status
@@ -26,9 +28,7 @@ class Components::Editor::GenerationStatus < Components::Base
 
   private
 
-  def classes(failed)
-    failed ? "min-h-5 text-sm empty:hidden" : "min-h-5 text-sm empty:hidden text-muted-foreground"
-  end
+  def classes(failed) = failed ? BASE : "#{BASE} text-muted-foreground"
 
   def failure
     render Chadcn::Alert.new(variant: :destructive) do |alert|
@@ -53,7 +53,7 @@ class Components::Editor::GenerationStatus < Components::Base
   end
 
   def color_button
-    render Chadcn::Button.new(type: "button", size: "sm", variant: "link", data: forwarding(:click, BRAND_TRIGGER, testid: "generation-pick-color")) { "Pick a primary color instead" }
+    render Chadcn::Button.new(type: "button", size: "sm", variant: "link", aria: { haspopup: "dialog", controls: BRAND_PANEL }, data: forwarding(:click, BRAND_TRIGGER, testid: "generation-pick-color")) { "Pick a primary color instead" }
   end
 
   def forwarding(method, selector, testid:)
