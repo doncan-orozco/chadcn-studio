@@ -17,8 +17,8 @@ class Themes::Presenter::ListTest < ActiveSupport::TestCase
     assert_equal "No themes yet.", list.summary
   end
 
-  test "New theme leads only on an empty list" do
-    assert_equal "outline", Themes::Presenter::List.new(Theme.all).new_theme_variant
+  test "New theme is the primary whether or not themes exist" do
+    assert_equal "default", Themes::Presenter::List.new(Theme.all).new_theme_variant
     assert_equal "default", Themes::Presenter::List.new(Theme.none).new_theme_variant
   end
 
