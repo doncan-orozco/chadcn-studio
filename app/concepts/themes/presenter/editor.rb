@@ -60,6 +60,7 @@ class Themes::Presenter::Editor < Core::Presenter::Base
   def derivations_path = helpers.derivations_path
   def refresh_path = helpers.derivations_path(controls: 1)
   def title = "Edit #{name}"
+  def document_title = "#{title} - Chadcn Studio"
 
   private
 
