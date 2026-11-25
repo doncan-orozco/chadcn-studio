@@ -90,8 +90,28 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     summaries.each { |summary| refute_match(/variable|oklch/, summary) }
   end
 
-  test "without overrides the advanced summary says so" do
-    assert_equal "No overrides", Themes::Presenter::Group.new(@theme, key: "advanced").summary
+  test "without overrides the advanced summary says what the group is for" do
+    assert_equal "Set one color by hex", Themes::Presenter::Group.new(@theme, key: "advanced").summary
+  end
+
+  test "advanced lists primary, border and ring first, then the rest, radius last" do
+    names = Themes::Presenter::Group.new(@theme, key: "advanced").overrides("light").map(&:name)
+
+    assert_equal %w[--primary --border --ring], names.first(3)
+    assert_equal "--radius", names.last
+    assert_equal Themes::Presenter::Group.new(@theme, key: "advanced").variables.size - 1, names.size
+    assert_equal names.uniq, names
+  end
+
+  test "a group's trigger id is the one panel links name" do
+    assert_equal "group-advanced-trigger", Themes::Presenter::Group.new(@theme, key: "advanced").trigger_id
+    assert_equal Themes::Presenter::Group.trigger_id("surfaces"), Themes::Presenter::Group.new(@theme, key: "surfaces").trigger_id
+  end
+
+  test "only the groups of read-only rows point to Advanced" do
+    pinnable = Themes::Presenter::Group.all(@theme).select(&:pinnable?).map(&:key)
+
+    assert_equal %w[surfaces charts sidebar], pinnable
   end
 
   test "the brand swatch id is the stream target of the brand swatch" do

@@ -24,7 +24,7 @@ class Components::Editor::AdvancedOverrides < Components::Base
   end
 
   def field(override)
-    div(class: "grid gap-1", data: { testid: "override-row", overridden: override.overridden?.to_s }) do
+    div(class: "grid gap-1", data: { testid: "override-row", overridden: override.overridden?.to_s, variable: override.name.delete_prefix("--"), editor__variable_filter_target: "row" }) do
       div(class: "flex items-center justify-between gap-2") do
         render Chadcn::Label.new(html_for: override.field_id, class: "font-mono text-xs") { override.name }
         render Chadcn::Badge.new(variant: "secondary", data: { testid: "overridden" }) { "Overridden" } if override.overridden?
