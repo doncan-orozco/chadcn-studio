@@ -85,4 +85,11 @@ class Themes::Operation::UpdateTest < ActiveSupport::TestCase
 
     assert_nil moved.inputs["primary_hex"]
   end
+
+  test "a newly typed hex primary replaces the remembered one" do
+    @theme.update!(inputs: { "primary" => Themes::Oklch.parse("#1d4ed8").to_s, "primary_hex" => "#1d4ed8" })
+    saved = Themes::Operation::Update.new.call(model: @theme, params: { "inputs" => { "primary" => "#ff0000" } }).value![:model].reload
+
+    assert_equal "#ff0000", saved.inputs["primary_hex"]
+  end
 end

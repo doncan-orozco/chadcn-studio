@@ -35,7 +35,7 @@ class Components::Editor::GroupDialog < Components::Base
     section(class: "grid gap-3 border-b p-2", aria: { labelledby: "#{@group.panel_id}-heading" }, data: { testid: "#{@group.panel_id}-panel" }) do
       h2(id: "#{@group.panel_id}-heading", class: "text-sm font-medium") { @group.label }
       div(class: "flex items-center gap-2 text-xs text-muted-foreground") do
-        span(id: "brand-swatch", class: "contents") { render Components::Editor::BrandSwatch.new(group: @group) }
+        span(id: @group.swatch_id, class: "contents") { render Components::Editor::BrandSwatch.new(group: @group) }
         p(id: @group.summary_id, class: "truncate") { @group.summary }
       end
       div(id: @group.controls_id) { render Components::Editor::BrandControls.new(group: @group) }

@@ -83,8 +83,8 @@ class Themes::Oklch
   def to_hex
     radians = hue * Math::PI / 180
     lab = [ lightness, chroma * Math.cos(radians), chroma * Math.sin(radians) ]
-    cones = LMS_FROM_LAB.map { |row| row.zip(lab).sum { |weight, value| weight * value }**3 }
-    channels = RGB_FROM_LMS.map { |row| delinearize(row.zip(cones).sum { |weight, value| weight * value }) }
+    cones = LMS_FROM_LAB.map { |row| self.class.send(:weigh, row, lab)**3 }
+    channels = RGB_FROM_LMS.map { |row| delinearize(self.class.send(:weigh, row, cones)) }
 
     channels.map { |channel| format("%02x", (channel * 255).round) }.join.prepend("#")
   end

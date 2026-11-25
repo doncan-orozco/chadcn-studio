@@ -94,6 +94,10 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     assert_equal "No overrides", Themes::Presenter::Group.new(@theme, key: "advanced").summary
   end
 
+  test "the brand swatch id is the stream target of the brand swatch" do
+    assert_equal "brand-swatch", Themes::Presenter::Group.new(@theme, key: "brand").swatch_id
+  end
+
   test "controls ids are the stream targets of the brand and advanced panels" do
     assert_equal "brand-controls", Themes::Presenter::Group.new(@theme, key: "brand").controls_id
     assert_equal "advanced-overrides", Themes::Presenter::Group.new(@theme, key: "advanced").controls_id

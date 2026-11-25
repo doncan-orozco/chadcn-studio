@@ -54,6 +54,9 @@ class Themes::Presenter::Group < Core::Presenter::Base
   def panel_id = "group-#{key}"
 
   # The element the derivation stream updates inside this group's panel.
+  # The element the derivation stream updates with the brand swatch and its hex.
+  def swatch_id = "#{key}-swatch"
+
   def controls_id = key == "advanced" ? "advanced-overrides" : "#{key}-controls"
 
   def summary
