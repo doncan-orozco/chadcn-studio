@@ -20,13 +20,17 @@ class Generations::Presenter::PanelTest < ActiveSupport::TestCase
     assert_predicate panel.prompt_placeholder, :present?
   end
 
-  test "a studio without a key or an injected client is not configured and its status says so" do
-    key = ENV.delete("ANTHROPIC_API_KEY")
-    panel = Generations::Presenter::Panel.new(themes(:blue))
+  test "a studio not configured says so in its status" do
+    panel = Generations::Presenter::Panel.new(themes(:blue), configured: false)
 
-    refute_predicate panel, :configured?
     assert_equal :failed, panel.status.state
     assert_match(/not set up/, panel.status.message)
+  end
+
+  test "a studio without a key or an injected client is not configured" do
+    key = ENV.delete("ANTHROPIC_API_KEY")
+
+    refute_predicate Generations::Presenter::Panel.new(themes(:blue)), :configured?
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
   end

@@ -63,8 +63,8 @@ class GenerationTest < ApplicationSystemTestCase
     visit edit_theme_path(themes(:slate))
 
     assert_selector :testid, "generation-status", text: "Generation is not set up in this studio"
-    assert_selector "[data-testid=generate][disabled]"
-    assert_selector "#generation-prompt[disabled]"
+    assert_button "Generate", disabled: true
+    assert_field "Describe a theme", disabled: true
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
   end
