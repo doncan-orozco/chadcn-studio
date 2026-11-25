@@ -58,4 +58,11 @@ class Generations::Presenter::StatusTest < ActiveSupport::TestCase
       assert_match(/unavailable/, status.message)
     end
   end
+
+  test "a studio without a client says generation is not set up" do
+    status = Generations::Presenter::Status.new(Generation.new, failure: :not_configured)
+
+    assert_predicate status, :failed?
+    assert_equal "Generation is not set up in this studio.", status.message
+  end
 end

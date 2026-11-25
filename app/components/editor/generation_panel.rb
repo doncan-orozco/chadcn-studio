@@ -18,21 +18,24 @@ class Components::Editor::GenerationPanel < Components::Base
         render Chadcn::Label.new(html_for: "generation-prompt") { "Describe a theme" }
         render Chadcn::Input.new(**prompt_attributes)
       end
-      render Chadcn::Button.new(type: "submit", variant: "outline", data: { testid: "generate" }) { "Generate" }
+      render Chadcn::Button.new(type: "submit", variant: "outline", disabled: !configured?, data: { testid: "generate" }) { "Generate" }
     end
     render Components::Editor::GenerationStatus.new(status: status)
   end
 
   private
 
-  def status = @panel.status
+  def status = configured? ? @panel.status : Generations::Presenter::Status.new(Generation.new, failure: :not_configured)
+
+  # A key in the environment, or the client the job was given (tests).
+  def configured? = Generations::Service::Client.configured? || GenerateThemeJob.client.present?
 
   def prompt_attributes
     attributes = {
       id: "generation-prompt", name: @panel.prompt_param, maxlength: @panel.prompt_limit, required: true,
-      placeholder: @panel.prompt_placeholder, class: "w-80", aria: { describedby: "generation_status" }
+      placeholder: @panel.prompt_placeholder, disabled: !configured?, class: "w-80", aria: { describedby: "generation_status" }
     }
-    attributes[:aria][:invalid] = "true" if status&.failed?
+    attributes[:aria][:invalid] = "true" if configured? && status&.failed?
     attributes
   end
 end

@@ -60,6 +60,9 @@ class Generations::Service::Client
     Answer only with the JSON object of the schema.
   PROMPT
 
+  # Whether a real call can be made: the SDK reads its key from ANTHROPIC_API_KEY (llm-generation R1).
+  def self.configured?(env: ENV) = env["ANTHROPIC_API_KEY"].to_s.strip.present?
+
   def initialize(client: nil, timeout: TIMEOUT)
     raise ArgumentError, "inject a fake client in tests" if client.nil? && Rails.env.test?
 
