@@ -20,6 +20,10 @@ class Themes::Oklch
   # Below this chroma the color is a gray: its hue is noise, so it is spelled as 0.
   ACHROMATIC = 0.0005
 
+  # The inverse: oklab -> LMS cube roots, then linear sRGB.
+  LMS_FROM_LAB = [ [ 1.0, 0.3963377774, 0.2158037573 ], [ 1.0, -0.1055613458, -0.0638541728 ], [ 1.0, -0.0894841775, -1.2914855480 ] ].freeze
+  RGB_FROM_LMS = [ [ 4.0767416621, -3.3077115913, 0.2309699292 ], [ -1.2684380046, 2.6097574011, -0.3413193965 ], [ -0.0041960863, -0.7034186147, 1.7076147010 ] ].freeze
+
   private_constant :NUMBER, :PATTERN, :HEX, :LMS, :LAB, :ACHROMATIC
 
   attr_reader :lightness, :chroma, :hue, :alpha
@@ -68,6 +72,17 @@ class Themes::Oklch
     alpha ? "oklch(#{base} / #{format_number(alpha)}%)" : "oklch(#{base})"
   end
 
+  # The sRGB hex a person would type for this color ("#1d4ed8"), lower case; out-of-gamut channels are clamped. Alpha is ignored.
+  # Oklch is kept at three decimals, so a hex that went through it can come back a few steps off.
+  def to_hex
+    radians = hue * Math::PI / 180
+    lab = [ lightness, chroma * Math.cos(radians), chroma * Math.sin(radians) ]
+    cones = LMS_FROM_LAB.map { |row| row.zip(lab).sum { |weight, value| weight * value }**3 }
+    channels = RGB_FROM_LMS.map { |row| delinearize(row.zip(cones).sum { |weight, value| weight * value }) }
+
+    channels.map { |channel| format("%02x", (channel * 255).round) }.join.prepend("#")
+  end
+
   def ==(other) = other.is_a?(self.class) && to_s == other.to_s
   alias_method :eql?, :==
 
@@ -84,6 +99,11 @@ class Themes::Oklch
     raise Invalid, "#{name} #{value.inspect} is outside #{range}" unless number.finite? && range.cover?(number)
 
     number
+  end
+
+  def delinearize(channel)
+    channel = channel.clamp(0.0, 1.0)
+    channel <= 0.0031308 ? channel * 12.92 : (1.055 * channel**(1 / 2.4)) - 0.055
   end
 
   def format_number(value) = format("%.3f", value).sub(/\.?0+\z/, "")

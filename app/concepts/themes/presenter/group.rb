@@ -68,6 +68,16 @@ class Themes::Presenter::Group < Core::Presenter::Base
   # The brand color as the three numbers the sliders move.
   def primary = inputs.to_h["primary"].presence || light["primary"]
 
+  # The brand color as a person writes it: the hex they typed while the primary still is that color, else the closest hex.
+  def hex
+    typed = inputs.to_h["primary_hex"]
+    typed.present? && Themes::Oklch.parse(typed).to_s == brand_color.to_s ? typed : brand_color.to_hex
+  rescue Themes::Oklch::Invalid
+    brand_color.to_hex
+  end
+
+  def hex_swatch_style = "background-color: #{hex}"
+
   def lightness = brand_color.lightness
   def chroma = brand_color.chroma
   def hue = brand_color.hue

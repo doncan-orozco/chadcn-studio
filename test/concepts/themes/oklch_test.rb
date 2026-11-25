@@ -81,4 +81,13 @@ class Themes::OklchTest < ActiveSupport::TestCase
       assert_raises(Themes::Oklch::Invalid, value) { Themes::Oklch.parse(value) }
     end
   end
+
+  test "to_hex writes the sRGB hex of a color, and a typed hex comes back within a few steps through the stored spelling" do
+    assert_equal "#1d4ed8", Themes::Oklch.parse("#1d4ed8").to_hex
+    assert_equal "#ffffff", Themes::Oklch.new(1, 0, 0).to_hex
+    assert_equal "#000000", Themes::Oklch.new(0, 0, 0).to_hex
+    stored = Themes::Oklch.parse(Themes::Oklch.parse("#1d4ed8").to_s)
+
+    assert_equal "#1d4ed8", stored.to_hex
+  end
 end

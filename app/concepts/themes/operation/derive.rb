@@ -44,9 +44,21 @@ class Themes::Operation::Derive < Core::Operation
 
   # A color typed as hex becomes oklch here, so the stored inputs and the palette speak one color space.
   def canonical(values)
-    values = values.merge(primary: Themes::Oklch.parse(values[:primary]).to_s)
+    values = values.merge(primary: Themes::Oklch.parse(values[:primary]).to_s).merge(primary_hex: typed_hex(values)).compact
     return values unless values[:overrides]
 
     values.merge(overrides: values[:overrides].transform_values { |variables| variables.to_h.transform_values { |color| Themes::Oklch.parse(color).to_s } })
+  end
+
+  # The hex the person typed, kept so the editor can show it back: oklch stored at three decimals cannot reproduce it.
+  # Dropped as soon as the primary moved away from it (a slider, the picker).
+  def typed_hex(values)
+    typed = values[:primary_hex] || (values[:primary] if values[:primary].to_s.match?(/\A\s*#?\h{3,6}\s*\z/))
+    return unless typed
+
+    hex = Themes::Oklch.parse(typed)
+    digits = typed.to_s.strip.delete_prefix("#")
+    digits = digits.gsub(/\h/) { |digit| digit * 2 } if digits.size == 3
+    "##{digits.downcase}" if hex.to_s == Themes::Oklch.parse(values[:primary]).to_s
   end
 end
