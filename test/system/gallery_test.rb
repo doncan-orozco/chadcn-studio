@@ -34,7 +34,10 @@ class GalleryTest < ApplicationSystemTestCase
     visit gallery_path
 
     assert_selector "nav[aria-label='Components'] a", minimum: 1
-    assert_equal 0, covered_links
+    hits = link_hits
+
+    assert_empty hits["covered"]
+    assert_operator hits["reachable"], :>=, 1, "no index link could be hit-tested in the first viewport"
   end
 
   private
@@ -49,14 +52,24 @@ class GalleryTest < ApplicationSystemTestCase
     JS
   end
 
-  def covered_links
+  # Links fully inside the first viewport (and inside their own scroll container: the index scrolls), split into the ones the
+  # user can hit and the ones something else covers.
+  def link_hits
     evaluate_script(<<~JS)
-      [...document.querySelectorAll("nav a, header a")].filter((link) => {
-        const box = link.getBoundingClientRect()
-        if (box.width === 0 || box.height === 0) return false
-        const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)
-        return hit && !link.contains(hit) && !hit.contains(link)
-      }).length
+      (() => {
+        const result = { reachable: 0, covered: [] }
+        document.querySelectorAll("nav a, header a").forEach((link) => {
+          const box = link.getBoundingClientRect()
+          if (box.width === 0 || box.height === 0 || box.top < 0 || box.bottom > window.innerHeight) return
+          const scroller = link.closest("nav")
+          const bounds = scroller ? scroller.getBoundingClientRect() : null
+          if (bounds && (box.bottom > bounds.bottom || box.top < bounds.top)) return
+          const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)
+          if (hit && (link.contains(hit) || hit.contains(link))) result.reachable++
+          else result.covered.push(link.textContent.trim())
+        })
+        return result
+      })()
     JS
   end
 end
