@@ -7,6 +7,7 @@ export default class extends Controller {
   static values = { copiedLabel: String, downloadedLabel: String, resetMs: { type: Number, default: 2000 } }
 
   #timer = null
+  #downloadTimer = null
   #originalLabel = null
 
   connect() {
@@ -27,7 +28,14 @@ export default class extends Controller {
   }
 
   downloaded() {
-    this.downloadStatusTarget.textContent = this.downloadedLabelValue
+    if (!this.hasDownloadStatusTarget) return
+
+    clearTimeout(this.#downloadTimer)
+    this.downloadStatusTarget.textContent = "" // Cleared first so a repeat download is announced again.
+    requestAnimationFrame(() => {
+      if (this.hasDownloadStatusTarget) this.downloadStatusTarget.textContent = this.downloadedLabelValue
+    })
+    this.#downloadTimer = setTimeout(() => this.#clearDownloadStatus(), this.resetMsValue)
   }
 
   #confirm() {
@@ -37,9 +45,16 @@ export default class extends Controller {
     this.#timer = setTimeout(() => this.#restore(), this.resetMsValue)
   }
 
+  #clearDownloadStatus() {
+    clearTimeout(this.#downloadTimer)
+    this.#downloadTimer = null
+    if (this.hasDownloadStatusTarget) this.downloadStatusTarget.textContent = ""
+  }
+
   #restore() {
     clearTimeout(this.#timer)
     this.#timer = null
+    this.#clearDownloadStatus()
     if (this.hasStatusTarget) this.statusTarget.textContent = ""
     if (this.#originalLabel !== null && this.hasButtonTarget) this.buttonTarget.textContent = this.#originalLabel
   }

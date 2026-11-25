@@ -26,7 +26,7 @@ class Components::Editor::ExportDialog::Body < Components::Base
   end
 
   def download_links
-    div(class: "grid gap-4", data: { controller: "editor--export", editor__export_downloaded_label_value: "Downloaded #{@presenter.css.filename}", editor__export_copied_label_value: "Copied" }) do
+    div(class: "grid gap-4", data: { controller: "editor--export", editor__export_downloaded_label_value: @presenter.css.downloaded_label, editor__export_copied_label_value: "Copied" }) do
       div(class: "grid gap-2") do
         div(class: "flex gap-2") { download_buttons }
         span(class: "text-sm text-muted-foreground", role: "status", data: { testid: "download-css-status", editor__export_target: "downloadStatus" })
@@ -36,7 +36,7 @@ class Components::Editor::ExportDialog::Body < Components::Base
   end
 
   def download_buttons
-    render Chadcn::Button.new(as_child: :a, href: @presenter.css.path, download: @presenter.css.filename, data: { testid: "download-css", action: "editor--export#downloaded" }) { "Download #{@presenter.css.filename}" }
+    render Chadcn::Button.new(as_child: :a, href: @presenter.css.path, download: @presenter.css.filename, data: { testid: "download-css", action: "editor--export#downloaded" }) { @presenter.css.download_label }
     render Chadcn::Button.new(as_child: :a, href: @presenter.json.path, download: @presenter.json.filename, variant: "outline", data: { testid: "download-json" }) { "Download JSON" }
   end
 

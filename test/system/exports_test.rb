@@ -73,6 +73,7 @@ class ExportsTest < ApplicationSystemTestCase
     link.click
 
     assert_selector :testid, "download-css-status", text: "Downloaded theme.css"
+    assert_selector :testid, "download-css-status", text: "", exact_text: true, visible: :all, wait: 5
   end
 
   test "unpublishing takes the theme off its URL" do

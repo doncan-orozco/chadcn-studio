@@ -23,6 +23,8 @@ class Exports::Presenter::Css < Core::Presenter::Base
   def path = helpers.theme_export_path(slug, format: "css")
   # Always theme.css: the name `chadcn:theme:import` and shadcn use, whatever the theme is called.
   def filename = "theme.css"
+  def download_label = "Download #{filename}"
+  def downloaded_label = "Downloaded #{filename}"
   def content_type = CONTENT_TYPE
   def import_command = "bin/rails theme:import[#{url}]"
 
