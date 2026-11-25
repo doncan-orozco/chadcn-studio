@@ -68,4 +68,40 @@ class GenerationTest < ApplicationSystemTestCase
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
   end
+
+  test "a failed generation keeps the description and Try again sends it once more" do
+    GenerateThemeJob.client = FakeGenerationClient.refusing
+    visit edit_theme_path(themes(:slate))
+
+    fill_in "Describe a theme", with: "calm blue"
+    click_on "Generate"
+    perform_enqueued_jobs
+
+    assert_selector :testid, "generation-status", text: "declined"
+    assert_selector :testid, "generation-status", text: "Your description is kept"
+    assert_field "Describe a theme", with: "calm blue"
+
+    GenerateThemeJob.client = FakeGenerationClient.new
+    click_on "Try again"
+
+    assert_selector :testid, "generation-status", text: "Generating a theme"
+    assert_equal "generation-prompt", evaluate_script("document.activeElement.id")
+    perform_enqueued_jobs
+
+    assert_selector :testid, "generation-status", text: "A confident blue with soft corners."
+  end
+
+  test "a failed generation links to the primary color" do
+    GenerateThemeJob.client = FakeGenerationClient.refusing
+    visit edit_theme_path(themes(:slate))
+
+    fill_in "Describe a theme", with: "calm blue"
+    click_on "Generate"
+    perform_enqueued_jobs
+
+    assert_equal "dialog", find(:testid, "generation-pick-color")["aria-haspopup"]
+    click_button "Pick a primary color instead"
+
+    assert_selector :testid, "group-brand-panel", visible: :visible
+  end
 end
