@@ -16,13 +16,19 @@ class Components::Gallery::Entry < Components::Base
         h3(class: "text-lg font-medium") { @entry.title }
         span(class: "text-xs text-muted-foreground") { @scenario_label }
       end
-      # `transform-gpu` makes the card the containing block of `position: fixed` demos (the Sidebar), and `overflow-hidden`
-      # clips them, so no demo can cover the gallery index or the header.
-      div(class: "relative transform-gpu overflow-hidden rounded-xl border bg-card p-6 text-card-foreground") { demo }
+      div(class: card_classes, data: { testid: "gallery-card" }) { demo }
     end
   end
 
   private
+
+  CARD_CLASSES = "rounded-xl border bg-card p-6 text-card-foreground"
+  # The gem's Sidebar is `position: fixed`. `transform-gpu` makes the card its containing block and `overflow-hidden`
+  # clips it, so it cannot cover the gallery index or the header. Other demos (popovers, menus) are left unclipped.
+  CONTAINED_CARD_CLASSES = "relative transform-gpu overflow-hidden #{CARD_CLASSES}".freeze
+  FIXED_POSITION_COMPONENTS = %w[sidebar].freeze
+
+  def card_classes = FIXED_POSITION_COMPONENTS.include?(@entry.component.to_s) ? CONTAINED_CARD_CLASSES : CARD_CLASSES
 
   def demo
     # `capture` restores the buffer if the renderer raises; the captured HTML is Phlex output, already escaped.
