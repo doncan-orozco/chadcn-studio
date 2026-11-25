@@ -90,12 +90,13 @@ class EditorTest < ApplicationSystemTestCase
   end
 
   test "Save theme is disabled while the save is submitting" do
-    evaluate_script(<<~JS)
-      document.addEventListener("turbo:submit-start", () => { window.saveDisabledAtStart = document.querySelector("[data-testid=save]").disabled })
+    execute_script(<<~JS, find_button("Save theme"))
+      const save = arguments[0]
+      document.addEventListener("turbo:submit-start", () => { window.saveDisabledAtStart = save.disabled }, { once: true })
     JS
     click_on "Save theme"
 
-    assert_text "saved"
+    assert_text "Zinc saved"
     assert evaluate_script("window.saveDisabledAtStart"), "Save theme should be disabled once the submit starts"
   end
 
