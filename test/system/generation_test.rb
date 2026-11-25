@@ -20,7 +20,8 @@ class GenerationTest < ApplicationSystemTestCase
     GenerateThemeJob.client = FakeGenerationClient.new
     visit edit_theme_path(themes(:slate))
 
-    fill_in "Describe a theme", with: "calm blue"
+    click_on "Describe a theme"
+    fill_in "Prompt", with: "calm blue"
     click_on "Generate"
 
     assert_selector :testid, "generation-status", text: "Generating a theme"
@@ -35,7 +36,8 @@ class GenerationTest < ApplicationSystemTestCase
     GenerateThemeJob.client = FakeGenerationClient.refusing
     visit edit_theme_path(themes(:slate))
 
-    fill_in "Describe a theme", with: "something"
+    click_on "Describe a theme"
+    fill_in "Prompt", with: "something"
     click_on "Generate"
 
     assert_selector :testid, "generation-status", text: "Generating a theme"
@@ -50,7 +52,8 @@ class GenerationTest < ApplicationSystemTestCase
     Rails.configuration.x.generations.hourly_cap = 1
     visit edit_theme_path(themes(:slate))
 
-    fill_in "Describe a theme", with: "calm blue"
+    click_on "Describe a theme"
+    fill_in "Prompt", with: "calm blue"
     click_on "Generate"
 
     assert_selector :testid, "generation-status", text: "hourly generation limit"
