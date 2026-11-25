@@ -27,17 +27,17 @@ class GalleryTest < ApplicationSystemTestCase
     visit gallery_path
 
     assert_selector "[data-slot='sidebar-container']", visible: :all
-    assert_equal 0, sidebars_outside_their_card
+    assert_empty sidebars_outside_their_card
   end
 
   test "the gallery index and the header links are not covered by the page content" do
     visit gallery_path
 
     assert_selector "nav[aria-label='Components'] a", minimum: 1
-    hits = link_hits
+    coverage = links_covered_by_content
 
-    assert_empty hits["covered"]
-    assert_operator hits["reachable"], :>=, 1, "no index link could be hit-tested in the first viewport"
+    assert_empty coverage["covered"]
+    assert_operator coverage["reachable"], :>=, 1, "no index link could be hit-tested in the first viewport"
   end
 
   private
@@ -48,16 +48,16 @@ class GalleryTest < ApplicationSystemTestCase
         const card = sidebar.closest("[data-testid='gallery-card']").getBoundingClientRect()
         const box = sidebar.getBoundingClientRect()
         return box.left < card.left - 1 || box.right > card.right + 1 || box.top < card.top - 1 || box.bottom > card.bottom + 1
-      }).length
+      }).map((sidebar) => JSON.stringify(sidebar.getBoundingClientRect()))
     JS
   end
 
   # Links fully inside the first viewport (and inside their own scroll container: the index scrolls), split into the ones the
   # user can hit and the ones something else covers.
-  def link_hits
+  def links_covered_by_content
     evaluate_script(<<~JS)
       (() => {
-        const result = { reachable: 0, covered: [] }
+        const coverage = { reachable: 0, covered: [] }
         document.querySelectorAll("nav a, header a").forEach((link) => {
           const box = link.getBoundingClientRect()
           if (box.width === 0 || box.height === 0 || box.top < 0 || box.bottom > window.innerHeight) return
@@ -65,10 +65,10 @@ class GalleryTest < ApplicationSystemTestCase
           const bounds = scroller ? scroller.getBoundingClientRect() : null
           if (bounds && (box.bottom > bounds.bottom || box.top < bounds.top)) return
           const hit = document.elementFromPoint(box.left + box.width / 2, box.top + box.height / 2)
-          if (hit && (link.contains(hit) || hit.contains(link))) result.reachable++
-          else result.covered.push(link.textContent.trim())
+          if (hit && (link.contains(hit) || hit.contains(link))) coverage.reachable++
+          else coverage.covered.push(link.textContent.trim())
         })
-        return result
+        return coverage
       })()
     JS
   end
