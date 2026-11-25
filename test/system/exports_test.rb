@@ -32,4 +32,17 @@ class ExportsTest < ApplicationSystemTestCase
 
     assert_selector :testid, "export-draft"
   end
+
+  test "a draft's Export dialog publishes from inside it" do
+    visit edit_theme_path(themes(:zinc))
+
+    click_on "Export"
+    within(:testid, "export-panel") { click_on "Publish" }
+
+    assert_text "Theme published"
+    click_on "Export"
+
+    assert_selector :testid, "download-css"
+    assert_no_selector :testid, "export-publish"
+  end
 end
