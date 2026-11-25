@@ -12,6 +12,7 @@ class Generations::Presenter::Status < Core::Presenter::Base
     "busy" => "A theme is already being generated. Wait for it to finish.",
     "throttled" => "Too many generations in a short time. Try again in a minute.",
     "capped" => "The studio has reached its hourly generation limit, try again later.",
+    "not_configured" => "Generation is not set up in this studio.",
     "prompt" => "Describe the theme in 1 to #{PROMPT_LIMIT} characters."
   }.freeze
   private_constant :MESSAGES
