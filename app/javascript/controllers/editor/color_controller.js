@@ -20,12 +20,18 @@ export default class extends Controller {
     if (hex) this.inputTarget.value = hex
   }
 
+  // The Hex field is rendered by the server with the exact hex the person typed (rounding through oklch would lose it), so
+  // the picker follows the primary and the field is only written here by what the person does.
   pick() {
     this.hexTarget.value = this.inputTarget.value
+    this.#invalid(false)
     this.#announce(this.inputTarget.value)
   }
 
+  // A cleared field is not an error, it changes nothing.
   typeHex() {
+    if (this.hexTarget.value.trim() === "") return this.#invalid(false)
+
     const hex = normalize(this.hexTarget.value)
     this.#invalid(!hex)
     if (!hex) return
