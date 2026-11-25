@@ -4,6 +4,9 @@
 # content is force-mounted into the editor form, so a closed group keeps its fields and the stream can reach them.
 class Components::Editor::GroupDialog < Components::Base
   CONTAINER = "#editor-panels"
+  # On the open, active or hovered entry the button paints --sidebar-accent, where muted text falls under 4.5:1.
+  SUBLABEL = "truncate text-xs text-muted-foreground in-data-[state=open]:text-sidebar-accent-foreground " \
+             "in-data-[active=true]:text-sidebar-accent-foreground in-hover:text-sidebar-accent-foreground"
   PANEL = "data-[state=closed]:hidden max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 " \
           "max-sm:rounded-b-none max-h-[85svh] overflow-y-auto sm:top-24 sm:right-4 sm:left-auto sm:max-w-sm sm:translate-x-0 sm:translate-y-0"
 
@@ -25,7 +28,7 @@ class Components::Editor::GroupDialog < Components::Base
   def entry
     span(class: "grid flex-1 text-left leading-tight") do
       span(class: "truncate font-medium") { @group.label }
-      span(id: @group.summary_id, class: "truncate text-xs text-muted-foreground") { @group.summary }
+      span(id: @group.summary_id, class: SUBLABEL) { @group.summary }
     end
   end
 
