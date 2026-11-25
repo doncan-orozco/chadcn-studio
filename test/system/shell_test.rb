@@ -62,6 +62,23 @@ class ShellTest < ApplicationSystemTestCase
     assert_operator height, :>=, 24, "Themes link is #{height}px tall"
   end
 
+  test "every theme link on home and on the Themes list is at least 24 px tall" do
+    {
+      root_path => "main a[href^='/themes/']",
+      themes_path => "[data-testid=theme-card] a[href^='/themes/']"
+    }.each do |screen, selector|
+      visit screen
+
+      assert_selector selector
+
+      all(selector).each do |link|
+        height = link.evaluate_script("this.getBoundingClientRect().height")
+
+        assert_operator height, :>=, 24, "#{link.text.inspect} on #{screen} is #{height}px tall"
+      end
+    end
+  end
+
   test "the header's Components link opens the gallery from home" do
     visit root_path
     within("header nav[aria-label=Main]") { click_on "Components" }
