@@ -6,7 +6,7 @@ class Components::Editor::VariableFilterTest < ActiveSupport::TestCase
 
     assert_includes html, "Find a variable"
     assert_includes html, 'type="search"'
-    assert_includes html, "input-&gt;editor--variable-filter#filter"
+    assert_includes html, "input->editor--variable-filter#filter"
     assert_includes html, 'role="status"'
   end
 end
