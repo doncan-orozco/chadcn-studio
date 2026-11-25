@@ -92,10 +92,12 @@ class EditorTest < ApplicationSystemTestCase
   test "the toolbar offers Save theme and shows Unsaved changes only once the editor differs" do
     assert_button "Save theme"
     assert_no_selector :testid, "unsaved"
+    assert_selector :testid, "saved", text: "Saved"
 
     fill_in "Name", with: "Renamed"
 
     assert_selector :testid, "unsaved", text: "Unsaved changes"
+    assert_no_selector :testid, "saved"
   end
 
   test "moving a slider marks the editor unsaved" do

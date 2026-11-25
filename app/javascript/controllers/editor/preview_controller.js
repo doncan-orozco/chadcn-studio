@@ -10,7 +10,7 @@ const DECIMALS = 3
 const formatNumber = (value) => Number(Number(value).toFixed(DECIMALS)).toString()
 
 export default class extends Controller {
-  static targets = ["root", "palette", "primaryField", "radiusField", "lightness", "chroma", "hue", "radius", "form", "derive", "refresh", "unsaved"]
+  static targets = ["root", "palette", "primaryField", "radiusField", "lightness", "chroma", "hue", "radius", "form", "derive", "refresh", "unsaved", "saved"]
   static values = { mode: { type: String, default: "light" } }
 
   disconnect() {
@@ -67,6 +67,7 @@ export default class extends Controller {
   // Native `input`/`change` of the form's fields call it; sliders and the picker write hidden inputs, so they call it too.
   markDirty() {
     if (this.hasUnsavedTarget) this.unsavedTarget.hidden = false
+    if (this.hasSavedTarget) this.savedTarget.hidden = true
   }
 
   // `chadcn--switch:checked-change`: the dark switch of the editor toggles the preview root only.

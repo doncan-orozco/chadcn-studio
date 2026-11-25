@@ -41,10 +41,11 @@ class Views::Themes::Edit::Toolbar < Views::Base
     end
   end
 
-  # Shown by the preview controller once the editor differs from the stored theme (inside an always-present status region so it is announced),
-  # and rendered visible when a rejected Save re-renders the form still holding the unsaved edits.
+  # One status region (announced) that always says where the editor stands: "Saved" while it matches the stored theme, and
+  # "Unsaved changes" once the preview controller sees an edit, or at once when a rejected Save re-renders the form with them.
   def unsaved_marker
     span(role: "status", class: "self-center text-sm text-foreground/70") do
+      span(hidden: @presenter.failed?, data: { editor__preview_target: "saved", testid: "saved" }) { "Saved" }
       span(hidden: !@presenter.failed?, data: { editor__preview_target: "unsaved", testid: "unsaved" }) { "Unsaved changes" }
     end
   end
