@@ -29,7 +29,7 @@ class EditorTest < ApplicationSystemTestCase
 
     mouse.up
 
-    assert_selector "#summary-brand", text: moved_primary
+    assert_selector "#summary-brand", text: "Gray"
     derived = wait_for_style_change(moved)
 
     assert_equal 1, derivation_requests.size
@@ -65,14 +65,12 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "oklch(0.6 0.1 30)", property("--ring")
 
     close_group
-    open_group "brand"
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
-    assert_selector "#summary-brand", text: "oklch(0.215"
+    assert_selector "#summary-brand", text: "Black"
     assert_selector :testid, "overridden", count: 1, visible: :all
     assert_equal "oklch(0.6 0.1 30)", property("--ring")
 
-    close_group
     open_group "advanced"
     fill_in "override-light-ring", with: ""
     find_field("override-light-ring").send_keys(:enter)
@@ -94,10 +92,12 @@ class EditorTest < ApplicationSystemTestCase
   test "the toolbar offers Save theme and shows Unsaved changes only once the editor differs" do
     assert_button "Save theme"
     assert_no_selector :testid, "unsaved"
+    assert_selector :testid, "saved", text: "Saved"
 
     fill_in "Name", with: "Renamed"
 
     assert_selector :testid, "unsaved", text: "Unsaved changes"
+    assert_no_selector :testid, "saved"
   end
 
   test "moving a slider marks the editor unsaved" do
@@ -109,11 +109,20 @@ class EditorTest < ApplicationSystemTestCase
     assert_selector :testid, "unsaved", text: "Unsaved changes"
   end
 
+  test "name, Save, Publish and Export share one row and the brand color is in the first viewport" do
+    tops = %w[theme-name save publish-toggle export].map { |id| evaluate_script("document.querySelector('[data-testid=#{id}], ##{id}').getBoundingClientRect().top").round }
+
+    assert_equal 1, tops.uniq.size
+    assert evaluate_script("document.querySelector('[data-testid=brand-color]').getBoundingClientRect().bottom < window.innerHeight")
+    assert_selector :testid, "brand-color", visible: :visible
+  end
+
   test "Save persists the name and the derived palette" do
     fill_in "Name", with: "Renamed"
     click_on "Save theme"
 
     assert_text "Renamed saved"
+    assert_selector :testid, "saved", text: "Saved"
     assert_equal "Renamed", @theme.reload.name
   end
 
@@ -169,7 +178,7 @@ class EditorTest < ApplicationSystemTestCase
     open_group "brand"
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
-    assert_selector "#summary-brand", text: "oklch(0.215"
+    assert_selector "#summary-brand", text: "Black"
     panel = find(:testid, "group-brand-panel")
 
     assert panel.has_selector?(:testid, "variable-rows")
@@ -184,10 +193,18 @@ class EditorTest < ApplicationSystemTestCase
 
   private
 
+  # The brand group is not a dialog: it sits open in the sidebar, its variable rows behind a disclosure.
   def open_group(key)
+    return open_brand_variables if key == "brand"
+
     find(:testid, "group-#{key}").click
 
     assert_selector :testid, "group-#{key}-panel"
+  end
+
+  def open_brand_variables
+    assert_selector :testid, "group-brand-panel"
+    find(:testid, "group-brand-panel").find("summary", text: "All brand variables").click
   end
 
   # The panel scrolls to the field that was filled; its Close button is at the top.
