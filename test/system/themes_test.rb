@@ -4,7 +4,7 @@ class ThemesTest < ApplicationSystemTestCase
   test "an out-of-range color keeps the form open with the error" do
     visit new_theme_path
     fill_in "Name", with: "Bad"
-    fill_in "Primary color", with: "oklch(2 0.2 250)"
+    fill_in "Brand color", with: "oklch(2 0.2 250)"
     click_on "Create theme"
 
     assert_selector "#theme-primary-error"
@@ -15,11 +15,11 @@ class ThemesTest < ApplicationSystemTestCase
     visit root_path
     click_on "Create theme"
     fill_in "Name", with: "Acme"
-    fill_in "Primary color", with: "#1d4ed8"
+    fill_in "Brand color", with: "#1d4ed8"
     click_on "Create theme"
 
     assert_text "Theme created"
-    assert_selector "#summary-brand", text: "oklch(0.488 0.217 264.376)"
+    assert_selector "#summary-brand", text: "Blue"
     assert_equal "oklch(0.488 0.217 264.376)", Theme.find_by!(slug: "acme").light["primary"]
   end
 
@@ -101,7 +101,7 @@ class ThemesTest < ApplicationSystemTestCase
     assert_no_text "Zinc"
   end
 
-  test "the new theme form marks Name and Primary color as required" do
+  test "the new theme form marks Name and Brand color as required" do
     visit new_theme_path
 
     assert_text "* Required"
@@ -114,12 +114,12 @@ class ThemesTest < ApplicationSystemTestCase
   test "a blank name re-renders the form with the error under Name and the color kept" do
     visit new_theme_path
     find(:testid, "new-theme-form").execute_script("this.noValidate = true")
-    fill_in "Primary color", with: "#1d4ed8"
+    fill_in "Brand color", with: "#1d4ed8"
     click_on "Create theme"
 
     assert_selector "#theme-name-error"
     assert_selector "#theme-name[aria-invalid='true']"
-    assert_field "Primary color", with: "oklch(0.488 0.217 264.376)"
+    assert_field "Brand color", with: "oklch(0.488 0.217 264.376)"
   end
 
   test "home's theme rows are links at least 24 px tall with a resting underline" do

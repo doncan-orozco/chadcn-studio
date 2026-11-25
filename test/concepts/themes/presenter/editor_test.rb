@@ -43,7 +43,7 @@ class Themes::Presenter::EditorTest < ActiveSupport::TestCase
 
     assert_predicate editor, :new_record?
     assert_equal "oklch(0.55 0.2 250)", editor.variables("light")["--primary"]
-    assert_equal "oklch(0.55 0.2 250)", editor.group("brand").summary
+    assert_equal "Blue", editor.group("brand").summary
   end
 
   test "failures merge the model errors with a rejected derivation's messages" do
@@ -66,5 +66,9 @@ class Themes::Presenter::EditorTest < ActiveSupport::TestCase
     assert_equal "/themes/#{themes(:zinc).id}", @editor.save_path
     assert_equal "/derivations", @editor.derivations_path
     assert_equal "/derivations?controls=1", @editor.refresh_path
+  end
+
+  test "the document title carries the theme name" do
+    assert_equal "Edit Zinc - Chadcn Studio", @editor.document_title
   end
 end

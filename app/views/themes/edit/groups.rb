@@ -7,17 +7,29 @@ class Views::Themes::Edit::Groups < Views::Base
   end
 
   def view_template
+    brand = @presenter.group("brand")
     render Chadcn::Sidebar.new(collapsible: "none", class: "w-full border-b md:w-72 md:border-b-0 md:border-r", aria: { label: "Theme groups" }, data: { testid: "groups" }) do |sidebar|
       sidebar.content do
+        render Components::Editor::GroupDialog.new(group: brand)
         render Chadcn::Sidebar::Group.new do
           render(Chadcn::Sidebar::GroupLabel.new { "Theme groups" })
           render Chadcn::Sidebar::GroupContent.new do
             render Chadcn::Sidebar::Menu.new do
-              @presenter.groups.each { |group| render Components::Editor::GroupDialog.new(group: group) }
+              @presenter.groups.reject { |group| group.equal?(brand) }.each { |group| render Components::Editor::GroupDialog.new(group: group) }
             end
           end
         end
+        generation
       end
+    end
+  end
+
+  private
+
+  # "Describe a theme" lives under the groups, at the width of the sidebar.
+  def generation
+    div(class: "border-t p-2 [&_form]:flex-col [&_form]:items-stretch [&_input]:w-full") do
+      render Components::Editor::GenerationPanel.new(panel: Generations::Presenter::Panel.for(@presenter.__getobj__))
     end
   end
 end

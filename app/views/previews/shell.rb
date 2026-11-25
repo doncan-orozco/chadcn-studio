@@ -28,7 +28,7 @@ class Views::Previews::Shell < Views::Base
             span(class: "text-sm text-muted-foreground") { @presenter.product }
           end
           div(class: "space-y-4 p-6") do
-            h1(class: "text-2xl font-semibold tracking-tight") { @presenter.title }
+            h2(class: "text-2xl font-semibold tracking-tight") { @presenter.title }
             p(class: "text-muted-foreground") { "The sidebar uses the sidebar-* variables of the theme." }
           end
         end

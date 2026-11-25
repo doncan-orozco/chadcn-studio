@@ -106,6 +106,26 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid=preview-root] h2", minimum: 1
   end
 
+  test "GET /themes/:id/edit says a draft is not published" do
+    get edit_theme_path(themes(:zinc))
+
+    assert_select "[data-testid=publication-state]", text: /Not published/
+    assert_select "[data-testid=publication-link]", 0
+  end
+
+  test "GET /themes/:id/edit says a published theme is published and links its public URL" do
+    get edit_theme_path(themes(:slate))
+
+    assert_select "[data-testid=publication-state]", text: /Published/
+    assert_select "[data-testid=publication-link][href=?]", "/t/slate.css"
+  end
+
+  test "GET /themes/:id/edit puts the theme name in the document title" do
+    get edit_theme_path(themes(:zinc))
+
+    assert_select "title", text: "Edit Zinc - Chadcn Studio"
+  end
+
   test "GET /themes/:id shows the palette, light and dark" do
     get theme_path(themes(:zinc))
 
