@@ -168,6 +168,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "button[data-testid=save]", text: "Save theme"
     assert_select "[role=status] [data-testid=unsaved][hidden]", text: "Unsaved changes"
+    assert_select "[role=status] [data-testid=saved]:not([hidden])", text: "Saved"
   end
 
   test "PATCH /themes/:id rejected re-renders the editor with the unsaved marker visible" do
@@ -175,6 +176,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :unprocessable_entity
     assert_select "[data-testid=unsaved]:not([hidden])", text: "Unsaved changes"
+    assert_select "[data-testid=saved][hidden]", text: "Saved"
   end
 
   test "PATCH /themes/:id escapes a markup name in the toast" do
