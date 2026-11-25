@@ -17,7 +17,7 @@ class SublabelContrastTest < ApplicationSystemTestCase
     find(:testid, "group-radius-panel").hover # the pointer is off the entry: only the open state can paint it
 
     assert_equal evaluate_script(PROBE), color_of("summary-radius")
-    assert_equal @muted, color_of("summary-dark"), "a closed sibling keeps the muted sublabel"
+    assert_equal @muted, color_of("summary-surfaces"), "a closed sibling keeps the muted sublabel"
   end
 
   test "closing the group restores the muted sublabel" do

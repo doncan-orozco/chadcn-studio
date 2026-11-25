@@ -13,6 +13,15 @@ class Generations::Service::BroadcastTest < ActiveSupport::TestCase
     assert_equal "generation_status", streams.first["target"]
   end
 
+  test "status renders the panel alone, without the app layout" do
+    generation = generations(:completed)
+    stream = capture_turbo_stream_broadcasts(generation.theme) { Generations::Service::Broadcast.status(generation) }.first
+    html = stream.at_css("template").inner_html
+
+    assert_includes html, 'id="generation_status"'
+    assert_no_match(/<(main|header|html|body|nav)\b/, html)
+  end
+
   test "theme_changed sends the status and then a refresh" do
     generation = generations(:completed)
     streams = capture_turbo_stream_broadcasts(generation.theme) { Generations::Service::Broadcast.theme_changed(generation) }
