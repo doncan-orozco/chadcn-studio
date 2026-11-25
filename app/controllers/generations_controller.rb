@@ -1,11 +1,11 @@
 class GenerationsController < ApplicationController
-  FAILURES = %i[busy capped].freeze
+  FAILURES = %i[busy capped not_configured].freeze
   private_constant :FAILURES
 
   rate_limit to: 5, within: 1.minute, only: :create, with: -> { throttled }
 
   def create
-    result = Generations::Operation::Begin.new.call(prompt: prompt, hourly_cap: hourly_cap)
+    result = Generations::Operation::Begin.new.call(prompt: prompt, configured: Generations::Presenter::Panel.configured?, hourly_cap: hourly_cap)
 
     if result.success?
       redirect_to edit_theme_path(result.value![:model])

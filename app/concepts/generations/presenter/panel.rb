@@ -24,6 +24,9 @@ class Generations::Presenter::Panel < Core::Presenter::Base
 
   def stream_source = __getobj__
 
+  # The editor's field starts empty.
+  def prompt = nil
+
   def prompt_param = PROMPT_PARAM
 
   def prompt_limit = Generations::Presenter::Status::PROMPT_LIMIT

@@ -32,7 +32,7 @@ class Components::Editor::GenerationPanel < Components::Base
   def prompt_attributes
     attributes = {
       id: "generation-prompt", name: @panel.prompt_param, maxlength: @panel.prompt_limit, required: true,
-      placeholder: @panel.prompt_placeholder, default_value: @panel.try(:prompt), disabled: !@panel.configured?, class: "w-80", aria: { describedby: "generation_status" }
+      placeholder: @panel.prompt_placeholder, default_value: @panel.prompt, disabled: !@panel.configured?, class: "w-80", aria: { describedby: "generation_status" }
     }
     attributes[:aria][:invalid] = "true" if @panel.configured? && status&.failed?
     attributes

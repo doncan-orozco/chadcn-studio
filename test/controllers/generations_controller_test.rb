@@ -42,4 +42,31 @@ class GenerationsControllerTest < ActionDispatch::IntegrationTest
   ensure
     Rails.configuration.x.generations.hourly_cap = original
   end
+
+  test "the sixth request in a minute is throttled and creates nothing" do
+    memory = ActiveSupport::Cache::MemoryStore.new
+    Rails.cache.define_singleton_method(:increment) { |key, amount = 1, **options| memory.increment(key, amount, **options) }
+    5.times { post generations_path, params: { generation: { prompt: "x" } } }
+
+    assert_no_difference -> { Theme.count } do
+      post generations_path, params: { generation: { prompt: "y" } }
+    end
+    assert_response :too_many_requests
+    assert_select "[data-testid=generation-status]", text: /Too many generations/
+  ensure
+    Rails.cache.singleton_class.remove_method(:increment)
+  end
+
+  test "an unconfigured studio refuses a crafted POST and creates nothing" do
+    GenerateThemeJob.client = nil
+    key = ENV.delete("ANTHROPIC_API_KEY")
+
+    assert_no_difference -> { Theme.count } do
+      post generations_path, params: { generation: { prompt: "calm blue" } }
+    end
+    assert_response :unprocessable_entity
+    assert_select "[data-testid=generation-status]", text: /not set up/
+  ensure
+    ENV["ANTHROPIC_API_KEY"] = key if key
+  end
 end
