@@ -81,7 +81,7 @@ class Themes::Operation::DeriveTest < ActiveSupport::TestCase
       failure = Themes::Operation::Derive.new.call(inputs: { primary: "#1d4ed8", primary_hex: value }).failure
 
       assert_equal :invalid, failure[:code], value
-      assert failure[:errors].key?(:primary_hex), value
+      assert_includes failure[:errors].keys, :primary_hex, value
     end
   end
 end
