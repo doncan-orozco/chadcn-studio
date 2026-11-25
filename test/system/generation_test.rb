@@ -97,7 +97,7 @@ class GenerationTest < ApplicationSystemTestCase
     fill_in "Describe a theme", with: "calm blue"
     click_on "Generate"
     perform_enqueued_jobs
-    click_on "Pick a primary color instead"
+    click_button "Pick a primary color instead"
 
     assert_selector :testid, "group-brand-panel", visible: :visible
   end

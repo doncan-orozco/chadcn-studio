@@ -27,7 +27,12 @@ class Generations::Presenter::Status < Core::Presenter::Base
     @failure = failure
   end
 
-  def failed? = @failure.present? || super || Generations::Service::Deadline.abandoned?(__getobj__)
+  # Read once: the deadline is a clock, and state, message and retryable? must agree within one render.
+  def failed?
+    return @failed if defined?(@failed)
+
+    @failed = @failure.present? || super || Generations::Service::Deadline.abandoned?(__getobj__)
+  end
 
   def state
     return :failed if failed?
