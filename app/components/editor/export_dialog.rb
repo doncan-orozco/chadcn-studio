@@ -29,7 +29,7 @@ class Components::Editor::ExportDialog < Components::Base
   end
 
   def draft_notice
-    p(class: "text-sm text-muted-foreground", data: { testid: "export-draft" }) { "Publish this theme to get its download links and import URL." }
+    p(class: "text-sm text-muted-foreground", data: { testid: "export-draft" }) { "Share a link to this theme to get its download links and import URL." }
   end
 
   def download_links
