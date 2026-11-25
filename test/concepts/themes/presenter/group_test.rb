@@ -23,6 +23,12 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     assert_equal "background-color: #{@theme.light['primary']}", row.light_style
   end
 
+  test "rows link to the theme page under All values" do
+    row = Themes::Presenter::Group.new(@theme, key: "brand").rows.first
+
+    assert_equal "/themes/#{@theme.id}#all-values", row.values_path
+  end
+
   test "the brand group exposes the primary as the three numbers the sliders move" do
     group = Themes::Presenter::Group.new(@theme, key: "brand")
 
