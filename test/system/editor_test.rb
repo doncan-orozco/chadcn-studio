@@ -122,6 +122,7 @@ class EditorTest < ApplicationSystemTestCase
     click_on "Save theme"
 
     assert_text "Renamed saved"
+    assert_selector :testid, "saved", text: "Saved"
     assert_equal "Renamed", @theme.reload.name
   end
 
