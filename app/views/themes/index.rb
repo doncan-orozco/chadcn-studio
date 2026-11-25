@@ -26,7 +26,7 @@ class Views::Themes::Index < Views::Base
 
   private
 
-  # The lasting confirmation of a delete (the toast is gone in seconds): announced once, and it stays until the next visit.
+  # The lasting confirmation of a delete: the toast announces it and is gone in seconds; this status stays until the next visit.
   def deleted_status
     return if @deleted.blank?
 

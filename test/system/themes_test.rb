@@ -160,9 +160,10 @@ class ThemesTest < ApplicationSystemTestCase
     visit theme_path(themes(:zinc))
     accept_confirm { click_on "Delete" }
 
-    assert_selector "[role=status][data-testid=deleted-status]", text: "Zinc deleted"
-    sleep 6 # past the toast: the status is the lasting one
+    assert_selector :testid, "deleted-status", text: "Zinc deleted"
+    assert_equal "status", find(:testid, "deleted-status")[:role]
+    assert_no_text "Theme deleted", wait: 10 # Capybara waits out the toast's lifetime; the status is the lasting one
 
-    assert_selector "[role=status]", text: "Zinc deleted"
+    assert_selector :testid, "deleted-status", text: "Zinc deleted"
   end
 end

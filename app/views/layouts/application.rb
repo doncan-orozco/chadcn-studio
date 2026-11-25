@@ -7,6 +7,9 @@ class Views::Layouts::Application < Views::Base
   include Phlex::Rails::Helpers::ContentFor
   include Phlex::Rails::Helpers::Flash
 
+  # Flash keys the toaster shows; any other key (e.g. `deleted`) belongs to the page that renders it.
+  TOASTED_FLASH = %w[notice alert].freeze
+
   # Layouts are request-bound by nature (CSRF, CSP, flash): this is the one view that reads the view context.
   def view_template
     doctype
@@ -27,7 +30,7 @@ class Views::Layouts::Application < Views::Base
 
       body(class: "bg-background text-foreground antialiased") do
         render Components::Shell::Frame.new(sidebar: content_for(:sidebar).presence) { yield }
-        render Chadcn::Toaster.new(flash: flash.to_h.except("deleted"), close_button: true)
+        render Chadcn::Toaster.new(flash: flash.to_h.slice(*TOASTED_FLASH), close_button: true)
       end
     end
   end
