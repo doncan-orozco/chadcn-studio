@@ -61,6 +61,20 @@ class ExportsTest < ApplicationSystemTestCase
     assert_selector :testid, "import-copy", text: "Copy", exact_text: true, wait: 5
   end
 
+  test "the CSS download is labelled and saved as theme.css, and the dialog says it was downloaded" do
+    visit edit_theme_path(themes(:slate))
+
+    click_on "Export"
+    link = find(:testid, "download-css")
+
+    assert_equal "Download theme.css", link.text
+    assert_equal "theme.css", link[:download]
+    assert_no_selector :testid, "download-css-status", text: "Downloaded", visible: :all
+    link.click
+
+    assert_selector :testid, "download-css-status", text: "Downloaded theme.css"
+  end
+
   test "unpublishing takes the theme off its URL" do
     visit edit_theme_path(themes(:slate))
 

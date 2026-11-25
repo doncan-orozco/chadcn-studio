@@ -27,7 +27,7 @@ class Exports::Presenter::CssTest < ActiveSupport::TestCase
   test "names the file, the content type and the import command" do
     export = Exports::Presenter::Css.new(themes(:slate), base_url: BASE)
 
-    assert_equal "slate.css", export.filename
+    assert_equal "theme.css", export.filename
     assert_equal "text/css", export.content_type
     assert_equal "bin/rails theme:import[#{URL}]", export.import_command
   end
