@@ -26,7 +26,7 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
   test "the brand group exposes the primary as the three numbers the sliders move" do
     group = Themes::Presenter::Group.new(@theme, key: "brand")
 
-    assert_equal "oklch(0.21 0.006 285.885)", group.summary
+    assert_equal "#18181b", group.summary
     assert_in_delta 0.21, group.lightness
     assert_in_delta 0.006, group.chroma
     assert_in_delta 285.885, group.hue
@@ -60,6 +60,11 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     refute_includes light.map(&:name), "--destructive"
     assert_equal "1 overridden", group.summary
     refute_includes group.overrides("dark").map(&:name), "--radius"
+  end
+
+  test "only the brand summary carries a color chip" do
+    assert_match(/\Abackground-color: oklch/, Themes::Presenter::Group.new(@theme, key: "brand").summary_style)
+    assert_nil Themes::Presenter::Group.new(@theme, key: "surfaces").summary_style
   end
 
   test "without overrides the advanced summary says so" do

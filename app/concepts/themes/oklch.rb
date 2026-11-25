@@ -20,7 +20,11 @@ class Themes::Oklch
   # Below this chroma the color is a gray: its hue is noise, so it is spelled as 0.
   ACHROMATIC = 0.0005
 
-  private_constant :NUMBER, :PATTERN, :HEX, :LMS, :LAB, :ACHROMATIC
+  # The inverse of `LAB` (oklab -> cube roots of LMS) and of `LMS` (LMS -> linear sRGB).
+  CONES = [ [ 1.0, 0.3963377774, 0.2158037573 ], [ 1.0, -0.1055613458, -0.0638541728 ], [ 1.0, -0.0894841775, -1.2914855480 ] ].freeze
+  LINEAR_RGB = [ [ 4.0767416621, -3.3077115913, 0.2309699292 ], [ -1.2684380046, 2.6097574011, -0.3413193965 ], [ -0.0041960863, -0.7034186147, 1.7076147010 ] ].freeze
+
+  private_constant :NUMBER, :PATTERN, :HEX, :LMS, :LAB, :ACHROMATIC, :CONES, :LINEAR_RGB
 
   attr_reader :lightness, :chroma, :hue, :alpha
 
@@ -68,12 +72,30 @@ class Themes::Oklch
     alpha ? "oklch(#{base} / #{format_number(alpha)}%)" : "oklch(#{base})"
   end
 
+  # The sRGB hex spelling (`#rrggbb`), out-of-gamut channels clamped; the alpha is not part of it.
+  def to_hex
+    radians = hue * Math::PI / 180
+    cones = CONES.map { |row| weigh_color(row, [ lightness, chroma * Math.cos(radians), chroma * Math.sin(radians) ])**3 }
+    channels = LINEAR_RGB.map { |row| encode(weigh_color(row, cones)) }
+
+    format("#%02x%02x%02x", *channels)
+  end
+
   def ==(other) = other.is_a?(self.class) && to_s == other.to_s
   alias_method :eql?, :==
 
   def hash = to_s.hash
 
   private
+
+  def weigh_color(row, values) = row.zip(values).sum { |weight, value| weight * value }
+
+  def encode(linear)
+    linear = linear.clamp(0.0, 1.0)
+    gamma = linear <= 0.0031308 ? linear * 12.92 : (1.055 * (linear**(1 / 2.4))) - 0.055
+
+    (gamma * 255).round.clamp(0, 255)
+  end
 
   def number!(name, value, range)
     number = begin

@@ -12,7 +12,7 @@ class Views::Layouts::Application < Views::Base
     doctype
     html(lang: "en") do
       head do
-        title { content_for(:title).presence || "Chadcn Studio" }
+        title { [ content_for(:title).presence, "Chadcn Studio" ].compact.join(" · ") }
         meta(name: "viewport", content: "width=device-width,initial-scale=1")
         csrf_meta_tags
         csp_meta_tag

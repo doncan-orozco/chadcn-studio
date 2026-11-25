@@ -20,7 +20,7 @@ class Components::Editor::Derived < Components::Base
   private
 
   def group_streams(group)
-    replace(group.summary_id) { plain group.summary }
+    replace(group.summary_id) { render Components::Editor::GroupDialog::Summary.new(group: group) }
     replace(group.rows_id) { render Components::Editor::VariableRows.new(rows: group.rows) } unless group.variables.empty? || group.key == "advanced"
     replace(group.controls_id) { render Components::Editor::AdvancedOverrides.new(group: group) } if group.key == "advanced"
   end

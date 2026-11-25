@@ -12,6 +12,19 @@ class Components::Editor::GroupDialog < Components::Base
   PANEL = "data-[state=closed]:hidden max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 " \
           "max-sm:rounded-b-none max-h-[85svh] overflow-y-auto sm:top-24 sm:right-4 sm:left-auto sm:max-w-sm sm:translate-x-0 sm:translate-y-0"
 
+  # The sublabel of an entry: the group's summary, led by a color chip when it names a color. The derivation stream
+  # re-renders it into the same element, so the first paint and every update share this one markup.
+  class Summary < Components::Base
+    def initialize(group:)
+      @group = group
+    end
+
+    def view_template
+      span(class: "mr-1.5 inline-block size-2.5 rounded-full border align-middle", style: @group.summary_style, aria_hidden: "true") if @group.summary_style
+      plain @group.summary
+    end
+  end
+
   def initialize(group:)
     @group = group
   end
@@ -30,7 +43,7 @@ class Components::Editor::GroupDialog < Components::Base
   def entry
     span(class: "grid flex-1 text-left leading-tight") do
       span(class: "truncate font-medium") { @group.label }
-      span(id: @group.summary_id, class: SUBLABEL) { @group.summary }
+      span(id: @group.summary_id, class: SUBLABEL) { render Summary.new(group: @group) }
     end
   end
 

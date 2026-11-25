@@ -29,12 +29,19 @@ class EditorTest < ApplicationSystemTestCase
 
     mouse.up
 
-    assert_selector "#summary-brand", text: moved_primary
+    assert_selector "#summary-brand", text: Themes::Oklch.parse(moved_primary).to_hex
     derived = wait_for_style_change(moved)
 
     assert_equal 1, derivation_requests.size
     assert_equal moved_primary, property("--sidebar-primary"), "the derived mirror arrives from the server"
     refute_equal moved, derived
+  end
+
+  test "the page title and the sidebar summaries name things in words, not oklch" do
+    assert_title "Edit Zinc · Chadcn Studio"
+    assert_selector "h1", text: "Edit Zinc"
+    assert_selector "#summary-brand", text: /\A#\h{6}\z/
+    assert_no_selector "[id^=summary-]", text: "oklch"
   end
 
   test "the dark switch toggles the dark class on the preview root only" do
@@ -68,7 +75,7 @@ class EditorTest < ApplicationSystemTestCase
     open_group "brand"
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
-    assert_selector "#summary-brand", text: "oklch(0.215"
+    assert_selector "#summary-brand", text: /\A#\h{6}\z/
     assert_selector :testid, "overridden", count: 1, visible: :all
     assert_equal "oklch(0.6 0.1 30)", property("--ring")
 

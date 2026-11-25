@@ -3,11 +3,14 @@
 # The theme editor: a toolbar form (name, save, the inputs the panels feed), the groups sidebar and the live preview.
 # `editor--preview` wraps all three; only the preview root carries the palette.
 class Views::Themes::Edit < Views::Base
+  include Phlex::Rails::Helpers::ContentFor
+
   def initialize(presenter)
     @presenter = presenter
   end
 
   def view_template
+    content_for(:title, @presenter.title)
     div(class: "flex flex-col", data: { controller: "editor--preview", action: "editor--color:picked->editor--preview#pick", testid: "editor" }) do
       h1(class: "px-3 pt-3 text-2xl font-semibold tracking-tight") { @presenter.title }
       render Views::Themes::Edit::Toolbar.new(@presenter)

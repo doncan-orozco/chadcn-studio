@@ -48,12 +48,15 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   def summary
     case key
-    when "brand" then primary
+    when "brand" then brand_color.to_hex
     when "radius" then light["radius"].to_s
     when "advanced" then override_count.zero? ? "No overrides" : "#{override_count} overridden"
-    else "#{variables.size} variables"
+    else "#{variables.size} colors"
     end
   end
+
+  # The color chip beside the summary: only the brand group names a color.
+  def summary_style = key == "brand" ? swatch(primary) : nil
 
   # The brand color as the three numbers the sliders move.
   def primary = inputs.to_h["primary"].presence || light["primary"]

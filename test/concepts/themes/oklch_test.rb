@@ -18,6 +18,18 @@ class Themes::OklchTest < ActiveSupport::TestCase
     assert_equal "oklch(1 0 0)", Themes::Oklch.new(1, 0, 0).to_s
   end
 
+  test "to_hex spells white, black and a saturated color as sRGB" do
+    assert_equal "#ffffff", Themes::Oklch.new(1, 0, 0).to_hex
+    assert_equal "#000000", Themes::Oklch.new(0, 0, 0).to_hex
+    assert_equal "#ff0000", Themes::Oklch.parse("#ff0000").to_hex
+  end
+
+  test "to_hex round-trips hex colors through oklch" do
+    %w[#3b82f6 #18181b #fafafa #10b981 #f59e0b].each do |hex|
+      assert_equal hex, Themes::Oklch.parse(hex).to_hex
+    end
+  end
+
   test "keeps the alpha of the dark border" do
     color = Themes::Oklch.parse("oklch(1 0 0 / 10%)")
 
