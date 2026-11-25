@@ -4,6 +4,13 @@
 # a notice (and reported) and never stops the rest of the gallery: the demo is captured first, so a tree that fails
 # halfway leaves no unclosed markup behind.
 class Components::Gallery::Entry < Components::Base
+  CARD_CLASSES = "rounded-xl border bg-card p-6 text-card-foreground"
+  # The gem's Sidebar is `position: fixed`. `transform-gpu` makes the card its containing block and `overflow-hidden`
+  # clips it, so it cannot cover the gallery index or the header. Other demos (popovers, menus) are left unclipped.
+  CONTAINED_CARD_CLASSES = "relative transform-gpu overflow-hidden #{CARD_CLASSES}".freeze
+  FIXED_POSITION_COMPONENTS = %w[sidebar].freeze
+  private_constant :CARD_CLASSES, :CONTAINED_CARD_CLASSES, :FIXED_POSITION_COMPONENTS
+
   def initialize(entry:, anchor:, scenario_label:)
     @entry = entry
     @anchor = anchor
@@ -21,12 +28,6 @@ class Components::Gallery::Entry < Components::Base
   end
 
   private
-
-  CARD_CLASSES = "rounded-xl border bg-card p-6 text-card-foreground"
-  # The gem's Sidebar is `position: fixed`. `transform-gpu` makes the card its containing block and `overflow-hidden`
-  # clips it, so it cannot cover the gallery index or the header. Other demos (popovers, menus) are left unclipped.
-  CONTAINED_CARD_CLASSES = "relative transform-gpu overflow-hidden #{CARD_CLASSES}".freeze
-  FIXED_POSITION_COMPONENTS = %w[sidebar].freeze
 
   def card_classes = FIXED_POSITION_COMPONENTS.include?(@entry.component.to_s) ? CONTAINED_CARD_CLASSES : CARD_CLASSES
 
