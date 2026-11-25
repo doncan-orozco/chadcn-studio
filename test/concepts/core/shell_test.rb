@@ -11,6 +11,23 @@ class Core::ShellTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid=sidebar]", count: 0
   end
 
+  test "the brand link is a 24 px target and the scheme buttons expose a pressed state" do
+    get root_path
+
+    assert_select "a[href='/'].min-h-6"
+    assert_select "[data-testid=theme-toggle][data-controller~='chadcn--theme'][data-controller~='shell--theme-toggle']"
+    %w[light dark system].each do |mode|
+      assert_select "[data-testid=theme-#{mode}][aria-pressed=false]"
+    end
+  end
+
+  test "the preview mode row is a full-width 24 px target" do
+    fragment = Nokogiri::HTML5.fragment(Components::Editor::ModeSwitch.new.call)
+
+    assert fragment.at_css("div.w-full.min-h-6 > label.flex-1.min-h-6[for=preview-dark]")
+    assert fragment.at_css("div.w-full.min-h-6 > [id=preview-dark]")
+  end
+
   test "the frame renders an html_safe sidebar and refuses a plain string" do
     assert_nothing_raised { Components::Shell::Frame.new(sidebar: ActiveSupport::SafeBuffer.new("<nav></nav>")) }
     assert_nothing_raised { Components::Shell::Frame.new }

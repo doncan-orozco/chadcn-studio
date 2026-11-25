@@ -15,7 +15,7 @@ class Components::Shell::Frame < Components::Base
     div(class: "flex min-h-svh flex-col", data: { testid: "shell" }) do
       header(class: "flex h-14 items-center justify-between border-b px-4") do
         div(class: "flex items-center gap-2") do
-          a(href: root_path, class: "text-sm font-semibold") { "Chadcn Studio" }
+          a(href: root_path, class: "inline-flex min-h-6 items-center text-sm font-semibold") { "Chadcn Studio" }
           nav(aria: { label: "Main" }) do
             render Chadcn::Button.new(as_child: :a, href: themes_path, variant: "ghost", size: "sm") { "Themes" }
           end
