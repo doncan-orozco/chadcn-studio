@@ -16,6 +16,7 @@ class Views::Pages::Home < Views::Base
       div(class: "flex flex-wrap items-center gap-3") do
         render Chadcn::Button.new(as_child: :a, href: new_theme_path) { "Create theme" }
         render Chadcn::Button.new(as_child: :a, href: themes_path, variant: "outline") { "Browse themes" }
+        render Chadcn::Button.new(as_child: :a, href: gallery_path, variant: "outline") { "Browse components" }
       end
       your_themes unless @presenter.empty?
     end

@@ -61,4 +61,18 @@ class ShellTest < ApplicationSystemTestCase
 
     assert_operator height, :>=, 24, "Themes link is #{height}px tall"
   end
+
+  test "the header's Components link opens the gallery from home" do
+    visit root_path
+    within("header nav[aria-label=Main]") { click_on "Components" }
+
+    assert_current_path gallery_path, wait: 15
+  end
+
+  test "home offers Browse components next to Browse themes" do
+    visit root_path
+    within("main#main-content") { click_on "Browse components" }
+
+    assert_current_path gallery_path, wait: 15
+  end
 end
