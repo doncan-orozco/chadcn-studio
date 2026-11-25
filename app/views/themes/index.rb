@@ -12,7 +12,10 @@ class Views::Themes::Index < Views::Base
           h1(class: "text-2xl font-semibold tracking-tight") { @presenter.title }
           p(class: "text-muted-foreground") { @presenter.summary }
         end
-        render Chadcn::Button.new(as_child: :a, href: new_theme_path, variant: @presenter.new_theme_variant) { "New theme" }
+        div(class: "flex items-center gap-2") do
+          render Chadcn::Button.new(as_child: :a, href: new_theme_path(anchor: "describe"), variant: "outline") { "Describe a theme" }
+          render Chadcn::Button.new(as_child: :a, href: new_theme_path, variant: @presenter.new_theme_variant) { "New theme" }
+        end
       end
 
       @presenter.empty? ? empty : cards
