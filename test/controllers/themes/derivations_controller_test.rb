@@ -35,16 +35,18 @@ class Themes::DerivationsControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "oklch(0.6 0.1 30)"
   end
 
-  test "controls=1 redraws the brand controls at the derived color" do
-    post derivations_path(controls: 1), params: { theme: { inputs: { primary: "oklch(0.55 0.2 250)" } } }
+  test "controls=1 (a picked or typed color) redraws the sliders at the derived color and leaves the Hex field alone" do
+    post derivations_path(controls: 1), params: { theme: { inputs: { primary: "#0f766e" } } }
 
-    assert_select "turbo-stream[target=brand-controls] template [data-testid=primary-lightness]"
+    assert_select "turbo-stream[target=brand-sliders] template [data-testid=primary-lightness]"
+    assert_select "turbo-stream[target=brand-color-field]", count: 0
   end
 
-  test "without controls=1 the brand controls are left alone" do
+  test "without controls=1 (a slider) the picker and the Hex field are redrawn at the derived hex and the sliders are left alone" do
     derive(primary: "oklch(0.55 0.2 250)")
 
-    assert_select "turbo-stream[target=brand-controls]", count: 0
+    assert_select "turbo-stream[target=brand-color-field] template input[data-testid=brand-hex-field]"
+    assert_select "turbo-stream[target=brand-sliders]", count: 0
   end
 
   test "an out-of-range color answers 422 with the errors and no palette" do

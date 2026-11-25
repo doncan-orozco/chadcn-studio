@@ -35,6 +35,22 @@ class BrandHexTest < ApplicationSystemTestCase
     assert_field "Hex", with: "#00ffaa"
   end
 
+  test "moving a slider updates the Hex field to the same hex the subtitle shows" do
+    before = find_field("Hex").value
+    find("#primary-lightness [role=slider]").send_keys(:right, :right, :right)
+
+    assert_no_field "Hex", with: before
+    assert_field "Hex", with: find(:testid, "brand-hex").text.strip
+  end
+
+  test "after Enter in the Hex field the focus stays on it" do
+    fill_in "Hex", with: "#0f766e"
+    find_field("Hex").send_keys(:enter)
+
+    assert_selector :testid, "brand-hex", text: "#0f766e"
+    assert_equal "brand-hex", evaluate_script("document.activeElement.id")
+  end
+
   test "something that is not a hex is refused where it was typed and changes nothing" do
     before = find(:testid, "brand-hex").text
     fill_in "Hex", with: "teal"

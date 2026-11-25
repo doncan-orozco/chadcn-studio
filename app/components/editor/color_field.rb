@@ -29,7 +29,7 @@ class Components::Editor::ColorField < Components::Base
   # Unnamed on purpose: it is not submitted; the controller turns it into the form's primary color.
   def hex_field
     render Chadcn::Input.new(
-      id: HEX_ID, default_value: @hex, autocomplete: "off", spellcheck: "false", maxlength: 7, aria: { describedby: ERROR_ID }, class: "h-9 w-28 font-mono text-sm",
+      id: HEX_ID, default_value: @hex, autocomplete: "off", spellcheck: "false", maxlength: 9, aria: { describedby: ERROR_ID }, class: "h-9 w-28 font-mono text-sm",
       data: { editor__color_target: "hex", action: "change->editor--color#typeHex keydown.enter->editor--color#typeHex:prevent", testid: "brand-hex-field" }
     )
   end
