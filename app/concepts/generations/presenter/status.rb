@@ -17,6 +17,10 @@ class Generations::Presenter::Status < Core::Presenter::Base
   }.freeze
   private_constant :MESSAGES
 
+  # Failures where sending the same description again cannot help (nothing is set up, the limit is hit, a run is going, or the text itself is rejected).
+  UNRETRYABLE = %w[not_configured capped busy prompt].freeze
+  private_constant :UNRETRYABLE
+
   # `failure` is a code for a generation that never started (a prompt that was refused by the form).
   def initialize(generation, failure: nil)
     super(generation)
@@ -36,9 +40,16 @@ class Generations::Presenter::Status < Core::Presenter::Base
     case state
     when :pending then "Generating a theme from your prompt..."
     when :done then rationale.presence || "Theme generated."
-    else MESSAGES.fetch((@failure || error_code).to_s, MESSAGES["unavailable"])
+    else MESSAGES.fetch(failure_code, MESSAGES["unavailable"])
     end
   end
 
+  # A failure the person can answer by submitting the description again.
+  def retryable? = failed? && UNRETRYABLE.exclude?(failure_code)
+
   def rationale = inputs.is_a?(Hash) ? inputs["rationale"].to_s[0, 280] : ""
+
+  private
+
+  def failure_code = (@failure || error_code).to_s
 end

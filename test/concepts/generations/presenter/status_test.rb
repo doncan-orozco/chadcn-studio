@@ -65,4 +65,13 @@ class Generations::Presenter::StatusTest < ActiveSupport::TestCase
     assert_predicate status, :failed?
     assert_equal "Generation is not set up in this studio.", status.message
   end
+
+  test "a failure of the generation can be retried; one that never started or a limit cannot" do
+    assert_predicate Generations::Presenter::Status.new(generations(:failed)), :retryable?
+    assert_predicate Generations::Presenter::Status.new(Generation.new, failure: :throttled), :retryable?
+    %i[not_configured capped busy prompt].each do |code|
+      refute_predicate Generations::Presenter::Status.new(Generation.new, failure: code), :retryable?, code
+    end
+    refute_predicate Generations::Presenter::Status.new(generations(:pending)), :retryable?
+  end
 end
