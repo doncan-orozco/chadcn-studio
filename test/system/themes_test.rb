@@ -23,6 +23,14 @@ class ThemesTest < ApplicationSystemTestCase
     assert_equal "oklch(0.488 0.217 264.376)", Theme.find_by!(slug: "acme").light["primary"]
   end
 
+  test "the Themes list links to describing a theme" do
+    visit themes_path
+    click_on "Describe a theme"
+
+    assert_current_path new_theme_path
+    assert_field "Describe a theme", disabled: :all
+  end
+
   test "the header's Themes link opens the list from home" do
     visit root_path
     within("header") { click_on "Themes" }

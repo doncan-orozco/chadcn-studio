@@ -9,6 +9,7 @@ Rails.application.routes.draw do
     resources :generations, only: :create, module: :themes
   end
 
+  resources :generations, only: :create
   resources :derivations, only: :create, module: :themes
 
   # The public URL `chadcn:theme:import` consumes: /t/<slug>.css (shadcn theme.css) and /t/<slug>.json.

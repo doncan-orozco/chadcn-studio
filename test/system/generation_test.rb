@@ -31,6 +31,21 @@ class GenerationTest < ApplicationSystemTestCase
     assert_equal "oklch(0.55 0.2 250)", themes(:slate).reload.inputs["primary"]
   end
 
+  test "a theme can be generated from where a new theme starts" do
+    GenerateThemeJob.client = FakeGenerationClient.new
+    visit root_path
+    click_on "Describe a theme"
+
+    fill_in "Describe a theme", with: "calm blue"
+    click_on "Generate"
+
+    assert_selector :testid, "generation-status", text: "Generating a theme"
+    perform_enqueued_jobs
+
+    assert_selector :testid, "generation-status", text: "A confident blue with soft corners."
+    assert_equal "oklch(0.55 0.2 250)", Theme.find_by!(name: "calm blue").inputs["primary"]
+  end
+
   test "a refusal is explained and nothing changes" do
     GenerateThemeJob.client = FakeGenerationClient.refusing
     visit edit_theme_path(themes(:slate))

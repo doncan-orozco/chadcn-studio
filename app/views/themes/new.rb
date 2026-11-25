@@ -4,8 +4,9 @@ class Views::Themes::New < Views::Base
   PRIMARY_EXAMPLE = "#1d4ed8"
   private_constant :PRIMARY_EXAMPLE
 
-  def initialize(theme)
+  def initialize(theme, intake:)
     @theme = theme
+    @intake = intake
   end
 
   def view_template
@@ -17,6 +18,13 @@ class Views::Themes::New < Views::Base
           card.description { "The rest of the palette is derived from them." }
         end
         card.content { render Views::Themes::New::Form.new(@theme, primary_example: PRIMARY_EXAMPLE) }
+      end
+      render Chadcn::Card.new(id: "describe") do |card|
+        card.header do
+          card.title { "Or describe it" }
+          card.description { "Claude picks the colors from your words. You can adjust them in the editor." }
+        end
+        card.content { render Components::Editor::GenerationPanel.new(panel: @intake, primary: true) }
       end
     end
   end

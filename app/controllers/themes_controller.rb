@@ -8,7 +8,7 @@ class ThemesController < ApplicationController
   end
 
   def new
-    render Views::Themes::New.new(Theme.new)
+    render Views::Themes::New.new(Theme.new, intake: Generations::Presenter::Intake.for)
   end
 
   def create
@@ -17,7 +17,7 @@ class ThemesController < ApplicationController
     if result.success?
       redirect_to edit_theme_path(result.value![:model]), notice: "Theme created"
     else
-      render Views::Themes::New.new(result.failure[:model]), status: :unprocessable_entity
+      render Views::Themes::New.new(result.failure[:model], intake: Generations::Presenter::Intake.for), status: :unprocessable_entity
     end
   end
 
