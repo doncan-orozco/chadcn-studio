@@ -38,6 +38,8 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
 
     assert_in_delta 0.5, group.lightness
     assert_in_delta 0.0, group.chroma
+    assert_equal "blue", group.summary
+    assert_nil group.summary_style
   end
 
   test "radius and tint read the stored values or the rule's default" do
