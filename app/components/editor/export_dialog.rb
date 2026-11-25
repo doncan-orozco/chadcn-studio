@@ -3,8 +3,6 @@
 # Getting the theme out: download the CSS or JSON and read the command that imports the public URL. A draft has no URL
 # yet, so the dialog carries the Publish button itself.
 class Components::Editor::ExportDialog < Components::Base
-  include Phlex::Rails::Helpers::FormAuthenticityToken
-
   def initialize(presenter:)
     @presenter = presenter
   end
@@ -32,11 +30,8 @@ class Components::Editor::ExportDialog < Components::Base
 
   def draft_notice
     div(class: "grid gap-3") do
-      p(class: "text-sm text-muted-foreground", data: { testid: "export-draft" }) { "Publish this theme to get its download links and import URL." }
-      form(action: @presenter.publication_path, method: "post") do
-        input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
-        render Chadcn::Button.new(type: "submit", data: { testid: "export-publish" }) { "Publish" }
-      end
+      p(class: "text-sm text-foreground/70", data: { testid: "export-draft" }) { "Publish this theme to get its download links and import URL." }
+      render Components::Editor::PublishToggle.new(presenter: @presenter, variant: "default", testid: "export-publish")
     end
   end
 
