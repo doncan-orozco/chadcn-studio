@@ -7,20 +7,39 @@ class Components::Editor::VariableRows < Components::Base
   end
 
   def view_template
-    ul(class: "space-y-1 text-xs", data: { testid: "variable-rows" }) do
-      @rows.each do |row|
-        li(class: "flex items-center justify-between gap-2") do
-          span(class: "font-mono") { row.name }
-          span(class: "flex items-center gap-1 text-muted-foreground") do
-            swatch(row.light_style, "Light #{row.name}")
-            swatch(row.dark_style, "Dark #{row.name}")
-          end
-        end
+    ul(class: "space-y-2 text-xs", data: { testid: "variable-rows" }) do
+      @rows.each { |row| variable(row) }
+    end
+    all_values_link
+  end
+
+  private
+
+  def variable(row)
+    li(class: "space-y-1") do
+      span(class: "font-mono") { row.name }
+      div(class: "flex items-center gap-3 text-muted-foreground") do
+        value("light", "Light #{row.name}", row.light, row.light_style)
+        value("dark", "Dark #{row.name}", row.dark, row.dark_style)
       end
     end
   end
 
-  private
+  def value(mode, label, text, style)
+    span(class: "flex min-w-0 items-center gap-1") do
+      swatch(style, label)
+      span(class: "truncate font-mono select-all", data: { value: mode }, title: label) { text }
+    end
+  end
+
+  def all_values_link
+    path = @rows.first&.values_path
+    return unless path
+
+    p(class: "pt-2 text-xs") do
+      a(href: path, class: "underline underline-offset-4", data: { testid: "all-values-link" }) { "See all values" }
+    end
+  end
 
   def swatch(style, label)
     return span(class: "size-4") unless style

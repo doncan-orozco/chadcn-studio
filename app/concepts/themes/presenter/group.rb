@@ -21,7 +21,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
   }.freeze
   KEYS = DEFINITIONS.keys.freeze
 
-  Row = Data.define(:name, :light, :light_style, :dark, :dark_style)
+  Row = Data.define(:name, :light, :light_style, :dark, :dark_style, :values_path)
   Override = Data.define(:mode, :name, :derived, :value, :style, :field_name, :field_id) do
     def overridden? = value.present?
   end
@@ -70,7 +70,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   def rows
     variables.map do |variable|
-      Row.new(name: "--#{variable}", light: light[variable], light_style: swatch(light[variable]), dark: dark[variable], dark_style: swatch(dark[variable]))
+      Row.new(name: "--#{variable}", light: light[variable], light_style: swatch(light[variable]), dark: dark[variable], dark_style: swatch(dark[variable]), values_path: values_path)
     end
   end
 
@@ -85,6 +85,8 @@ class Themes::Presenter::Group < Core::Presenter::Base
   def override_count = MODES.sum { |mode| stored_overrides(mode).size }
 
   private
+
+  def values_path = id ? "#{helpers.theme_path(__getobj__)}#all-values" : nil
 
   def definition = DEFINITIONS.fetch(key)
 

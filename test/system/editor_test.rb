@@ -138,7 +138,7 @@ class EditorTest < ApplicationSystemTestCase
 
   test "a group panel shows the light and dark values as text and links to all values" do
     open_group "brand"
-    row = find(:testid, "group-brand-panel").find(:testid, "variable-rows").find("li", text: "--primary")
+    row = find(:testid, "group-brand-panel").find(:testid, "variable-rows").find("li", text: /\A--primary\n/)
 
     assert_equal @theme.light["primary"], row.find("[data-value=light]").text
     assert_equal @theme.dark["primary"], row.find("[data-value=dark]").text
