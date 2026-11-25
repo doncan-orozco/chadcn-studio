@@ -43,7 +43,7 @@ class Themes::Presenter::EditorTest < ActiveSupport::TestCase
 
     assert_predicate editor, :new_record?
     assert_equal "oklch(0.55 0.2 250)", editor.variables("light")["--primary"]
-    assert_equal "oklch(0.55 0.2 250)", editor.group("brand").summary
+    assert_equal "Blue", editor.group("brand").summary
   end
 
   test "failures merge the model errors with a rejected derivation's messages" do

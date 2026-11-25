@@ -21,6 +21,12 @@ class Themes::Presenter::Group < Core::Presenter::Base
   }.freeze
   KEYS = DEFINITIONS.keys.freeze
 
+  # What a collapsed group says, in the user's words: the brand color is named from the primary, the rest say what they change.
+  SUMMARIES = { "surfaces" => "Backgrounds, cards and text", "charts" => "Five chart colors", "sidebar" => "Sidebar colors" }.freeze
+  # Upper bound of each hue name on the oklch wheel; red also owns the wrap-around above the last bound.
+  HUE_NAMES = [ [ 15, "pink" ], [ 40, "red" ], [ 75, "orange" ], [ 115, "yellow" ], [ 170, "green" ], [ 210, "teal" ], [ 275, "blue" ], [ 335, "purple" ] ].freeze
+  GRAY_CHROMA = 0.03
+
   Row = Data.define(:name, :light, :light_style, :dark, :dark_style)
   Override = Data.define(:mode, :name, :derived, :value, :style, :field_name, :field_id) do
     def overridden? = value.present?
@@ -48,10 +54,10 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   def summary
     case key
-    when "brand" then primary
+    when "brand" then color_name
     when "radius" then light["radius"].to_s
     when "advanced" then override_count.zero? ? "No overrides" : "#{override_count} overridden"
-    else "#{variables.size} variables"
+    else SUMMARIES.fetch(key)
     end
   end
 
@@ -64,6 +70,16 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   def tint = Float(inputs.to_h.fetch("tint") { Themes::Service::Harmony::DEFAULTS[:tint] })
   def radius_rem = Float(light["radius"].to_s.delete_suffix("rem"), exception: false) || 0.0
+
+  # "Blue", "Dark blue", "Light yellow", "Gray": the primary in words a user would say.
+  def color_name
+    return neutral_name if chroma < GRAY_CHROMA
+
+    hue_name = HUE_NAMES.find { |bound, _name| hue < bound }&.last || "pink"
+    return hue_name.capitalize unless lightness < 0.4 || lightness > 0.8
+
+    "#{lightness < 0.4 ? 'Dark' : 'Light'} #{hue_name}"
+  end
 
   def variables = definition[:variables]
   def modes = MODES
@@ -90,6 +106,13 @@ class Themes::Presenter::Group < Core::Presenter::Base
   private
 
   def definition = DEFINITIONS.fetch(key)
+
+  def neutral_name
+    if lightness < 0.3 then "Black"
+    elsif lightness > 0.9 then "White"
+    else "Gray"
+    end
+  end
 
   def brand_color
     @brand_color ||= Themes::Oklch.parse(primary)

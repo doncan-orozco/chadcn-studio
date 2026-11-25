@@ -34,7 +34,7 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
   test "the brand group exposes the primary as the three numbers the sliders move" do
     group = Themes::Presenter::Group.new(@theme, key: "brand")
 
-    assert_equal "oklch(0.21 0.006 285.885)", group.summary
+    assert_equal "Black", group.summary
     assert_in_delta 0.21, group.lightness
     assert_in_delta 0.006, group.chroma
     assert_in_delta 285.885, group.hue
@@ -68,6 +68,26 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     refute_includes light.map(&:name), "--destructive"
     assert_equal "1 overridden", group.summary
     refute_includes group.overrides("dark").map(&:name), "--radius"
+  end
+
+  test "the brand summary names the color in plain words, never the oklch string" do
+    {
+      "oklch(0.55 0.2 250)" => "Blue", "oklch(0.35 0.15 250)" => "Dark blue", "oklch(0.85 0.1 250)" => "Light blue",
+      "oklch(0.6 0.22 25)" => "Red", "oklch(0.7 0.18 60)" => "Orange", "oklch(0.85 0.17 95)" => "Light yellow",
+      "oklch(0.6 0.17 145)" => "Green", "oklch(0.7 0.12 190)" => "Teal", "oklch(0.55 0.25 300)" => "Purple",
+      "oklch(0.65 0.22 355)" => "Pink", "oklch(0.55 0.002 0)" => "Gray", "oklch(0.97 0 0)" => "White"
+    }.each do |primary, name|
+      theme = Theme.new(light: @theme.light.merge("primary" => primary), dark: @theme.dark, inputs: { "primary" => primary })
+
+      assert_equal name, Themes::Presenter::Group.new(theme, key: "brand").summary, primary
+    end
+  end
+
+  test "the other groups say what they change, not how many variables they hold" do
+    summaries = %w[surfaces charts sidebar].map { |key| Themes::Presenter::Group.new(@theme, key: key).summary }
+
+    assert_equal [ "Backgrounds, cards and text", "Five chart colors", "Sidebar colors" ], summaries
+    summaries.each { |summary| refute_match(/variable|oklch/, summary) }
   end
 
   test "without overrides the advanced summary says so" do
