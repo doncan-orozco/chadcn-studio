@@ -20,19 +20,14 @@ class GenerationTest < ApplicationSystemTestCase
     GenerateThemeJob.client = FakeGenerationClient.new
     visit edit_theme_path(themes(:slate))
 
-    click_on "Describe a theme"
-    fill_in "Prompt", with: "calm blue"
+    fill_in "Describe a theme", with: "calm blue"
     click_on "Generate"
 
     assert_selector :testid, "generation-status", text: "Generating a theme"
     perform_enqueued_jobs
 
-    # The success broadcasts a refresh that re-renders the page (and the dialog): wait for the palette, then look at the status.
-    assert_selector :testid, "preview-root", visible: :all, style: /--primary: oklch\(0\.55 0\.2 250\)/
-    assert_no_selector :testid, "generation-panel"
-    click_on "Describe a theme"
-
     assert_selector :testid, "generation-status", text: "A confident blue with soft corners."
+    assert_selector :testid, "preview-root", visible: :all, style: /--primary: oklch\(0\.55 0\.2 250\)/
     assert_equal "oklch(0.55 0.2 250)", themes(:slate).reload.inputs["primary"]
   end
 
@@ -40,30 +35,11 @@ class GenerationTest < ApplicationSystemTestCase
     GenerateThemeJob.client = FakeGenerationClient.refusing
     visit edit_theme_path(themes(:slate))
 
-    click_on "Describe a theme"
-    fill_in "Prompt", with: "something"
+    fill_in "Describe a theme", with: "something"
     click_on "Generate"
 
     assert_selector :testid, "generation-status", text: "Generating a theme"
     perform_enqueued_jobs
-
-    assert_selector :testid, "generation-status", text: "declined"
-  end
-
-  test "a refusal that lands while the dialog is closed shows when it is reopened" do
-    GenerateThemeJob.client = FakeGenerationClient.refusing
-    visit edit_theme_path(themes(:slate))
-
-    click_on "Describe a theme"
-    fill_in "Prompt", with: "something"
-    click_on "Generate"
-
-    assert_selector :testid, "generation-status", text: "Generating a theme"
-    find(:testid, "generation-panel").send_keys :escape
-
-    assert_no_selector :testid, "generation-panel"
-    perform_enqueued_jobs
-    click_on "Describe a theme"
 
     assert_selector :testid, "generation-status", text: "declined"
   end
@@ -74,8 +50,7 @@ class GenerationTest < ApplicationSystemTestCase
     Rails.configuration.x.generations.hourly_cap = 1
     visit edit_theme_path(themes(:slate))
 
-    click_on "Describe a theme"
-    fill_in "Prompt", with: "calm blue"
+    fill_in "Describe a theme", with: "calm blue"
     click_on "Generate"
 
     assert_selector :testid, "generation-status", text: "hourly generation limit"
@@ -87,11 +62,9 @@ class GenerationTest < ApplicationSystemTestCase
     key = ENV.delete("ANTHROPIC_API_KEY")
     visit edit_theme_path(themes(:slate))
 
-    click_on "Describe a theme"
-
     assert_selector :testid, "generation-status", text: "Generation is not set up in this studio"
     assert_button "Generate", disabled: true
-    assert_field "Prompt", disabled: true
+    assert_field "Describe a theme", disabled: true
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
   end

@@ -29,7 +29,7 @@ class EditorTest < ApplicationSystemTestCase
 
     mouse.up
 
-    assert_selector "#summary-brand", text: moved_primary
+    assert_selector "#summary-brand", text: "Gray"
     derived = wait_for_style_change(moved)
 
     assert_equal 1, derivation_requests.size
@@ -65,14 +65,12 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "oklch(0.6 0.1 30)", property("--ring")
 
     close_group
-    open_group "brand"
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
-    assert_selector "#summary-brand", text: "oklch(0.215"
+    assert_selector "#summary-brand", text: "Black"
     assert_selector :testid, "overridden", count: 1, visible: :all
     assert_equal "oklch(0.6 0.1 30)", property("--ring")
 
-    close_group
     open_group "advanced"
     fill_in "override-light-ring", with: ""
     find_field("override-light-ring").send_keys(:enter)
@@ -107,6 +105,22 @@ class EditorTest < ApplicationSystemTestCase
     page.driver.browser.mouse.move(x: x, y: y).down.move(x: x + 60, y: y, steps: 4).up
 
     assert_selector :testid, "unsaved", text: "Unsaved changes"
+  end
+
+  test "name, Save, Publish and Export share one row and the brand color is in the first viewport" do
+    tops = %w[theme-name save publish-toggle export].map { |id| evaluate_script("document.querySelector('[data-testid=#{id}], ##{id}').getBoundingClientRect().top").round }
+
+    assert_equal 1, tops.uniq.size
+    assert evaluate_script("document.querySelector('[data-testid=brand-color]').getBoundingClientRect().bottom < window.innerHeight")
+    assert_selector :testid, "brand-color", visible: :visible
+  end
+
+  # The form follows the toolbar row, so its top is the row's bottom. An error may legitimately wrap the row; this is the clean state.
+  test "the toolbar row is at most 100 px tall" do
+    row_bottom = evaluate_script("arguments[0].getBoundingClientRect().top", find(:testid, "editor-form"))
+    editor_top = evaluate_script("arguments[0].getBoundingClientRect().top", find(:testid, "editor"))
+
+    assert_operator row_bottom - editor_top, :<=, 100
   end
 
   test "Save persists the name and the derived palette" do
@@ -155,57 +169,6 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "Zinc", @theme.reload.name
   end
 
-  # An error in #editor-errors may legitimately wrap the toolbar onto a second line; this is the clean state.
-  test "name, Save, Publish, Export and Describe a theme share one row above the groups" do
-    nodes = [ find_field("Name"), *%w[save publish-toggle export describe].map { |id| find(:testid, id) } ]
-    tops = nodes.map { |node| evaluate_script("Math.round(arguments[0].getBoundingClientRect().top)", node) }
-    header_bottom = evaluate_script("arguments[0].getBoundingClientRect().bottom", find(:testid, "editor-header"))
-    editor_top = evaluate_script("arguments[0].getBoundingClientRect().top", find(:testid, "editor"))
-
-    assert_equal 1, tops.uniq.size, "the controls sit on #{tops.uniq.size} rows"
-    assert_operator header_bottom - editor_top, :<=, 100
-  end
-
-  test "the describe trigger announces a dialog, points at its panel while open and drops the pointer on Escape" do
-    trigger = find(:testid, "describe")
-
-    assert_equal "dialog", trigger[:"aria-haspopup"]
-    assert_nil trigger[:"aria-controls"]
-
-    trigger.click
-
-    assert_selector :testid, "generation-panel"
-    assert_equal find(:testid, "generation-panel")[:id], find(:testid, "describe")[:"aria-controls"]
-
-    find(:testid, "generation-panel").send_keys :escape
-
-    assert_no_selector :testid, "generation-panel"
-    assert_nil find(:testid, "describe")[:"aria-controls"]
-    assert_equal "false", find(:testid, "describe")[:"aria-expanded"]
-  end
-
-  test "the describe dialog opens from the keyboard, lands on the prompt, tabs to Generate and returns focus on Escape" do
-    GenerateThemeJob.client = FakeGenerationClient.new # an unconfigured studio disables the prompt
-    visit edit_theme_path(@theme)
-    evaluate_script("document.querySelector('[data-testid=describe]').focus()")
-    page.driver.browser.keyboard.type(:enter)
-
-    assert_selector :testid, "generation-panel"
-    assert_equal "generation-prompt", evaluate_script("document.activeElement.id")
-
-    page.driver.browser.keyboard.type("calm blue", :tab)
-
-    assert_equal "generate", evaluate_script("document.activeElement.dataset.testid")
-    assert_selector :testid, "generation-panel"
-
-    page.driver.browser.keyboard.type(:escape)
-
-    assert_no_selector :testid, "generation-panel"
-    assert_equal "describe", evaluate_script("document.activeElement.dataset.testid")
-  ensure
-    GenerateThemeJob.client = nil
-  end
-
   test "a group panel shows the light and dark values as text and links to all values" do
     open_group "brand"
     row = find(:testid, "group-brand-panel").find(:testid, "variable-rows").find("li", text: /\A--primary\n/)
@@ -220,7 +183,7 @@ class EditorTest < ApplicationSystemTestCase
     open_group "brand"
     find(:testid, "primary-lightness").find("[role=slider]").send_keys(:right)
 
-    assert_selector "#summary-brand", text: "oklch(0.215"
+    assert_selector "#summary-brand", text: "Black"
     panel = find(:testid, "group-brand-panel")
 
     assert panel.has_selector?(:testid, "variable-rows")
@@ -235,10 +198,18 @@ class EditorTest < ApplicationSystemTestCase
 
   private
 
+  # The brand group is not a dialog: it sits open in the sidebar, its variable rows behind a disclosure.
   def open_group(key)
+    return open_brand_variables if key == "brand"
+
     find(:testid, "group-#{key}").click
 
     assert_selector :testid, "group-#{key}-panel"
+  end
+
+  def open_brand_variables
+    assert_selector :testid, "group-brand-panel"
+    find(:testid, "group-brand-panel").find("summary", text: "All brand variables").click
   end
 
   # The panel scrolls to the field that was filled; its Close button is at the top.
