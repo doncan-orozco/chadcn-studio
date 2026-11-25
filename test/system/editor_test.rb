@@ -133,12 +133,34 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal "Zinc", @theme.reload.name
   end
 
+  # An error in #editor-errors may legitimately wrap the toolbar onto a second line; this is the clean state.
   test "name, Save, Publish, Export and Describe a theme share one row above the groups" do
-    tops = %w[save publish-toggle export describe].map { |id| evaluate_script("Math.round(document.querySelector('[data-testid=#{id}]').getBoundingClientRect().top)") }
-    tops << evaluate_script("Math.round(document.querySelector('#theme-name').getBoundingClientRect().top)")
+    nodes = [ find_field("Name"), *%w[save publish-toggle export describe].map { |id| find(:testid, id) } ]
+    tops = nodes.map { |node| evaluate_script("Math.round(arguments[0].getBoundingClientRect().top)", node) }
+    header_bottom = evaluate_script("arguments[0].getBoundingClientRect().bottom", find(:testid, "editor-header"))
+    editor_top = evaluate_script("arguments[0].getBoundingClientRect().top", find(:testid, "editor"))
 
     assert_equal 1, tops.uniq.size, "the controls sit on #{tops.uniq.size} rows"
-    assert_operator evaluate_script("document.querySelector('[data-testid=editor-form]').parentElement.getBoundingClientRect().bottom - document.querySelector('[data-testid=editor]').getBoundingClientRect().top"), :<=, 100
+    assert_operator header_bottom - editor_top, :<=, 100
+  end
+
+  # Focus return on close is not asserted: a force-mounted gem dialog never releases its focus scope (UPSTREAM, chadcn).
+  test "the describe trigger announces a dialog, points at its panel while open and drops the pointer on Escape" do
+    trigger = find(:testid, "describe")
+
+    assert_equal "dialog", trigger[:"aria-haspopup"]
+    assert_nil trigger[:"aria-controls"]
+
+    trigger.click
+
+    assert_selector :testid, "generation-panel"
+    assert_equal find(:testid, "generation-panel")[:id], find(:testid, "describe")[:"aria-controls"]
+
+    find(:testid, "generation-panel").send_keys :escape
+
+    assert_no_selector :testid, "generation-panel"
+    assert_nil find(:testid, "describe")[:"aria-controls"]
+    assert_equal "false", find(:testid, "describe")[:"aria-expanded"]
   end
 
   test "the page switcher renders the other preview pages inside the preview root" do

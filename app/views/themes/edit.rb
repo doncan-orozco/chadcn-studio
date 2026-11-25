@@ -21,7 +21,7 @@ class Views::Themes::Edit < Views::Base
 
   # One row above the groups: the heading, the name and Save (the toolbar form), Publish, Export and the describe dialog.
   def header
-    div(class: "flex flex-wrap items-end border-b") do
+    div(class: "flex flex-wrap items-end border-b", data: { testid: "editor-header" }) do
       h1(class: "px-3 pb-3 text-2xl font-semibold leading-9 tracking-tight") { @presenter.title }
       render Views::Themes::Edit::Toolbar.new(@presenter)
       actions
