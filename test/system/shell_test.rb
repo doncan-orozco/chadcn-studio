@@ -54,4 +54,14 @@ class ShellTest < ApplicationSystemTestCase
       assert_operator height, :>=, 24, "brand link on #{screen} is #{height}px tall"
     end
   end
+
+  test "the header's brand and Themes links are at least 24 px tall" do
+    visit root_path
+
+    [ "Chadcn Studio", "Themes" ].each do |name|
+      height = find("header a", text: name, exact_text: true).evaluate_script("this.getBoundingClientRect().height")
+
+      assert_operator height, :>=, 24, "#{name} link is #{height}px tall"
+    end
+  end
 end
