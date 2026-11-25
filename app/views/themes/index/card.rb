@@ -2,7 +2,7 @@
 
 class Views::Themes::Index::Card < Views::Base
   # The name opens the editor, and its ::after stretches the hit area over the whole card; the footer controls sit above it.
-  TITLE_LINK = "hover:underline focus-visible:underline focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none after:absolute after:inset-0 after:content-['']"
+  TITLE_LINK = "text-primary underline underline-offset-4 focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none after:absolute after:inset-0 after:content-['']"
 
   def initialize(card)
     @card = card
