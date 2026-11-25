@@ -66,4 +66,10 @@ class Themes::DerivationsControllerTest < ActionDispatch::IntegrationTest
   test "writes nothing" do
     assert_no_difference("Theme.count") { derive(primary: "oklch(0.55 0.2 250)") }
   end
+
+  test "the brand swatch streams the typed hex" do
+    derive(primary: Themes::Oklch.parse("#1d4ed8").to_s, primary_hex: "#1d4ed8")
+
+    assert_select "turbo-stream[target=brand-swatch] template [data-testid=brand-hex]", text: "#1d4ed8"
+  end
 end

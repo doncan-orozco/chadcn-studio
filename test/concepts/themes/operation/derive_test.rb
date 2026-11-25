@@ -52,4 +52,36 @@ class Themes::Operation::DeriveTest < ActiveSupport::TestCase
       (palette.root.values + palette.dark.values).each { |value| refute_match(/(?<![\w.])-0(?![\d.])/, value, inputs.inspect) }
     end
   end
+
+  test "a hex primary is kept as typed beside its oklch spelling" do
+    inputs = Themes::Operation::Derive.new.call(inputs: { primary: "#1D4ED8" }).value![:inputs]
+
+    assert_equal "#1d4ed8", inputs[:primary_hex]
+    assert_equal Themes::Oklch.parse("#1d4ed8").to_s, inputs[:primary]
+  end
+
+  test "the typed hex is dropped once the primary moved away from it" do
+    inputs = Themes::Operation::Derive.new.call(inputs: { primary: "oklch(0.55 0.2 250)", primary_hex: "#1d4ed8" }).value![:inputs]
+
+    assert_nil inputs[:primary_hex]
+  end
+
+  test "an oklch primary carries no typed hex" do
+    assert_not Themes::Operation::Derive.new.call(inputs: { primary: "oklch(0.55 0.2 250)" }).value![:inputs].key?(:primary_hex)
+  end
+
+  test "a hex typed as the primary wins over a remembered typed hex" do
+    inputs = Themes::Operation::Derive.new.call(inputs: { primary: "#FF0000", primary_hex: "#1d4ed8" }).value![:inputs]
+
+    assert_equal "#ff0000", inputs[:primary_hex]
+  end
+
+  test "a primary_hex that is not #rrggbb is invalid" do
+    [ "#1de", "1d4ed8", "#1d4ed8;x", "red" ].each do |value|
+      failure = Themes::Operation::Derive.new.call(inputs: { primary: "#1d4ed8", primary_hex: value }).failure
+
+      assert_equal :invalid, failure[:code], value
+      assert_includes failure[:errors].keys, :primary_hex, value
+    end
+  end
 end

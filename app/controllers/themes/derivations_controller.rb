@@ -15,7 +15,7 @@ class Themes::DerivationsController < ApplicationController
 
   # A cleared override field is posted blank: it is no override.
   def derivation_inputs
-    inputs = params.expect(theme: [ inputs: [ :primary, :tint, :radius, { overrides: {} } ] ]).to_h.fetch("inputs")
+    inputs = params.expect(theme: [ inputs: [ :primary, :primary_hex, :tint, :radius, { overrides: {} } ] ]).to_h.fetch("inputs")
     inputs.except("overrides").compact_blank.merge(overrides(inputs))
   end
 
