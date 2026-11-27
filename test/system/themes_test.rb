@@ -143,12 +143,12 @@ class ThemesTest < ApplicationSystemTestCase
     assert_includes evaluate_script("getComputedStyle(#{row}.querySelector('[data-link-name]')).textDecorationLine"), "underline"
   end
 
-  test "home lists the saved themes above the Create theme button, the only default button on the page" do
+  test "home puts the Create theme button above the saved themes, the only default button on the page" do
     visit root_path
     list_top = evaluate_script("document.querySelector(\"ul[aria-label='Your themes']\").getBoundingClientRect().top")
     create_top = evaluate_script("Array.from(document.querySelectorAll('main a')).find(function(a){return a.textContent.trim() === 'Create theme'}).getBoundingClientRect().top")
 
-    assert_operator list_top, :<, create_top
+    assert_operator create_top, :<, list_top
     assert_selector "main a[data-variant=default]", count: 1
   end
 
