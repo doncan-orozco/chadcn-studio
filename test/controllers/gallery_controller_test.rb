@@ -22,6 +22,29 @@ class GalleryControllerTest < ActionDispatch::IntegrationTest
     Chadcn::Catalog.entries.each { |entry| assert_select "nav[aria-label=Components] a[href='##{entry.component}']" }
   end
 
+  test "the index has a labelled filter field and groups its links by letter like the content" do
+    get gallery_path
+
+    assert_select "nav[aria-label=Components] label[for=gallery-filter]", text: "Find a component"
+    assert_select "nav[aria-label=Components] input#gallery-filter[type=search][data-editor--variable-filter-target=query]"
+    assert_select "nav[aria-label=Components] [role=status][data-editor--variable-filter-target=status]"
+    Chadcn::Catalog.entries.each do |entry|
+      assert_select "nav[aria-label=Components] section li[data-editor--variable-filter-target=row][data-variable='#{entry.title.downcase}'] a[href='##{entry.component}']"
+    end
+    index_letters = css_select("nav[aria-label=Components] section > p[data-testid=gallery-index-letter]").map { |letter| letter.text.strip }
+    content_letters = css_select("section[aria-label^='Components starting'] > h2").map { |heading| heading.text.strip }
+
+    assert_equal content_letters, index_letters
+  end
+
+  test "the page wires the current-entry marker to the index links and the entries" do
+    get gallery_path
+
+    assert_select "[data-controller~='gallery--index-spy']", 1
+    assert_select "nav[aria-label=Components] a[data-gallery--index-spy-target=link]", Chadcn::Catalog.entries.size
+    assert_select "nav[aria-label=Components] a[aria-current]", 0
+  end
+
   test "an entry whose tree cannot render shows a notice and the rest still renders" do
     broken = Chadcn::Catalog::Entry.new(component: "broken", title: "Broken", scenario_id: "x", scenario_count: 1, tree: { "c" => "NoSuchThing" }.freeze)
     entries = [ broken, *Chadcn::Catalog.entries.first(2) ]
