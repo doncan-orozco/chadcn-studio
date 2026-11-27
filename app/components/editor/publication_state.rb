@@ -4,6 +4,8 @@
 # It has a stable id so a Turbo Stream can replace it when the theme is published from inside the Export dialog.
 class Components::Editor::PublicationState < Components::Base
   ID = "publication-state-host"
+  CLASSES = "flex items-center gap-2 text-sm"
+  private_constant :CLASSES
 
   def initialize(presenter:, **attrs)
     @presenter = presenter
@@ -11,7 +13,7 @@ class Components::Editor::PublicationState < Components::Base
   end
 
   def view_template
-    span(**@attrs, id: ID, class: "flex items-center gap-2 text-sm") do
+    span(**mix({ class: CLASSES }, @attrs), id: ID) do
       badge
       public_link if @presenter.public_path
     end
