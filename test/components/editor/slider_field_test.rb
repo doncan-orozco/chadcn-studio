@@ -61,6 +61,10 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
     assert_not_includes render_field, "slider-speech"
   end
 
+  test "the thumb is named by the label" do
+    assert_includes render_field, 'role="slider" aria-label="Corner radius"'
+  end
+
   private
 
   def render_field(**options) = Components::Editor::SliderField.new(**SLIDER, **options).call
