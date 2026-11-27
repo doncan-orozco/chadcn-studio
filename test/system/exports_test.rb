@@ -11,12 +11,12 @@ class ExportsTest < ApplicationSystemTestCase
     send_keys :escape
 
     assert_selector :testid, "publication-state", text: "Not published"
-    click_on "Publish"
+    click_on "Share link"
 
     assert_text "Theme published"
     assert_selector :testid, "publication-state", text: "Published"
     assert_selector :testid, "publication-link"
-    assert_selector :testid, "publish-toggle", text: "Unpublish"
+    assert_selector :testid, "publish-toggle", text: "Stop sharing"
 
     click_on "Export"
 
@@ -38,7 +38,7 @@ class ExportsTest < ApplicationSystemTestCase
     send_keys :escape
 
     assert_no_selector :testid, "export-panel"
-    assert_selector :testid, "publish-toggle", text: "Unpublish"
+    assert_selector :testid, "publish-toggle", text: "Stop sharing"
 
     click_on "Export"
 
@@ -79,7 +79,7 @@ class ExportsTest < ApplicationSystemTestCase
   test "unpublishing takes the theme off its URL" do
     visit edit_theme_path(themes(:slate))
 
-    click_on "Unpublish"
+    click_on "Stop sharing"
 
     assert_text "Theme unpublished"
     assert_selector :testid, "publication-state", text: "Not published"

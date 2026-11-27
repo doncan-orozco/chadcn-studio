@@ -14,7 +14,7 @@ class Themes::PublicationsControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_predicate themes(:zinc).reload, :published?
     assert_select "turbo-stream[action=replace][target=export-dialog-host] [data-testid=import-command]"
-    assert_select "turbo-stream[action=replace][target=publish-toggle-form] [data-testid=publish-toggle]", /Unpublish/
+    assert_select "turbo-stream[action=replace][target=publish-toggle-form] [data-testid=publish-toggle]", /Stop sharing/
   end
 
   test "publishing an invalid theme from the Export dialog answers 422 HTML with the errors" do
