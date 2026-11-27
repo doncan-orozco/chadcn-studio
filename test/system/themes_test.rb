@@ -104,7 +104,8 @@ class ThemesTest < ApplicationSystemTestCase
 
   test "deleting a theme from its page returns to the list" do
     visit theme_path(themes(:zinc))
-    accept_confirm { click_on "Delete" }
+    click_on "Delete"
+    confirm_delete("Zinc")
 
     assert_current_path themes_path
     assert_no_selector :testid, "theme-card", text: "Zinc"
@@ -158,7 +159,8 @@ class ThemesTest < ApplicationSystemTestCase
 
   test "after a delete the list keeps a status that names the theme" do
     visit theme_path(themes(:zinc))
-    accept_confirm { click_on "Delete" }
+    click_on "Delete"
+    confirm_delete("Zinc")
 
     assert_selector :testid, "deleted-status", text: "Zinc deleted"
     assert_equal "status", find(:testid, "deleted-status")[:role]
@@ -169,9 +171,39 @@ class ThemesTest < ApplicationSystemTestCase
 
   test "a card's Delete button removes that theme from the list" do
     visit themes_path
-    within(:testid, "theme-card", text: "Zinc") { accept_confirm { find("button[aria-label='Delete Zinc']").click } }
+    within(:testid, "theme-card", text: "Zinc") { find("button[aria-label='Delete Zinc']").click }
+    confirm_delete("Zinc")
 
     assert_current_path themes_path
     assert_no_selector :testid, "theme-card", text: "Zinc"
+  end
+
+  test "Delete opens a dialog that names the theme and what is lost" do
+    visit theme_path(themes(:zinc))
+    click_on "Delete"
+
+    dialog = find("[role=alertdialog]")
+
+    assert_equal "Delete Zinc?", find(id: dialog["aria-labelledby"]).text
+    assert_equal "Its 32 variables will be lost. This cannot be undone.", find(id: dialog["aria-describedby"]).text
+    assert_equal "Cancel", evaluate_script("document.activeElement.textContent")
+    assert_equal "Delete Zinc", dialog.find(:testid, "confirm-delete").text
+  end
+
+  test "cancelling the delete dialog keeps the theme" do
+    visit theme_path(themes(:zinc))
+    click_on "Delete"
+    within("[role=alertdialog]") { click_button "Cancel" }
+
+    assert_no_selector "[role=alertdialog]"
+    assert_equal "Delete Zinc", evaluate_script("document.activeElement.getAttribute('aria-label')")
+    assert_current_path theme_path(themes(:zinc))
+    assert Theme.exists?(themes(:zinc).id)
+  end
+
+  private
+
+  def confirm_delete(name)
+    within("[role=alertdialog]") { click_button "Delete #{name}" }
   end
 end

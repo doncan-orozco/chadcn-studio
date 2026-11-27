@@ -132,7 +132,8 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "h1", "Zinc"
     assert_select "a[href='#{edit_theme_path(themes(:zinc))}'][data-variant=default]", "Preview and edit"
-    assert_select "button[data-variant=destructive]", false
+    assert_select "button[data-variant=destructive]", 1 # only the dialog's confirm; the page's own actions are not destructive
+    assert_select "template button[data-variant=destructive][data-testid=confirm-delete]"
     assert_select "button[aria-label='Delete Zinc'][data-variant=outline].text-destructive", "Delete"
     assert_select "[data-testid=palette] tbody tr", Chadcn::Theme::REQUIRED.size + Chadcn::Theme::ROOT_ONLY.size
   end
