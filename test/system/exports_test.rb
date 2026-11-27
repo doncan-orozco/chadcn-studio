@@ -131,6 +131,7 @@ class ExportsTest < ApplicationSystemTestCase
 
     assert_current_path themes_path
     assert_selector :testid, "download-css"
+    assert_selector "button[aria-label='Export Zinc']", count: 1
     assert_match(%r{/t/zinc\.css\]\z}, find(:testid, "import-command").text)
     assert_predicate themes(:zinc).reload, :published?
   end
