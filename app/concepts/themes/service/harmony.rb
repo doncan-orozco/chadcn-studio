@@ -12,10 +12,10 @@ class Themes::Service::Harmony
                  "secondary" => 0.274, "muted" => 0.274, "accent" => 0.274, "muted-foreground" => 0.705,
                  "foreground" => 0.985, "secondary-foreground" => 0.985, "accent-foreground" => 0.985 }.freeze
   # Above this tint the page, cards and popovers stop being white and take the hue: the surface chroma and its lightness dip
-  # grow linearly to their maximum at tint 1. At or below it, white stays white.
+  # grow linearly to their maximum at tint 1, where the page meets the sidebar step (0.985) and never drops below it. At or below it, white stays white.
   SURFACE_TINT_START = 0.5
   SURFACE_CHROMA_MAX = 0.025
-  SURFACE_LIGHTNESS_DIP_MAX = 0.02
+  SURFACE_LIGHTNESS_DIP_MAX = 0.015
   MUTED_FOREGROUND_CHROMA_MIN = { light: 0.016, dark: 0.015 }.freeze
   DARK_PRIMARY_LIFT = 0.15
   DARK_PRIMARY_LIGHTNESS_MAX = 0.92

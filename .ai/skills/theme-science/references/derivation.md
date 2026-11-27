@@ -16,8 +16,12 @@
 
 ```ruby
 NEUTRAL_CHROMA_MAX = 0.015
-LIGHT_STEPS = { "background" => 1.0, "sidebar" => 0.985, "secondary" => 0.967, "muted" => 0.967, "accent" => 0.967,
-                "border" => 0.92, "input" => 0.92, "muted-foreground" => 0.54, "foreground" => 0.141 }.freeze
+LIGHT_STEPS = { "sidebar" => 0.985, "secondary" => 0.967, "muted" => 0.967, "accent" => 0.967,
+                "border" => 0.92, "input" => 0.92, "muted-foreground" => 0.54, "foreground" => 0.141,
+                "secondary-foreground" => 0.21, "accent-foreground" => 0.21 }.freeze
+SURFACE_TINT_START = 0.5          # at or below this tint the light background/card/popover are oklch(1 0 0)
+SURFACE_CHROMA_MAX = 0.025        # their chroma at tint 1
+SURFACE_LIGHTNESS_DIP_MAX = 0.015 # their lightness drop at tint 1 (1 -> the sidebar step 0.985)
 DARK_STEPS  = { "background" => 0.141, "card" => 0.21, "popover" => 0.21, "sidebar" => 0.21,
                 "secondary" => 0.274, "muted" => 0.274, "accent" => 0.274, "muted-foreground" => 0.705, "foreground" => 0.985 }.freeze
 DARK_PRIMARY_LIFT = 0.15        # added to L, result clamped to 0.92
@@ -28,15 +32,15 @@ CHART_LIGHTNESS = { light: 0.65, dark: 0.70 }.freeze
 CHART_CHROMA_MIN = 0.12
 DESTRUCTIVE = { light: "oklch(0.577 0.245 27.325)", dark: "oklch(0.704 0.191 22.216)" }.freeze
 DARK_ALPHA = { "border" => "oklch(1 0 0 / 10%)", "input" => "oklch(1 0 0 / 15%)" }.freeze
-FOREGROUND_CANDIDATES = { light: 0.985, dark: 0.141 }.freeze   # lightness of the two text candidates
+FOREGROUND_LIGHTNESS = { light: 0.985, dark: 0.141 }.freeze   # lightness of the two text candidates
 REPAIR_STEP = 0.05
 REPAIR_MAX_STEPS = 10
 ```
 
 ## Steps
 
-1. **Neutral color.** `neutral(l) = Oklch.new(l, tint * NEUTRAL_CHROMA_MAX, primary.hue)`; `background` in light is `oklch(1 0 0)` up to `tint = 0.5` (white stays white); above it, `background`, `card` and `popover` take the hue: chroma `0.025 * s` and lightness `1 - 0.02 * s`, with `s = (tint - 0.5) / 0.5`.
-2. **Light surfaces.** `background`, `card`, `popover` = white (tinted above tint 0.5, step 1); `sidebar` = neutral(0.985); `secondary`, `muted`, `accent` = neutral(0.967); `border`, `input` = neutral(0.92).
+1. **Neutral color.** `neutral(l) = Oklch.new(l, tint * NEUTRAL_CHROMA_MAX, primary.hue)`; 
+2. **Light surfaces.** `background`, `card`, `popover` = one surface: `oklch(1 0 0)` while `tint <= SURFACE_TINT_START`, above it `Oklch.new(1 - SURFACE_LIGHTNESS_DIP_MAX * s, SURFACE_CHROMA_MAX * s, primary.hue)` with `s = (tint - 0.5) / 0.5` (tint 1 -> `oklch(0.985 0.025 H)`); `sidebar` = neutral(0.985); `secondary`, `muted`, `accent` = neutral(0.967); `border`, `input` = neutral(0.92).
 3. **Light text.** `foreground`, `card-foreground`, `popover-foreground`, `sidebar-foreground` = neutral(0.141); `muted-foreground` = neutral(0.54) with chroma raised to `max(neutral chroma, 0.016)` so muted text keeps a hint of hue; `secondary-foreground`, `accent-foreground` = neutral(0.21).
 4. **Light brand.** `primary` = input; `primary-foreground` = candidate with the higher `Chadcn::Theme.contrast` against `primary` (white candidate `oklch(0.985 0 0)` vs dark candidate neutral(0.141)).
 5. **Light lines.** `ring` = `Oklch.new(0.705, primary.chroma * 0.6, primary.hue)`.
