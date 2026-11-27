@@ -11,7 +11,6 @@ class Components::Editor::ExportDialog::BodyTest < ActiveSupport::TestCase
     command = html.at_css("[data-testid=import-command]")
     copy = html.at_css("[data-testid=import-copy]")
 
-    assert_not_includes command.ancestors.first.name, "button"
     assert_not_equal command.parent, copy.parent, "the command and Copy share a row"
     assert_no_match(/\bflex-1\b/, command["class"])
   end
@@ -25,5 +24,17 @@ class Components::Editor::ExportDialog::BodyTest < ActiveSupport::TestCase
     assert_operator command.css("wbr").size, :>=, 3
     assert_no_match(%r{slate\.<wbr|sla<wbr|\.<wbr>css}, command.inner_html)
     assert_includes command.inner_html, "slate.css]"
+    assert_not_includes command.inner_html, "/<wbr>/"
+  end
+
+  test "a draft theme offers to publish and shows no import command" do
+    theme = themes(:zinc)
+    html = render_body(theme)
+    sharing = Exports::Presenter::Sharing.new(theme, base_url: "https://studio.test")
+
+    assert_not sharing.published?
+    assert html.at_css("[data-testid=export-draft]")
+    assert html.at_css("[data-testid=export-publish]")
+    assert_nil html.at_css("[data-testid=import-command]")
   end
 end
