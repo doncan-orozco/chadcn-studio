@@ -9,7 +9,7 @@ class Views::Themes::Index < Views::Base
   end
 
   def view_template
-    content_for(:title, "#{@presenter.title} - Chadcn Studio")
+    content_for(:title, @presenter.document_title)
     div(class: "mx-auto max-w-6xl space-y-6 p-6") do
       header(class: "flex items-center justify-between gap-4") do
         div do
