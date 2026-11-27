@@ -191,6 +191,15 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid=palette] tbody tr", Chadcn::Theme::REQUIRED.size + Chadcn::Theme::ROOT_ONLY.size
   end
 
+  test "GET /themes/:id lists the brand variables first, in words, with the hex beside the oklch value" do
+    get theme_path(themes(:zinc))
+
+    assert_equal [ "Brand", "Everything else" ], css_select("[data-testid=palette] h3").map(&:text)
+    assert_select "[data-testid=palette-brand] tbody tr", 3
+    assert_select "[data-testid=palette-brand] tbody tr:first-child td:first-child", /Brand color\s*--primary/
+    assert_select "[data-testid=palette-brand] tbody tr:first-child td:nth-child(2)", /#[0-9a-f]{6}/
+  end
+
   test "GET /themes/:id swatches carry a border that shows on both backgrounds" do
     get theme_path(themes(:zinc))
 

@@ -23,6 +23,23 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     assert_equal "background-color: #{@theme.light['primary']}", row.light_style
   end
 
+  test "rows name the variable in words and carry the hex beside the oklch value" do
+    row = Themes::Presenter::Group.new(@theme, key: "brand").rows.find { |candidate| candidate.name == "--primary" }
+
+    assert_equal "Brand color", row.label
+    assert_equal Themes::Oklch.parse(@theme.light["primary"]).to_hex, row.light_hex
+    assert_equal Themes::Oklch.parse(@theme.dark["primary"]).to_hex, row.dark_hex
+  end
+
+  test "a value that is not a color has no hex" do
+    assert_nil Themes::Presenter::Group.hex_for("0.625rem")
+    assert_nil Themes::Presenter::Group.hex_for("oklch(1 0 0 / 10%)")
+  end
+
+  test "every variable has a label of its own, not its CSS name" do
+    Chadcn::Theme::REQUIRED.each { |variable| assert_not_equal variable, Themes::Presenter::Group.label_for(variable) }
+  end
+
   test "rows link to the theme page under All values" do
     assert_equal "/themes/#{@theme.id}#all-values", Themes::Presenter::Group.new(@theme, key: "brand").values_path
   end

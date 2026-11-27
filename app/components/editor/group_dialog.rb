@@ -41,7 +41,7 @@ class Components::Editor::GroupDialog < Components::Base
       div(id: @group.controls_id) { render Components::Editor::BrandControls.new(group: @group) }
       p(class: "text-xs text-foreground/70", data: { testid: "brand-live-note" }) { "Changes show live; Save keeps them." }
       details(class: "text-sm") do
-        summary(class: "block cursor-pointer py-1 text-muted-foreground") { "All brand variables" }
+        summary(class: "block cursor-pointer py-1 text-foreground/70") { "Brand variables (light and dark values)" }
         rows
       end
     end

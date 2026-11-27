@@ -14,7 +14,7 @@ class Views::Themes::Show < Views::Base
         end
         actions
       end
-      render Views::Themes::Show::Palette.new(@presenter.rows)
+      render Views::Themes::Show::Palette.new(@presenter.sections)
     end
   end
 

@@ -31,7 +31,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
   # What each variable colors, in the words of someone tuning a theme; the CSS name stays beside it for people who export.
   VARIABLE_LABELS = {
     "background" => "Page background", "foreground" => "Page text", "primary" => "Brand color", "primary-foreground" => "Text on brand color",
-    "border" => "Borders", "input" => "Input borders", "ring" => "Focus ring", "sidebar-border" => "Sidebar borders", "sidebar-ring" => "Sidebar focus ring", "radius" => "Corner radius"
+    "destructive" => "Destructive color", "border" => "Borders", "input" => "Input borders", "ring" => "Focus ring", "sidebar-border" => "Sidebar borders", "sidebar-ring" => "Sidebar focus ring", "radius" => "Corner radius"
   }.freeze
   # Variables that come as a surface and its text: "card" is the background, "card-foreground" the text on it.
   SURFACE_NAMES = { "card" => "Card", "popover" => "Popover", "secondary" => "Secondary", "muted" => "Muted", "accent" => "Accent", "sidebar" => "Sidebar",
@@ -42,7 +42,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
   BLACK_LIGHTNESS = 0.3
   WHITE_LIGHTNESS = 0.9
 
-  Row = Data.define(:name, :light, :light_style, :dark, :dark_style)
+  Row = Data.define(:name, :label, :light, :light_style, :light_hex, :dark, :dark_style, :dark_hex)
   Override = Data.define(:mode, :name, :label, :derived, :value, :style, :field_name, :field_id) do
     def overridden? = value.present?
 
@@ -59,6 +59,28 @@ class Themes::Presenter::Group < Core::Presenter::Base
   def self.trigger_id(key) = "group-#{key}-trigger"
 
   def self.all(theme) = KEYS.map { |key| new(theme, key: key) }
+
+  # "Card text" for card-foreground, "Chart color 3" for chart-3; the CSS name when nothing better is known.
+  def self.label_for(variable)
+    VARIABLE_LABELS.fetch(variable) do
+      stem = variable.delete_suffix("-foreground")
+      chart_number = variable[/\Achart-(\d)\z/, 1]
+      next "Chart color #{chart_number}" if chart_number
+
+      surface = SURFACE_NAMES[stem]
+      next variable unless surface
+
+      "#{surface} #{stem == variable ? 'background' : 'text'}"
+    end
+  end
+
+  # The hex a person would type for an oklch value; nil when hex cannot say it (translucent, or not a color such as a radius).
+  def self.hex_for(value)
+    color = Themes::Oklch.parse(value)
+    color.alpha ? nil : color.to_hex
+  rescue Themes::Oklch::Invalid
+    nil
+  end
 
   def initialize(theme, key:)
     raise ArgumentError, "unknown group #{key.inspect}" unless DEFINITIONS.key?(key)
@@ -118,7 +140,8 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   def rows
     variables.map do |variable|
-      Row.new(name: "--#{variable}", light: light[variable], light_style: swatch(light[variable]), dark: dark[variable], dark_style: swatch(dark[variable]))
+      Row.new(name: "--#{variable}", label: self.class.label_for(variable), light: light[variable], light_style: swatch(light[variable]), light_hex: self.class.hex_for(light[variable]),
+              dark: dark[variable], dark_style: swatch(dark[variable]), dark_hex: self.class.hex_for(dark[variable]))
     end
   end
 
@@ -162,24 +185,10 @@ class Themes::Presenter::Group < Core::Presenter::Base
     Themes::Oklch.new(0.5, 0, 0)
   end
 
-  # "Card text" for card-foreground, "Chart color 3" for chart-3; the CSS name when nothing better is known.
-  def variable_label(variable)
-    VARIABLE_LABELS.fetch(variable) do
-      stem = variable.delete_suffix("-foreground")
-      chart_number = variable[/\Achart-(\d)\z/, 1]
-      next "Chart color #{chart_number}" if chart_number
-
-      surface = SURFACE_NAMES[stem]
-      next variable unless surface
-
-      "#{surface} #{stem == variable ? 'background' : 'text'}"
-    end
-  end
-
   def swatch(value) = Themes::Presenter::Card.swatch_style(value)
 
   def override_row(mode, variable, derived)
-    Override.new(mode: mode, name: "--#{variable}", label: variable_label(variable), derived: derived, value: stored_overrides(mode)[variable].to_s,
+    Override.new(mode: mode, name: "--#{variable}", label: self.class.label_for(variable), derived: derived, value: stored_overrides(mode)[variable].to_s,
                  style: swatch(derived), field_name: "theme[inputs][overrides][#{mode}][#{variable}]", field_id: "override-#{mode}-#{variable}")
   end
 
