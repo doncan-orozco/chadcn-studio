@@ -5,13 +5,14 @@ class Gallery::Presenter::Index
   Group = Data.define(:letter, :label, :entries)
 
   def initialize(entries: Chadcn::Catalog.entries)
-    @entries = entries.sort_by { |entry| entry.title.downcase }
+    @entries = entries.sort_by { |entry| filter_key(entry) }
   end
 
   def title = "Components"
   def count = @entries.size
   def summary = "#{count} components, rendered from the chadcn catalog."
   def entries = @entries
+  def filter_key(entry) = entry.title.downcase
   def anchor(entry) = entry.component
   def anchor_href(entry) = "##{anchor(entry)}"
   def scenario_label(entry) = "#{entry.scenario_count} #{entry.scenario_count == 1 ? 'scenario' : 'scenarios'}"

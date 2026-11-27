@@ -40,7 +40,63 @@ class GalleryTest < ApplicationSystemTestCase
     assert_operator coverage["reachable"], :>=, 1, "no index link could be hit-tested in the first viewport"
   end
 
+  test "the index marks the entry in view as current and follows the scroll" do
+    visit gallery_path
+
+    assert_selector "nav[aria-label='Components'] a[aria-current='location']", count: 1, visible: :all
+    initial_entry_id = find("nav[aria-label='Components'] a[aria-current='location']", visible: :all)[:href].split("#").last
+
+    assert_not_equal initial_entry_id, last_entry_id
+    page.execute_script("document.getElementById(arguments[0]).scrollIntoView()", last_entry_id)
+
+    assert_selector "nav[aria-label='Components'] a[aria-current='location'][href='##{last_entry_id}']", count: 1, visible: :all
+    assert_selector "nav[aria-label='Components'] a[aria-current='location']", count: 1, visible: :all
+  end
+
+  test "the current marker is more than color: the current link is heavier than the others" do
+    visit gallery_path
+
+    assert_selector "nav[aria-label='Components'] a[aria-current='location']", count: 1, visible: :all
+    weights = evaluate_script(<<~JS)
+      (() => {
+        const links = [...document.querySelectorAll("nav[aria-label='Components'] a")]
+        const current = links.find((link) => link.getAttribute("aria-current") === "location")
+        const other = links.find((link) => link !== current)
+        return [current, other].map((link) => parseInt(getComputedStyle(link).fontWeight, 10))
+      })()
+    JS
+
+    assert_operator weights.first, :>, weights.last
+  end
+
+  test "typing in the index filter narrows the links and hides a letter with none left" do
+    visit gallery_path
+    total = all("nav[aria-label='Components'] li", visible: :all).size
+    fill_in "Find a component", with: "accordion"
+
+    assert_selector "nav[aria-label='Components'] li:not([hidden]) a", text: "Accordion", visible: :all
+    assert_no_selector "nav[aria-label='Components'] li:not([hidden]) a", text: "Alert dialog", visible: :all
+    assert_operator all("nav[aria-label='Components'] li:not([hidden])", visible: :all).size, :<, total
+    assert_equal 1, all("nav[aria-label='Components'] section:not([hidden])", visible: :all).size
+  end
+
+  test "a filter that matches nothing says so and clearing it restores the index" do
+    visit gallery_path
+    fill_in "Find a component", with: "zzzzzz"
+
+    assert_text "No component matches"
+    assert_no_selector "nav[aria-label='Components'] li:not([hidden])", visible: :all
+    fill_in "Find a component", with: ""
+
+    assert_no_text "No component matches"
+    assert_selector "nav[aria-label='Components'] li:not([hidden])", minimum: 2, visible: :all
+  end
+
   private
+
+  def last_entry_id
+    @last_entry_id ||= all(:testid, "gallery-entry", visible: :all).last[:id]
+  end
 
   def sidebars_outside_their_card
     evaluate_script(<<~JS)

@@ -14,14 +14,15 @@ class Components::Gallery::Entry < Components::Base
   FIXED_POSITION_COMPONENTS = %w[sidebar].freeze
   private_constant :CARD_CLASSES, :CONTAINED_CARD_CLASSES, :FIXED_POSITION_COMPONENTS
 
-  def initialize(entry:, anchor:, scenario_label:)
+  def initialize(entry:, anchor:, scenario_label:, **attrs)
     @entry = entry
     @anchor = anchor
     @scenario_label = scenario_label
+    @attrs = attrs
   end
 
   def view_template
-    section(id: @anchor, class: "scroll-mt-6 space-y-3", data: { testid: "gallery-entry" }) do
+    section(**@attrs.except(:data), id: @anchor, class: "scroll-mt-6 space-y-3", data: { testid: "gallery-entry" }.merge(@attrs.fetch(:data, {}))) do
       div(class: "flex items-baseline justify-between gap-4") do
         h3(class: "text-lg font-medium") { @entry.title }
         span(class: "text-xs text-muted-foreground") { @scenario_label }

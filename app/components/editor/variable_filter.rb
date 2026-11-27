@@ -5,17 +5,10 @@
 class Components::Editor::VariableFilter < Components::Base
   ID = "variable-filter"
   EMPTY = "No variable matches"
-  ACTIONS = "input->editor--variable-filter#filter:stop change->editor--variable-filter#filter:stop " \
-            "keydown.enter->editor--variable-filter#preventSubmit"
+  PLACEHOLDER = "primary, border, ring..."
+  WRAPPER = "grid gap-1 pb-4"
 
   def view_template
-    div(class: "grid gap-1 pb-4") do
-      render Chadcn::Label.new(html_for: ID, class: "text-sm") { "Find a variable" }
-      render Chadcn::Input.new(
-        id: ID, type: "search", placeholder: "primary, border, ring...", autocomplete: "off", spellcheck: "false",
-        data: { editor__variable_filter_target: "query", action: ACTIONS }
-      )
-      p(class: "text-xs text-muted-foreground", role: "status", data: { editor__variable_filter_target: "status" })
-    end
+    render Components::Shared::ListFilter.new(id: ID, label: "Find a variable", placeholder: PLACEHOLDER, class: WRAPPER, isolated: true)
   end
 end
