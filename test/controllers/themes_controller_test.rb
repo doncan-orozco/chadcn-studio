@@ -260,4 +260,18 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "&lt;b&gt;x&lt;/b&gt; saved: renamed from Zinc"
     assert_select "b", 0
   end
+
+  test "each themes page sets its own browser title, as the editor does" do
+    get themes_path
+
+    assert_select "title", text: "Themes - Chadcn Studio"
+
+    get new_theme_path
+
+    assert_select "title", text: "New theme - Chadcn Studio"
+
+    get theme_path(themes(:zinc))
+
+    assert_select "title", text: "Zinc - Chadcn Studio"
+  end
 end

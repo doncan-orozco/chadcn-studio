@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 class Views::Themes::Index < Views::Base
+  include Phlex::Rails::Helpers::ContentFor
+
   def initialize(presenter, deleted: nil)
     @presenter = presenter
     @deleted = deleted
   end
 
   def view_template
+    content_for(:title, "#{@presenter.title} - Chadcn Studio")
     div(class: "mx-auto max-w-6xl space-y-6 p-6") do
       header(class: "flex items-center justify-between gap-4") do
         div do
