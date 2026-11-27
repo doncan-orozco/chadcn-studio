@@ -92,7 +92,29 @@ class GalleryTest < ApplicationSystemTestCase
     assert_selector "nav[aria-label='Components'] li:not([hidden])", minimum: 2, visible: :all
   end
 
+  test "a breadcrumb demo link is reachable by keyboard and a # link does not move the page" do
+    visit gallery_path
+    selector = "##{breadcrumb_anchor} a[data-slot=breadcrumb-link][href='#']"
+    link = find(selector, match: :first, visible: :all)
+    page.execute_script("arguments[0].scrollIntoView({block: 'center'})", link)
+    page.execute_script("arguments[0].focus()", link)
+
+    assert_selector "#{selector}:focus", match: :first
+    assert_equal "#", link[:href].to_s.sub(/\A.*(?=#)/, "")
+
+    url_before = current_url
+    scroll_before = evaluate_script("window.scrollY")
+
+    assert_operator scroll_before, :>, 0
+    link.click
+
+    assert_equal url_before, current_url
+    assert_in_delta scroll_before, evaluate_script("window.scrollY"), 1
+  end
+
   private
+
+  def breadcrumb_anchor = "breadcrumb"
 
   def last_entry_id
     @last_entry_id ||= all(:testid, "gallery-entry", visible: :all).last[:id]
