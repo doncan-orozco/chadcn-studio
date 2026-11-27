@@ -33,7 +33,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "main p", text: "Open a theme to edit, rename or delete it."
     Themes::Query::Recent.call.limit(PagesController::HOME_THEMES).each do |theme|
-      assert_select "main ul[aria-label='Your themes'] a[href=?] span.text-muted-foreground", edit_theme_path(theme), text: "Edit"
+      assert_select "main ul[aria-label='Your themes'] a[href=?] span:not([data-link-name])", edit_theme_path(theme), text: "Edit"
     end
   end
 
