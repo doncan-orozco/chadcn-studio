@@ -4,7 +4,6 @@
 # yet, so the dialog offers to publish it in place. The gem mounts the portal from an inert template on every open, so
 # the publication answers with a Turbo Stream that replaces this whole host with the dialog open on the published body.
 class Components::Editor::ExportDialog < Components::Base
-
   # One host and one dialog per theme, so a list of themes can carry an Export dialog on every row.
   def self.host_id(theme) = "export-dialog-host-#{theme.id}"
 

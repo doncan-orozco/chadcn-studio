@@ -81,7 +81,7 @@ class ThemesTest < ApplicationSystemTestCase
 
   test "clicking the empty footer strip of a card opens the editor" do
     visit themes_path
-    find(:testid, "theme-card", text: "Zinc").find("[data-slot=card-footer]").click(x: 0, y: 0)
+    find(:testid, "theme-card", text: "Zinc").find("[data-slot=card-footer]").click(x: -150, y: 0)
 
     assert_current_path edit_theme_path(themes(:zinc))
   end

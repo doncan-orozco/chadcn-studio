@@ -47,11 +47,11 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "main ul[aria-label='Your themes'] a.focus-visible\\:ring-\\[3px\\].focus-visible\\:outline-none"
   end
 
-  test "home theme links are full-width rows at least 24 px tall, spaced apart" do
+  test "home theme links are rows that take the width Export leaves at least 24 px tall, spaced apart" do
     get root_path
 
     assert_select "main ul[aria-label='Your themes'].space-y-2"
-    assert_select "main ul[aria-label='Your themes'] a.flex.w-full.min-h-8", minimum: 1
+    assert_select "main ul[aria-label='Your themes'] a.flex.flex-1.min-h-8", minimum: 1
   end
 
   test "home lists at most the five newest themes" do

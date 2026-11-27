@@ -125,6 +125,7 @@ class ExportsTest < ApplicationSystemTestCase
     visit themes_path
 
     find("button[aria-label='Export Zinc']").click
+
     assert_selector :testid, "export-draft"
     click_on "Publish and show import command"
 
