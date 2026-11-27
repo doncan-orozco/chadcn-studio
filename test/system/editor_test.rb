@@ -213,7 +213,7 @@ class EditorTest < ApplicationSystemTestCase
 
   test "a group panel shows the light and dark values as text and links to all values" do
     open_group "brand"
-    row = find(:testid, "group-brand-panel").find(:testid, "variable-rows").find("li", text: /\A--primary\n/)
+    row = find(:testid, "group-brand-panel").find(:testid, "variable-rows").find("li", text: /\ABrand color\n--primary\n/)
 
     assert_equal @theme.light["primary"], row.find("[data-value=light]").text
     assert_equal @theme.dark["primary"], row.find("[data-value=dark]").text
@@ -260,7 +260,7 @@ class EditorTest < ApplicationSystemTestCase
 
   def open_brand_variables
     assert_selector :testid, "group-brand-panel"
-    find(:testid, "group-brand-panel").find("summary", text: "All brand variables").click
+    find(:testid, "group-brand-panel").find("summary", text: "Brand variables").click
   end
 
   # The panel scrolls to the field that was filled; its Close button is at the top.

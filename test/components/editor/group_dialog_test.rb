@@ -25,6 +25,13 @@ class Components::Editor::GroupDialogTest < ActiveSupport::TestCase
     assert_includes html, "Changes show live; Save keeps them."
   end
 
+  test "the brand variables summary says what it holds, in readable text" do
+    html = render_dialog(Themes::Presenter::Group.new(themes(:zinc), key: "brand"))
+
+    assert_match(%r{<summary class="[^"]*text-foreground/70[^"]*">Brand variables \(light and dark values\)</summary>}, html)
+    assert_not_includes html, "All brand variables"
+  end
+
   test "the Advanced entry carries the trigger id the links name" do
     assert_includes render_dialog(Themes::Presenter::Group.new(themes(:zinc), key: "advanced")), 'id="group-advanced-trigger"'
   end

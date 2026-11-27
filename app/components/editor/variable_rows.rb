@@ -17,19 +17,26 @@ class Components::Editor::VariableRows < Components::Base
 
   def variable(row)
     li(class: "min-w-0 space-y-1") do
-      span(class: "font-mono") { row.name }
+      div(class: "flex flex-wrap items-baseline gap-x-2") do
+        span(class: "font-medium") { row.label }
+        span(class: "font-mono text-muted-foreground") { row.name }
+      end
       div(class: "grid min-w-0 gap-1 text-muted-foreground") do
-        value("light", "Light #{row.name}", row.light, row.light_style)
-        value("dark", "Dark #{row.name}", row.dark, row.dark_style)
+        value("light", "Light #{row.name}", row.light, row.light_style, row.light_hex)
+        value("dark", "Dark #{row.name}", row.dark, row.dark_style, row.dark_hex)
       end
     end
   end
 
-  def value(mode, label, text, style)
+  # The hex first, as a person types it, then the oklch the theme stores; both stay as text so either can be copied.
+  def value(mode, label, text, style, hex)
     span(class: "flex min-w-0 items-start gap-1") do
       span(class: "w-9 shrink-0 font-sans") { mode.capitalize }
       swatch(style, label)
-      span(class: "min-w-0 font-mono break-all select-all", data: { value: mode }, title: label) { text }
+      span(class: "grid min-w-0") do
+        span(class: "font-mono text-foreground select-all") { hex } if hex
+        span(class: "min-w-0 font-mono break-all select-all", data: { value: mode }, title: label) { text }
+      end
     end
   end
 
