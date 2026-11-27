@@ -25,6 +25,7 @@ class Themes::Presenter::CardTest < ActiveSupport::TestCase
     assert_equal "secondary", @card.badge_variant
     assert_equal "default", Themes::Presenter::Card.new(themes(:slate)).badge_variant
     assert_equal "Edit or rename Blue", @card.edit_label
+    assert @card.edit_label.start_with?(@card.edit_text)
   end
 
   test "paths, status and date" do

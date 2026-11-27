@@ -26,5 +26,7 @@ class Themes::Presenter::Card < Core::Presenter::Base
   def status_label = published? ? "Published" : "Draft"
   def badge_variant = published? ? "default" : "secondary"
   def swatches_label = "#{name} color swatches"
-  def edit_label = "Edit or rename #{name}"
+  def edit_text = "Edit or rename"
+  # Starts with the visible text so the accessible name contains the label (WCAG 2.5.3).
+  def edit_label = "#{edit_text} #{name}"
 end
