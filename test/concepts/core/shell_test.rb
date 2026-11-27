@@ -24,7 +24,7 @@ class Core::ShellTest < ActionDispatch::IntegrationTest
   test "the header toggle is captioned as the studio's interface" do
     get root_path
 
-    assert_select "[data-testid=theme-toggle][aria-labelledby=studio-appearance]"
+    assert_select "[data-testid=theme-toggle][aria-labelledby=studio-appearance][aria-describedby=studio-appearance-hint]"
     assert_select "#studio-appearance", text: "Studio interface"
   end
 
