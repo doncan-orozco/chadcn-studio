@@ -17,6 +17,15 @@ class Themes::PublicationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-stream[action=replace][target=publish-toggle-form] [data-testid=publish-toggle]", /Unpublish/
   end
 
+  test "publishing from the Export dialog also swaps the header badge and link" do
+    post theme_publication_path(themes(:zinc)), params: { from: "export_dialog" }, as: :turbo_stream
+
+    assert_select "turbo-stream[action=replace][target=?]", Components::Editor::PublicationState::ID do
+      assert_select "[data-testid=publication-state]", text: /\APublished\z/
+      assert_select "[data-testid=publication-link][href=?]", "/t/zinc.css"
+    end
+  end
+
   test "publishing an invalid theme from the Export dialog answers 422 HTML with the errors" do
     themes(:zinc).update_column(:light, themes(:zinc).light.except("primary"))
 
