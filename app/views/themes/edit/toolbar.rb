@@ -11,7 +11,10 @@ class Views::Themes::Edit::Toolbar < Views::Base
   end
 
   FORM_ID = "editor-form"
-  private_constant :FORM_ID
+  # While the status says Saved, Save is the outline look (nothing to save yet); the preview controller drops `data-quiet` at the
+  # first edit and the default look returns. Pressed and focus states are the button's own.
+  QUIET = "data-[quiet]:border data-[quiet]:bg-background data-[quiet]:text-foreground data-[quiet]:shadow-xs data-[quiet]:hover:bg-accent data-[quiet]:hover:text-accent-foreground"
+  private_constant :FORM_ID, :QUIET
 
   # One row of chrome: the title, the name and Save (form-associated to the form below) and, from the caller's block, the
   # buttons that are forms of their own (Publish, Export). The form itself holds the hidden inputs, the errors and the panels.
@@ -19,7 +22,7 @@ class Views::Themes::Edit::Toolbar < Views::Base
     div(class: "flex flex-wrap items-end gap-3 border-b p-3", data: { action: "input->editor--preview#markDirty change->editor--preview#markDirty" }) do
       h1(class: "mr-2 self-center text-xl font-semibold tracking-tight") { @presenter.title }
       name_field
-      render Chadcn::Button.new(type: "submit", form: FORM_ID, name: "_method", value: "patch", data: { testid: "save" }) { "Save theme" }
+      render Chadcn::Button.new(type: "submit", form: FORM_ID, name: "_method", value: "patch", class: QUIET, data: { quiet: (true unless @presenter.failed?), editor__preview_target: "save", testid: "save" }) { "Save theme" }
       save_status
       div(class: "ml-auto flex items-center gap-2", &)
     end
