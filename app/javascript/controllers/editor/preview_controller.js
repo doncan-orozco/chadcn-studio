@@ -74,9 +74,11 @@ export default class extends Controller {
     this.#flush()
   }
 
-  // `turbo:submit-end` of the editor form: a rejected Save leaves the editor on the page, free to derive again.
+  // `turbo:submit-end` of the editor form: a Save that did not succeed (a transport error) leaves the editor on the page,
+  // free to derive again. A successful Save keeps the flag until the redirected page replaces this controller.
   afterSubmit(event) {
-    if (event.detail.formSubmission?.submitter === this.saveTarget) this.saving = false
+    const { success, formSubmission } = event.detail
+    if (!success && this.hasSaveTarget && formSubmission?.submitter === this.saveTarget) this.saving = false
   }
 
   // Enter in an override field confirms it (the field's `change` posts) instead of submitting the Save form.

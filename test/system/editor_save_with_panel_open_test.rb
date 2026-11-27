@@ -9,11 +9,12 @@ class EditorSaveWithPanelOpenTest < ApplicationSystemTestCase
     find(:testid, "group-radius").click
 
     assert_selector :testid, "group-radius-panel"
-    execute_script(<<~JS)
-      var thumb = document.querySelector('[data-testid=radius] [role=slider]');
-      thumb.focus();
-      thumb.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
-      document.querySelector('[data-testid=save]').click();
+    thumb = find(:testid, "radius").find("[role=slider]")
+    execute_script(<<~JS, thumb, find_button("Save theme"))
+      const [thumb, save] = arguments
+      thumb.focus()
+      thumb.dispatchEvent(new KeyboardEvent("keydown", { key: "ArrowRight", bubbles: true }))
+      save.click()
     JS
 
     assert_text "Zinc saved", wait: 10
@@ -23,7 +24,7 @@ class EditorSaveWithPanelOpenTest < ApplicationSystemTestCase
   test "one click on Save with the Advanced panel open saves the typed override" do
     find(:testid, "group-advanced").click
     fill_in "override-light-border", with: "#9ca3af"
-    click_on_in_same_tick(:id, "override-light-border", "save")
+    change_then_click_within_the_frame("override-light-border", find_button("Save theme"))
 
     assert_text "Zinc saved", wait: 10
     assert_equal "oklch(0.714 0.019 261.325)", themes(:zinc).reload.inputs.dig("overrides", "light", "border")
@@ -33,14 +34,12 @@ class EditorSaveWithPanelOpenTest < ApplicationSystemTestCase
 
   # What a quick click does: the blur commits the field, and the click follows before the next frame (after the microtasks
   # that carry the field's value on to the slider and the hidden inputs).
-  def click_on_in_same_tick(locator_type, locator, save_testid)
-    field = locator_type == :id ? "document.getElementById('#{locator}')" : "document.querySelector('[data-testid=#{locator}]')"
-    execute_script(<<~JS)
-      var f = #{field};
-      f.dispatchEvent(new Event('change', { bubbles: true }));
-      var save = document.querySelector('[data-testid=#{save_testid}]');
-      var wait = function (n) { return n === 0 ? Promise.resolve() : Promise.resolve().then(function () { return wait(n - 1) }) };
-      wait(5).then(function () { save.click() });
+  def change_then_click_within_the_frame(field_id, button)
+    execute_script(<<~JS, field_id, button)
+      const [fieldId, button] = arguments
+      document.getElementById(fieldId).dispatchEvent(new Event("change", { bubbles: true }))
+      const settle = (n) => n === 0 ? Promise.resolve() : Promise.resolve().then(() => settle(n - 1))
+      settle(5).then(() => button.click())
     JS
   end
 end
