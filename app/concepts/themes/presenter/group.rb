@@ -25,7 +25,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
   KEYS = DEFINITIONS.keys.freeze
 
   # What a collapsed group says, in the user's words: the brand color is named from the primary, the rest say what they change.
-  SUMMARIES = { "surfaces" => "Backgrounds, cards and text", "charts" => "Five chart colors", "sidebar" => "Sidebar colors" }.freeze
+  SUMMARIES = { "surfaces" => "Page, card and border colors", "charts" => "Five chart colors", "sidebar" => "Sidebar colors" }.freeze
   # Upper bound of each hue name on the oklch wheel; pink also owns the wrap-around above the last bound.
   HUE_NAMES = [ [ 15, "pink" ], [ 40, "red" ], [ 75, "orange" ], [ 115, "yellow" ], [ 170, "green" ], [ 210, "teal" ], [ 275, "blue" ], [ 335, "purple" ] ].freeze
   # What each variable colors, in the words of someone tuning a theme; the CSS name stays beside it for people who export.
@@ -57,19 +57,6 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   # The sidebar entry that opens a group's panel; links between panels name it.
   def self.trigger_id(key) = "group-#{key}-trigger"
-
-  # "Card text" for card-foreground, "Chart color 3" for chart-3; the CSS name when nothing better is known.
-  def self.variable_label(variable)
-    VARIABLE_LABELS.fetch(variable) do
-      chart = variable[/\Achart-(\d)\z/, 1]
-      next "Chart color #{chart}" if chart
-
-      surface = SURFACE_NAMES[variable.delete_suffix("-foreground")]
-      next variable unless surface
-
-      "#{surface} #{variable.end_with?('-foreground') ? 'text' : 'background'}"
-    end
-  end
 
   def self.all(theme) = KEYS.map { |key| new(theme, key: key) }
 
@@ -175,10 +162,24 @@ class Themes::Presenter::Group < Core::Presenter::Base
     Themes::Oklch.new(0.5, 0, 0)
   end
 
+  # "Card text" for card-foreground, "Chart color 3" for chart-3; the CSS name when nothing better is known.
+  def variable_label(variable)
+    VARIABLE_LABELS.fetch(variable) do
+      stem = variable.delete_suffix("-foreground")
+      chart_number = variable[/\Achart-(\d)\z/, 1]
+      next "Chart color #{chart_number}" if chart_number
+
+      surface = SURFACE_NAMES[stem]
+      next variable unless surface
+
+      "#{surface} #{stem == variable ? 'background' : 'text'}"
+    end
+  end
+
   def swatch(value) = Themes::Presenter::Card.swatch_style(value)
 
   def override_row(mode, variable, derived)
-    Override.new(mode: mode, name: "--#{variable}", label: self.class.variable_label(variable), derived: derived, value: stored_overrides(mode)[variable].to_s,
+    Override.new(mode: mode, name: "--#{variable}", label: variable_label(variable), derived: derived, value: stored_overrides(mode)[variable].to_s,
                  style: swatch(derived), field_name: "theme[inputs][overrides][#{mode}][#{variable}]", field_id: "override-#{mode}-#{variable}")
   end
 

@@ -97,7 +97,7 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
   test "the other groups say what they change, not how many variables they hold" do
     summaries = %w[surfaces charts sidebar].map { |key| Themes::Presenter::Group.new(@theme, key: key).summary }
 
-    assert_equal [ "Backgrounds, cards and text", "Five chart colors", "Sidebar colors" ], summaries
+    assert_equal [ "Page, card and border colors", "Five chart colors", "Sidebar colors" ], summaries
     summaries.each { |summary| refute_match(/variable|oklch/, summary) }
   end
 
