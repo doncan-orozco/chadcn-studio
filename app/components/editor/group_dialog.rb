@@ -112,7 +112,7 @@ class Components::Editor::GroupDialog < Components::Base
     return unless @group.values_path
 
     p(class: "pt-2 text-xs") do
-      a(href: @group.values_path, class: "underline underline-offset-4", data: { testid: "all-values-link" }) { "See all values" }
+      a(href: @group.values_path, class: "underline underline-offset-4", aria: { label: "See all values for #{@group.label}" }, data: { testid: "all-values-link" }) { "See all values" }
     end
   end
 end

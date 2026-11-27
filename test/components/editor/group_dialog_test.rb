@@ -29,6 +29,12 @@ class Components::Editor::GroupDialogTest < ActiveSupport::TestCase
     assert_includes render_dialog(Themes::Presenter::Group.new(themes(:zinc), key: "advanced")), 'id="group-advanced-trigger"'
   end
 
+  test "the See all values link names the group it opens" do
+    html = render_dialog(Themes::Presenter::Group.new(themes(:zinc), key: "surfaces"))
+
+    assert_match(/<a [^>]*aria-label="See all values for Surfaces and text"[^>]*>See all values<\/a>/, html)
+  end
+
   private
 
   def render_dialog(subject = group)

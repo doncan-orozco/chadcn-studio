@@ -38,6 +38,21 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
     assert_not_includes html, "editor--slider-number"
   end
 
+  test "a slider with speak wires the controller that says its value" do
+    html = render_field(speak: { scale: 100, unit: "%" })
+
+    assert_includes html, 'data-controller="editor--slider-speech"'
+    assert_includes html, 'data-editor--slider-speech-scale-value="100"'
+    assert_includes html, 'data-editor--slider-speech-unit-value="%"'
+    assert_includes html, 'data-editor--slider-speech-target="slider"'
+    assert_includes html, "chadcn--slider:value-change->editor--slider-speech#mirror"
+    assert_includes html, 'aria-label="Corner radius"'
+  end
+
+  test "a slider without speak wires nothing" do
+    assert_not_includes render_field, "slider-speech"
+  end
+
   private
 
   def render_field(**options) = Components::Editor::SliderField.new(**SLIDER, **options).call

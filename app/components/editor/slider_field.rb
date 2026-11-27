@@ -8,20 +8,23 @@ class Components::Editor::SliderField < Components::Base
     commit: "chadcn--slider:value-commit->editor--preview#commit"
   }.freeze
   MIRROR = "chadcn--slider:value-change->editor--slider-number#mirror"
+  SPEAK = "chadcn--slider:value-change->editor--slider-speech#mirror"
   DETACHED_FORM_SUFFIX = "-number-form"
 
-  def initialize(id:, label:, value:, min:, max:, step:, channel: nil, live: true, name: nil, unit: nil)
+  def initialize(id:, label:, value:, min:, max:, step:, channel: nil, live: true, name: nil, unit: nil, speak: nil)
     @id = id
     @label = label
     @channel = channel
     @live = live
     @unit = unit
+    @speak = speak
     @value = value.is_a?(Float) && value == value.floor ? value.to_i : value
     @range = { min: min, max: max, step: step }
     @slider = { default_value: [ @value ], name: name, **@range }
   end
 
   def view_template
+    return div(class: "grid gap-2", data: speech_data) { field } if @speak
     return field unless @unit
 
     div(class: "grid gap-2", data: { controller: "editor--slider-number", editor__slider_number_unit_value: @unit }) { field }
@@ -57,8 +60,14 @@ class Components::Editor::SliderField < Components::Base
     )
   end
 
+  # `speak: { scale:, digits:, unit: }` says the value the way the label means it (0.488 as "49%") on the thumb's aria-valuetext.
+  def speech_data
+    { controller: "editor--slider-speech", editor__slider_speech_scale_value: @speak.fetch(:scale, 1), editor__slider_speech_digits_value: @speak.fetch(:digits, 0), editor__slider_speech_unit_value: @speak[:unit] }
+  end
+
   def slider_attributes
-    attributes = { editor__slider_number_target: ("slider" if @unit), action: [ ACTIONS.fetch(@live ? :live : :commit), (MIRROR if @unit) ].compact.join(" "), testid: @id }
+    attributes = { editor__slider_number_target: ("slider" if @unit), editor__slider_speech_target: ("slider" if @speak), testid: @id,
+                   action: [ ACTIONS.fetch(@live ? :live : :commit), (MIRROR if @unit), (SPEAK if @speak) ].compact.join(" ") }
     return attributes unless @channel
 
     attributes.merge(editor__preview_target: @channel, editor__preview_channel_param: @channel)
