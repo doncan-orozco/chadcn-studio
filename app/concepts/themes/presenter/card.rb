@@ -21,6 +21,15 @@ class Themes::Presenter::Card < Core::Presenter::Base
     end
   end
 
+  # `base_url` is where the public export URLs point: the controller knows it, the card only carries it.
+  def initialize(theme, base_url:)
+    super(theme)
+    @base_url = base_url
+  end
+
+  # What the row's Export dialog shows: the same presenter the editor's dialog takes.
+  def sharing = Exports::Presenter::Sharing.new(__getobj__, base_url: @base_url)
+
   def edit_path = helpers.edit_theme_path(__getobj__)
   def created_label = "Created #{created_at.to_date.to_fs(:long)}"
   def status_label = published? ? "Published" : "Draft"

@@ -37,4 +37,12 @@ class Components::Editor::ExportDialog::BodyTest < ActiveSupport::TestCase
     assert html.at_css("[data-testid=export-publish]")
     assert_nil html.at_css("[data-testid=import-command]")
   end
+
+  test "a row's draft form tells the server its trigger was compact, the editor's does not" do
+    sharing = Exports::Presenter::Sharing.new(themes(:zinc), base_url: "https://studio.test")
+    row = Nokogiri::HTML.fragment(ApplicationController.render(Components::Editor::ExportDialog::Body.new(presenter: sharing, compact: true), layout: false))
+
+    assert row.at_css("input[name=trigger][value=row]")
+    assert_nil render_body(themes(:zinc)).at_css("input[name=trigger]")
+  end
 end
