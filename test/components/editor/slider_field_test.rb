@@ -49,6 +49,10 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
     assert_includes html, 'aria-label="Corner radius"'
   end
 
+  test "speak and unit cannot be combined" do
+    assert_raises(ArgumentError) { render_field(unit: "rem", speak: { digits: 1 }) }
+  end
+
   test "a slider without speak wires nothing" do
     assert_not_includes render_field, "slider-speech"
   end

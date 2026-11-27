@@ -17,7 +17,7 @@ class EditorSlidersTest < ApplicationSystemTestCase
     thumb = find(:testid, "primary-lightness").find("[role=slider]")
     before = thumb["aria-valuetext"]
     thumb.execute_script("this.focus()")
-    page.driver.browser.keyboard.type(:Right)
+    2.times { page.driver.browser.keyboard.type(:Right) }
 
     assert_no_selector "[data-testid=primary-lightness] [role=slider][aria-valuetext='#{before}']"
   end

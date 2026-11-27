@@ -12,6 +12,8 @@ class Components::Editor::SliderField < Components::Base
   DETACHED_FORM_SUFFIX = "-number-form"
 
   def initialize(id:, label:, value:, min:, max:, step:, channel: nil, live: true, name: nil, unit: nil, speak: nil)
+    raise ArgumentError, "speak: and unit: are exclusive (a unit already speaks its value)" if speak && unit
+
     @id = id
     @label = label
     @channel = channel
