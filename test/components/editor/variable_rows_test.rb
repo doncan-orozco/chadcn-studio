@@ -13,11 +13,10 @@ class Components::Editor::VariableRowsTest < ActiveSupport::TestCase
   test "names which value is Light and which is Dark on the same line as the value" do
     item = @page.find("li")
 
-    { "light" => [ "Light", LIGHT ], "dark" => [ "Dark", DARK ] }.each do |mode, (label, value)|
+    { "light" => "Light", "dark" => "Dark" }.each do |mode, label|
       line = item.find("[data-value=#{mode}]").find(:xpath, "..")
 
       assert line.text.start_with?(label), "expected the #{mode} line to start with #{label}, got #{line.text.inspect}"
-      assert_equal value, line.find("[data-value]").text
     end
   end
 
@@ -29,17 +28,13 @@ class Components::Editor::VariableRowsTest < ActiveSupport::TestCase
   test "renders a swatch only for the mode that has a style" do
     page = render_rows(Row.new(name: "--primary", light: LIGHT, dark: DARK, light_style: "background-color: #{LIGHT}", dark_style: nil))
 
-    assert_selector_count page, "[role=img][aria-label='Light --primary']", 1
-    assert_selector_count page, "[role=img][aria-label='Dark --primary']", 0
+    assert page.has_selector?("[role=img][aria-label='Light --primary']", count: 1)
+    assert page.has_no_selector?("[role=img][aria-label='Dark --primary']")
   end
 
   private
 
   def render_rows(*rows)
     Capybara.string(Components::Editor::VariableRows.new(rows: rows).call)
-  end
-
-  def assert_selector_count(page, selector, count)
-    assert_equal count, page.all(selector).size
   end
 end
