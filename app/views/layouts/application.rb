@@ -9,6 +9,10 @@ class Views::Layouts::Application < Views::Base
 
   # Flash keys the toaster shows; any other key (e.g. `deleted`) belongs to the page that renders it.
   TOASTED_FLASH = %w[notice alert].freeze
+  # The toast's 20 px close button becomes a 28 px target with an invisible `::after` box (WCAG 2.2 SC 2.5.8); the button is
+  # already `position: absolute`, so the box anchors to it. Same technique as Components::Editor::HitArea.
+  TOAST_CLOSE = "after:absolute after:-inset-1 after:content-['']"
+  private_constant :TOAST_CLOSE
 
   # Layouts are request-bound by nature (CSRF, CSP, flash): this is the one view that reads the view context.
   def view_template
@@ -30,7 +34,7 @@ class Views::Layouts::Application < Views::Base
 
       body(class: "bg-background text-foreground antialiased") do
         render Components::Shell::Frame.new(sidebar: content_for(:sidebar).presence) { yield }
-        render Chadcn::Toaster.new(flash: flash.to_h.slice(*TOASTED_FLASH), close_button: true)
+        render Chadcn::Toaster.new(flash: flash.to_h.slice(*TOASTED_FLASH), close_button: true, toast_options: { class_names: { close_button: TOAST_CLOSE } })
       end
     end
   end
