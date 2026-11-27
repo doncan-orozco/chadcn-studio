@@ -1,12 +1,13 @@
 require "test_helper"
 
 class PagesControllerTest < ActionDispatch::IntegrationTest
-  test "home offers Create theme as its primary action and a way to the themes" do
+  test "home offers Create theme as its primary action and leaves the browsing to the header nav" do
     get root_path
 
     assert_response :success
     assert_select "main a[href=?]", new_theme_path, text: "Create theme"
-    assert_select "main a[href=?]", themes_path, text: "Browse themes"
+    assert_select "main a", text: "Browse themes", count: 0
+    assert_select "main a", text: "Browse components", count: 0
   end
 
   test "the header links to the themes list on every page" do
@@ -17,7 +18,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "home lists existing themes above the buttons, each name linking to its editor" do
+  test "home lists existing themes below the buttons, each name linking to its editor" do
     get root_path
 
     assert_response :success
@@ -27,7 +28,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "home puts Your themes before Create theme in document order, so tab and heading order follow" do
+  test "home puts Create theme right under the intro, before Your themes, so tab and heading order follow" do
     get root_path
 
     nodes = css_select("main h1, main h2, main a")
@@ -35,7 +36,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     create = nodes.index { |node| node.name == "a" && node.text.strip == "Create theme" }
 
     assert_operator nodes.index { |node| node.name == "h1" }, :<, heading
-    assert_operator heading, :<, create
+    assert_operator create, :<, heading
   end
 
   test "home theme links carry a visible focus style" do

@@ -13,20 +13,18 @@ class Views::Pages::Home < Views::Base
         h1(class: "text-2xl font-semibold tracking-tight") { "Chadcn Studio" }
         p(class: "text-muted-foreground") { @presenter.intro }
       end
-      your_themes unless @presenter.empty?
       actions
+      your_themes unless @presenter.empty?
     end
   end
 
   private
 
-  # Below the saved themes when there are any: reopening one is the top task, Create theme the one default button.
+  # Right under the intro, whatever the list length: Create theme is the one default button; the header nav carries the browsing.
   def actions
     div(class: "flex flex-wrap items-center gap-3") do
       render Chadcn::Button.new(as_child: :a, href: new_theme_path) { "Create theme" }
       render Chadcn::Button.new(as_child: :a, href: new_theme_path(anchor: "describe"), variant: "outline") { "Describe a theme" } if @presenter.describable?
-      render Chadcn::Button.new(as_child: :a, href: themes_path, variant: "outline") { "Browse themes" }
-      render Chadcn::Button.new(as_child: :a, href: gallery_path, variant: "outline") { "Browse components" }
     end
   end
 
