@@ -11,6 +11,6 @@ class Views::Previews::FormTest < ActiveSupport::TestCase
     page = Capybara.string(Views::Previews::Form.new(Previews::Presenter::Form.new).call)
 
     assert page.has_css?("#form-email-sample", text: "Sample validation state")
-    assert_equal "form-email-sample form-email-error", page.find("#form-email")["aria-describedby"]
+    assert_equal "form-email-sample form-email-error", page.find_by_id("form-email")["aria-describedby"]
   end
 end
