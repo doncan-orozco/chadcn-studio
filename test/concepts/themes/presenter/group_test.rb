@@ -31,6 +31,11 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     assert_equal Themes::Oklch.parse(@theme.dark["primary"]).to_hex, row.dark_hex
   end
 
+  test "the brand variables are the ones the brand group lists" do
+    assert Themes::Presenter::Group.brand?("primary")
+    assert_not Themes::Presenter::Group.brand?("background")
+  end
+
   test "rows link to the theme page under All values" do
     assert_equal "/themes/#{@theme.id}#all-values", Themes::Presenter::Group.new(@theme, key: "brand").values_path
   end

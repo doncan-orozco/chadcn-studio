@@ -31,7 +31,15 @@ class Themes::Presenter::ShowTest < ActiveSupport::TestCase
     assert_equal "background-color: oklch(1 0 0)", rows.find { |row| row.name == "--background" }.light_style
   end
 
-  test "labels" do
+  test "the delete label names the theme" do
     assert_equal "Delete Zinc", @show.delete_label
+  end
+
+  test "the summary says whether the theme is published and how many variables it has" do
+    count = Chadcn::Theme::REQUIRED.size + Chadcn::Theme::ROOT_ONLY.size
+    theme = themes(:zinc)
+
+    assert_equal "Draft theme, #{count} variables.", Themes::Presenter::Show.new(Theme.new(light: theme.light, dark: theme.dark)).summary
+    assert_equal "Published theme, #{count} variables.", Themes::Presenter::Show.new(Theme.new(light: theme.light, dark: theme.dark, published_at: Time.current)).summary
   end
 end
