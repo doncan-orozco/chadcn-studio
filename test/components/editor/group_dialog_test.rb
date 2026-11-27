@@ -32,7 +32,7 @@ class Components::Editor::GroupDialogTest < ActiveSupport::TestCase
   test "the See all values link names the group it opens" do
     html = render_dialog(Themes::Presenter::Group.new(themes(:zinc), key: "surfaces"))
 
-    assert_match(/<a [^>]*aria-label="See all values for Surfaces and text"[^>]*>See all values<\/a>/, html)
+    assert_match(/<a [^>]*aria-label="See all values for Backgrounds, cards and text"[^>]*>See all values<\/a>/, html)
   end
 
   private

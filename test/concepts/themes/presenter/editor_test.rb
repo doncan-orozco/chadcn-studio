@@ -4,7 +4,7 @@ class Themes::Presenter::EditorTest < ActiveSupport::TestCase
   setup { @editor = Themes::Presenter::Editor.new(themes(:zinc)) }
 
   test "lists the six groups of the sidebar" do
-    assert_equal [ "Brand color", "Surfaces and text", "Radius", "Charts", "Sidebar", "Advanced" ], @editor.groups.map(&:label)
+    assert_equal [ "Brand color", "Backgrounds, cards and text", "Radius", "Charts", "Sidebar", "Advanced" ], @editor.groups.map(&:label)
     assert_equal "Charts", @editor.group("charts").label
   end
 

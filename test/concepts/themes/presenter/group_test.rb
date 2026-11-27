@@ -70,6 +70,17 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     refute_includes group.overrides("dark").map(&:name), "--radius"
   end
 
+  test "advanced fields lead with what the variable colors, the CSS name beside it" do
+    labels = Themes::Presenter::Group.new(@theme, key: "advanced").overrides("light").to_h { |field| [ field.name, field.label ] }
+
+    assert_equal "Borders", labels["--border"]
+    assert_equal "Card text", labels["--card-foreground"]
+    assert_equal "Chart color 3", labels["--chart-3"]
+    assert_equal "Sidebar brand text", labels["--sidebar-primary-foreground"]
+    assert_equal "Corner radius", labels["--radius"]
+    refute(labels.any? { |name, label| label == name.delete_prefix("--") }, "a variable fell back to its CSS name")
+  end
+
   test "the brand summary names the color in plain words, never the oklch string" do
     {
       "oklch(0.55 0.2 250)" => "Blue", "oklch(0.35 0.15 250)" => "Dark blue", "oklch(0.85 0.1 250)" => "Light blue",
@@ -135,7 +146,7 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
   end
 
   test "an override's placeholder is the derived color as hex, or the derived value when it is not a color" do
-    row = Themes::Presenter::Group::Override.new(mode: "light", name: "--ring", derived: "oklch(1 0 0)", value: "", style: nil, field_name: "n", field_id: "i")
+    row = Themes::Presenter::Group::Override.new(mode: "light", name: "--ring", label: "Focus ring", derived: "oklch(1 0 0)", value: "", style: nil, field_name: "n", field_id: "i")
 
     assert_equal "#ffffff", row.placeholder
     assert_equal "not a color", row.with(derived: "not a color").placeholder
