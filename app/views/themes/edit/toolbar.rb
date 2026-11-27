@@ -38,7 +38,7 @@ class Views::Themes::Edit::Toolbar < Views::Base
   def save_data = { quiet: (true unless @presenter.failed?), editor__preview_target: "save", testid: "save" }
 
   def editor_form
-    form(id: FORM_ID, action: @presenter.save_path, method: "post", data: { editor__preview_target: "form", action: "input->editor--preview#markDirty change->editor--preview#markDirty submit->editor--preview#beforeSubmit", testid: "editor-form" }) do
+    form(id: FORM_ID, action: @presenter.save_path, method: "post", data: { editor__preview_target: "form", action: "input->editor--preview#markDirty change->editor--preview#markDirty submit->editor--preview#beforeSubmit turbo:submit-end->editor--preview#afterSubmit", testid: "editor-form" }) do
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
       input(type: "hidden", name: "theme[inputs][primary]", value: @presenter.primary, data: { editor__preview_target: "primaryField" })
       # Trusted only while it still parses to the primary (Derive drops it otherwise); Save keeps the stored one.

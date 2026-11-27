@@ -13,7 +13,6 @@ export default class extends Controller {
   static targets = ["root", "palette", "primaryField", "radiusField", "lightness", "chroma", "hue", "radius", "form", "derive", "refresh", "unsaved", "saved", "save"]
   static values = { mode: { type: String, default: "light" } }
 
-  // A rejected Save re-renders the editor in place: it is free to derive again.
   connect() {
     this.saving = false
   }
@@ -73,6 +72,11 @@ export default class extends Controller {
     cancelAnimationFrame(this.animationFrame)
     this.animationFrame = null
     this.#flush()
+  }
+
+  // `turbo:submit-end` of the editor form: a rejected Save leaves the editor on the page, free to derive again.
+  afterSubmit(event) {
+    if (event.detail.formSubmission?.submitter === this.saveTarget) this.saving = false
   }
 
   // Enter in an override field confirms it (the field's `change` posts) instead of submitting the Save form.
