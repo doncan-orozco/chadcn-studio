@@ -13,6 +13,11 @@ export default class extends Controller {
   static targets = ["root", "palette", "primaryField", "radiusField", "lightness", "chroma", "hue", "radius", "form", "derive", "refresh", "unsaved", "saved", "save"]
   static values = { mode: { type: String, default: "light" } }
 
+  // A rejected Save re-renders the editor in place: it is free to derive again.
+  connect() {
+    this.saving = false
+  }
+
   disconnect() {
     cancelAnimationFrame(this.animationFrame)
     this.animationFrame = null
@@ -53,9 +58,21 @@ export default class extends Controller {
     this.animationFrame = requestAnimationFrame(() => {
       this.animationFrame = null
       this.#flush()
+      if (this.saving) return
       this.dispatch("change", { detail: { mode: this.modeValue } })
       this.formTarget.requestSubmit(this.deriveTarget)
     })
+  }
+
+  // `submit` of the editor form: Save wins over a derivation. The blur that a click on Save causes commits a field and asks for
+  // a derivation one frame later; submitted after the Save click, it would replace the Save in flight. So a Save writes the
+  // pending preview into the hidden inputs now and drops the pending request (and the later ones, the page is leaving).
+  beforeSubmit(event) {
+    if (!this.hasSaveTarget || event.submitter !== this.saveTarget) return
+    this.saving = true
+    cancelAnimationFrame(this.animationFrame)
+    this.animationFrame = null
+    this.#flush()
   }
 
   // Enter in an override field confirms it (the field's `change` posts) instead of submitting the Save form.
@@ -82,6 +99,7 @@ export default class extends Controller {
     this.markDirty()
     this.primaryFieldTarget.value = event.detail.primary
     this.#setVariable("--primary", event.detail.primary)
+    if (this.saving) return
     this.dispatch("change", { detail: { mode: this.modeValue } })
     this.formTarget.requestSubmit(this.refreshTarget)
   }
