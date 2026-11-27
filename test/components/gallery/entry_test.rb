@@ -28,4 +28,21 @@ class Components::Gallery::EntryTest < ActiveSupport::TestCase
     assert_equal "Solo", section.at_css("h3").text
     assert_no_match(/scenario/i, section.text)
   end
+
+  def catalog_entry(component) = Chadcn::Catalog.entries.find { |entry| entry.component.to_s == component }
+
+  test "demo headings sit below the entry title" do
+    section = Nokogiri::HTML5.fragment(Components::Gallery::Entry.new(entry: catalog_entry("accordion"), anchor: "accordion").call).at_css("section")
+
+    assert_equal %w[Accordion], section.css("h3").map(&:text)
+    assert_operator section.css("h4").size, :>=, 1
+  end
+
+  test "demo links to # or to a missing anchor are inert, and links to an anchor inside the demo are kept" do
+    html = Components::Gallery::Entry.new(entry: catalog_entry("breadcrumb"), anchor: "breadcrumb").call
+    links = Nokogiri::HTML5.fragment(html).css("a[data-slot=breadcrumb-link]")
+
+    assert_not_empty links
+    assert links.none? { |link| link["href"] }
+  end
 end
