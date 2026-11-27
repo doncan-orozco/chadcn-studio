@@ -39,7 +39,7 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
   end
 
   test "a slider with speak wires the controller that says its value" do
-    html = render_field(speak: { scale: 100, unit: "%" })
+    html = render_field(speak: Components::Editor::SliderField::Speech.new(scale: 100, unit: "%"))
 
     assert_includes html, 'data-controller="editor--slider-speech"'
     assert_includes html, 'data-editor--slider-speech-scale-value="100"'
@@ -50,7 +50,11 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
   end
 
   test "speak and unit cannot be combined" do
-    assert_raises(ArgumentError) { render_field(unit: "rem", speak: { digits: 1 }) }
+    assert_raises(ArgumentError) { render_field(unit: "rem", speak: Components::Editor::SliderField::Speech.new(digits: 1)) }
+  end
+
+  test "a misspelled speech option fails loudly" do
+    assert_raises(ArgumentError) { Components::Editor::SliderField::Speech.new(digit: 1) }
   end
 
   test "a slider without speak wires nothing" do

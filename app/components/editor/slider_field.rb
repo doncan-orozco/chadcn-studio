@@ -3,6 +3,14 @@
 # A labelled `Chadcn::Slider` wired to the preview controller: `value-change` while it moves (live preview, no request),
 # `value-commit` on release (derivation request).
 class Components::Editor::SliderField < Components::Base
+  # How a thumb says its value: the slider value times `scale`, rounded to `digits`, followed by `unit` (0.488 as "48.8%").
+  Speech = Data.define(:scale, :digits, :unit) do
+    def initialize(scale: 1, digits: 0, unit: "") = super
+
+    def data
+      { controller: "editor--slider-speech", editor__slider_speech_scale_value: scale, editor__slider_speech_digits_value: digits, editor__slider_speech_unit_value: unit }
+    end
+  end
   ACTIONS = {
     live: "chadcn--slider:value-change->editor--preview#slide chadcn--slider:value-commit->editor--preview#commit",
     commit: "chadcn--slider:value-commit->editor--preview#commit"
@@ -26,7 +34,7 @@ class Components::Editor::SliderField < Components::Base
   end
 
   def view_template
-    return div(class: "grid gap-2", data: speech_data) { field } if @speak
+    return div(class: "grid gap-2", data: @speak.data) { field } if @speak
     return field unless @unit
 
     div(class: "grid gap-2", data: { controller: "editor--slider-number", editor__slider_number_unit_value: @unit }) { field }
@@ -60,11 +68,6 @@ class Components::Editor::SliderField < Components::Base
       id: "#{@id}-number", type: "number", default_value: @value, class: "w-20 shrink-0", form: "#{@id}#{DETACHED_FORM_SUFFIX}", aria: { label: "#{@label} in #{@unit}" },
       data: { editor__slider_number_target: "input", action: "change->editor--slider-number#type", testid: "#{@id}-number" }, **@range
     )
-  end
-
-  # `speak: { scale:, digits:, unit: }` says the value the way the label means it (0.488 as "49%") on the thumb's aria-valuetext.
-  def speech_data
-    { controller: "editor--slider-speech", editor__slider_speech_scale_value: @speak.fetch(:scale, 1), editor__slider_speech_digits_value: @speak.fetch(:digits, 0), editor__slider_speech_unit_value: @speak[:unit] }
   end
 
   def slider_attributes
