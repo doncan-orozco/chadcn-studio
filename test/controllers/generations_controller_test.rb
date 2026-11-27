@@ -65,7 +65,7 @@ class GenerationsControllerTest < ActionDispatch::IntegrationTest
       post generations_path, params: { generation: { prompt: "calm blue" } }
     end
     assert_response :unprocessable_entity
-    assert_select "[data-testid=generation-status]", text: /not set up/
+    assert_select "[data-testid=generation-status]", text: /ANTHROPIC_API_KEY/
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
   end

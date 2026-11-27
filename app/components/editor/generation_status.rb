@@ -2,7 +2,9 @@
 
 # The status of a generation: pending, done or failed with its reason. Always renders the `generation_status` target
 # so a stream can replace it. The model's text is plain text (llm-generation R8). A failure is a destructive alert under
-# the field that keeps the description and offers the way on: try again, or pick the primary color by hand. Both actions are buttons that forward to the control that already exists.
+# the field that keeps the description and offers the way on: try again, or pick the primary color by hand; both actions
+# are buttons that forward to the control that already exists. A studio without an API key is not an error: it says how
+# to turn generation on as one muted line.
 class Components::Editor::GenerationStatus < Components::Base
   # The prompt field (its form holds the CSRF token a streamed fragment cannot carry) and the Brand group's dialog
   # trigger (Components::Editor::GroupDialog, keyed by the group's panel_id), which the two actions hand the click to.
@@ -16,9 +18,9 @@ class Components::Editor::GenerationStatus < Components::Base
   end
 
   def view_template
-    failed = @status&.failed?
-    div(id: "generation_status", role: failed ? nil : "status", class: classes(failed), data: { testid: "generation-status", state: @status&.state }) do
-      if failed
+    alert = @status&.alert?
+    div(id: "generation_status", role: alert ? nil : "status", class: classes(alert), data: { testid: "generation-status", state: @status&.state }) do
+      if alert
         failure
       elsif @status
         plain @status.message
@@ -28,7 +30,7 @@ class Components::Editor::GenerationStatus < Components::Base
 
   private
 
-  def classes(failed) = failed ? BASE : "#{BASE} text-muted-foreground"
+  def classes(alert) = alert ? BASE : "#{BASE} text-muted-foreground"
 
   def failure
     render Chadcn::Alert.new(variant: :destructive) do |alert|

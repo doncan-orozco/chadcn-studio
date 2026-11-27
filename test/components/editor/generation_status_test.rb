@@ -15,12 +15,22 @@ class Components::Editor::GenerationStatusTest < ActiveSupport::TestCase
   end
 
   test "a failure that retrying cannot fix offers only the color" do
-    html = render_status(Generations::Presenter::Status.new(Generation.new, failure: :not_configured))
+    html = render_status(Generations::Presenter::Status.new(Generation.new, failure: :busy))
 
-    assert_includes html, "Generation is not set up in this studio."
+    assert_includes html, "Wait for it to finish"
     assert_includes html, "Pick a primary color instead"
     assert_not_includes html, "Try again"
     assert_not_includes html, "description is kept"
+  end
+
+  test "a studio without an API key says how to turn generation on as one muted line, not an alert" do
+    html = render_status(Generations::Presenter::Status.new(Generation.new, failure: :not_configured))
+
+    assert_includes html, "set ANTHROPIC_API_KEY and restart the studio"
+    assert_includes html, "text-muted-foreground"
+    assert_not_includes html, 'role="alert"'
+    assert_not_includes html, 'data-slot="alert"'
+    assert_not_includes html, "Pick a primary color instead"
   end
 
   test "pending and done stay plain text in a status region" do
