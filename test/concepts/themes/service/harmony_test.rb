@@ -89,4 +89,30 @@ class Themes::Service::HarmonyTest < ActiveSupport::TestCase
 
     assert_equal "oklch(0.8 0.1 10)", palette.dark["ring"]
   end
+
+  test "light background, card and popover stay white up to the middle tint and take the hue above it" do
+    assert_equal "oklch(1 0 0)", Themes::Service::Harmony.call(BLUE.merge(tint: 0.5)).root["background"]
+
+    surfaces = Themes::Service::Harmony.call(BLUE.merge(tint: 1)).root.slice("background", "card", "popover").values.uniq
+
+    assert_equal [ "oklch(0.985 0.025 250)" ], surfaces
+  end
+
+  test "the surface tint grows with the tint and keeps every text pair readable" do
+    chromas = [ 0.6, 0.8, 1.0 ].map { |tint| Themes::Oklch.parse(Themes::Service::Harmony.call(BLUE.merge(tint: tint)).root["background"]).chroma }
+
+    assert_equal chromas.sort, chromas
+    assert_operator chromas.first, :>, 0
+    [ 250, 30, 140 ].each do |hue|
+      assert_empty Chadcn::Theme.validate(Themes::Service::Harmony.call(primary: "oklch(0.55 0.2 #{hue})", tint: 1), strict: true)[:errors]
+    end
+  end
+
+  test "the light sidebar never sits above the page surface" do
+    [ 0.5, 0.9, 1.0 ].each do |tint|
+      light = Themes::Service::Harmony.call(BLUE.merge(tint: tint)).root
+
+      assert_operator Themes::Oklch.parse(light["sidebar"]).lightness, :<=, Themes::Oklch.parse(light["background"]).lightness
+    end
+  end
 end

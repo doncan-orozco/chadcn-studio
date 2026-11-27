@@ -11,6 +11,11 @@ class Themes::Service::Harmony
   DARK_STEPS = { "background" => 0.141, "card" => 0.21, "popover" => 0.21, "sidebar" => 0.21,
                  "secondary" => 0.274, "muted" => 0.274, "accent" => 0.274, "muted-foreground" => 0.705,
                  "foreground" => 0.985, "secondary-foreground" => 0.985, "accent-foreground" => 0.985 }.freeze
+  # Above this tint the page, cards and popovers stop being white and take the hue: the surface chroma and its lightness dip
+  # grow linearly to their maximum at tint 1, where the page meets the sidebar step (0.985) and never drops below it. At or below it, white stays white.
+  SURFACE_TINT_START = 0.5
+  SURFACE_CHROMA_MAX = 0.025
+  SURFACE_LIGHTNESS_DIP_MAX = 0.015
   MUTED_FOREGROUND_CHROMA_MIN = { light: 0.016, dark: 0.015 }.freeze
   DARK_PRIMARY_LIFT = 0.15
   DARK_PRIMARY_LIGHTNESS_MAX = 0.92
@@ -71,10 +76,10 @@ class Themes::Service::Harmony
   end
 
   def light_variables(brand)
-    white = Themes::Oklch.new(1, 0, 0)
+    surface = light_surface
     foreground = neutral(LIGHT_STEPS["foreground"])
     base = {
-      "background" => white, "card" => white, "popover" => white,
+      "background" => surface, "card" => surface, "popover" => surface,
       "foreground" => foreground, "card-foreground" => foreground, "popover-foreground" => foreground,
       "primary" => brand, "primary-foreground" => foreground_for(brand)
     }
@@ -84,6 +89,13 @@ class Themes::Service::Harmony
     base["muted-foreground"] = neutral(LIGHT_STEPS["muted-foreground"], MUTED_FOREGROUND_CHROMA_MIN[:light])
 
     shared_variables(base, brand, :light)
+  end
+
+  def light_surface
+    strength = ((tint - SURFACE_TINT_START) / (1 - SURFACE_TINT_START)).clamp(0, 1)
+    return Themes::Oklch.new(1, 0, 0) if strength.zero?
+
+    Themes::Oklch.new(1 - SURFACE_LIGHTNESS_DIP_MAX * strength, SURFACE_CHROMA_MAX * strength + 0.0, primary.hue)
   end
 
   def dark_variables(brand)
