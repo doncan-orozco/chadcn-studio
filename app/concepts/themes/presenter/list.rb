@@ -12,6 +12,8 @@ class Themes::Presenter::List
 
   def describable? = @configured
 
+  def intro = describable? ? "Pick a color, or describe a theme, and get a whole shadcn theme." : "Pick a color and get a whole shadcn theme."
+
   def title = "Themes"
   def empty? = cards.empty?
   def summary = empty? ? "No themes yet." : "#{cards.size} #{cards.size == 1 ? 'theme' : 'themes'}, newest first."

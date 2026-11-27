@@ -20,9 +20,11 @@ class Views::Themes::New < Views::Base
         card.content { render Views::Themes::New::Form.new(@theme, primary_example: PRIMARY_EXAMPLE) }
       end
       render Chadcn::Card.new(id: "describe") do |card|
-        card.header do
-          card.title { "Or describe it" }
-          card.description { "Claude picks the colors from your words. You can adjust them in the editor." } if @intake.configured?
+        if @intake.title
+          card.header do
+            card.title { @intake.title }
+            card.description { @intake.description } if @intake.description
+          end
         end
         card.content { render Components::Editor::GenerationPanel.new(panel: @intake, primary: true) }
       end

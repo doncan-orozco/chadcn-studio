@@ -7,12 +7,14 @@ class Components::Editor::GenerationPanelTest < ActiveSupport::TestCase
     assert_no_match(/<input[^>]* disabled[ >=]/, html)
     assert_no_match(/<button[^>]* disabled[ >=]/, html)
     assert_no_match(/not set up/, html)
+    assert_includes html, "turbo-cable-stream-source"
   end
 
   test "not configured: no form, no prompt, no Generate; the line that says why" do
     html = render_panel(configured: false)
 
     assert_no_match(/<form/, html)
+    assert_no_match(/turbo-cable-stream-source/, html)
     assert_no_match(/<input/, html)
     assert_no_match(/data-testid="generate"/, html)
     assert_includes html, "Generation is not set up in this studio."

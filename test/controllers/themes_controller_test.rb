@@ -56,6 +56,8 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "#describe #generation_status", text: /not set up/
     assert_select "#describe form", count: 0
+    assert_no_match(/Claude picks the colors/, response.body)
+    assert_no_match(/Or describe it/, response.body)
     assert_select "#describe input, #describe [data-testid=generate]", count: 0
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
@@ -67,6 +69,8 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "#describe form input[name=?]:not([disabled])", "generation[prompt]"
     assert_select "#describe button[data-testid=generate]:not([disabled])"
+    assert_match(/Claude picks the colors/, response.body)
+    assert_match(/Or describe it/, response.body)
   ensure
     GenerateThemeJob.client = nil
   end

@@ -14,16 +14,16 @@ class Components::Editor::GenerationPanel < Components::Base
 
   # A studio that cannot generate offers nothing to fill in: only the line that says why.
   def view_template
-    return render(Components::Editor::GenerationStatus.new(status: status)) unless @panel.configured?
-
-    turbo_stream_from @panel.stream_source if @panel.stream_source
-    form(action: @panel.create_path, method: "post", class: "flex flex-wrap items-end gap-2", data: { testid: "generation-form" }) do
-      input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
-      div(class: "grid gap-1") do
-        render Chadcn::Label.new(html_for: "generation-prompt") { "Describe a theme" }
-        render Chadcn::Input.new(**prompt_attributes)
+    if @panel.configured?
+      turbo_stream_from @panel.stream_source if @panel.stream_source
+      form(action: @panel.create_path, method: "post", class: "flex flex-wrap items-end gap-2", data: { testid: "generation-form" }) do
+        input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
+        div(class: "grid gap-1") do
+          render Chadcn::Label.new(html_for: "generation-prompt") { "Describe a theme" }
+          render Chadcn::Input.new(**prompt_attributes)
+        end
+        render Chadcn::Button.new(type: "submit", variant: @primary ? "default" : "outline", data: { testid: "generate" }) { "Generate" }
       end
-      render Chadcn::Button.new(type: "submit", variant: @primary ? "default" : "outline", data: { testid: "generate" }) { "Generate" }
     end
     render Components::Editor::GenerationStatus.new(status: status)
   end

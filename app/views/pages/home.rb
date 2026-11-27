@@ -11,7 +11,7 @@ class Views::Pages::Home < Views::Base
     div(class: "mx-auto max-w-2xl space-y-6 p-8") do
       div(class: "space-y-2") do
         h1(class: "text-2xl font-semibold tracking-tight") { "Chadcn Studio" }
-        p(class: "text-muted-foreground") { @presenter.describable? ? "Pick a color, or describe a theme, and get a whole shadcn theme." : "Pick a color and get a whole shadcn theme." }
+        p(class: "text-muted-foreground") { @presenter.intro }
       end
       your_themes unless @presenter.empty?
       actions
