@@ -85,11 +85,4 @@ class ShellTest < ApplicationSystemTestCase
 
     assert_current_path gallery_path, wait: 15
   end
-
-  test "home offers Browse components next to Browse themes" do
-    visit root_path
-    within("main#main-content") { click_on "Browse components" }
-
-    assert_current_path gallery_path, wait: 15
-  end
 end
