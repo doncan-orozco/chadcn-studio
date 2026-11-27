@@ -26,5 +26,5 @@ class Themes::Presenter::Card < Core::Presenter::Base
   def status_label = published? ? "Published" : "Draft"
   def badge_variant = published? ? "default" : "secondary"
   def swatches_label = "#{name} color swatches"
-  def edit_label = "Edit #{name}"
+  def edit_label = "Edit or rename #{name}"
 end
