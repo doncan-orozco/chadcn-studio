@@ -27,6 +27,7 @@ class Components::Editor::VariableRows < Components::Base
 
   def value(mode, label, text, style)
     span(class: "flex min-w-0 items-start gap-1") do
+      span(class: "w-9 shrink-0 font-sans") { mode.capitalize }
       swatch(style, label)
       span(class: "min-w-0 font-mono break-all select-all", data: { value: mode }, title: label) { text }
     end
