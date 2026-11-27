@@ -10,6 +10,8 @@ class Components::Editor::GenerationStatusTest < ActiveSupport::TestCase
     assert_includes html, "Pick a primary color instead"
     assert_includes html, 'aria-haspopup="dialog"'
     assert_includes html, 'aria-controls="group-brand"'
+    assert_includes html, "#theme-primary" # on New theme the way on is the Brand color field
+    assert_includes html, "underline underline-offset-4"
     assert_includes html, "<svg"
     assert_equal 1, html.scan('role="alert"').size
   end

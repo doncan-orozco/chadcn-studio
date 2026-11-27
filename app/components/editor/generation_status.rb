@@ -6,10 +6,13 @@
 # are buttons that forward to the control that already exists. A studio without an API key is not an error: it says how
 # to turn generation on as one muted line.
 class Components::Editor::GenerationStatus < Components::Base
-  # The prompt field (its form holds the CSRF token a streamed fragment cannot carry) and the Brand group's dialog
-  # trigger (Components::Editor::GroupDialog, keyed by the group's panel_id), which the two actions hand the click to.
+  # The prompt field (its form holds the CSRF token a streamed fragment cannot carry) and the way to the brand color, which
+  # the two actions hand the click to: the editor's Brand group dialog trigger (Components::Editor::GroupDialog, keyed by the
+  # group's panel_id), or on New theme the Brand color field itself, which the forward controller focuses. A page has one of
+  # the two, so a selector list finds whichever is there.
   PROMPT_FIELD = "#generation-prompt"
-  BRAND_TRIGGER = "[data-testid='group-brand']"
+  BRAND_TRIGGER = "[data-testid='group-brand'], #theme-primary"
+  LINK = "underline underline-offset-4"
   BRAND_PANEL = "group-brand"
   BASE = "min-h-5 text-sm empty:hidden"
 
@@ -55,7 +58,7 @@ class Components::Editor::GenerationStatus < Components::Base
   end
 
   def color_button
-    render Chadcn::Button.new(type: "button", size: "sm", variant: "link", aria: { haspopup: "dialog", controls: BRAND_PANEL }, data: forwarding(:click, BRAND_TRIGGER, testid: "generation-pick-color")) { "Pick a primary color instead" }
+    render Chadcn::Button.new(type: "button", size: "sm", variant: "link", class: LINK, aria: { haspopup: "dialog", controls: BRAND_PANEL }, data: forwarding(:click, BRAND_TRIGGER, testid: "generation-pick-color")) { "Pick a primary color instead" }
   end
 
   def forwarding(method, selector, testid:)
