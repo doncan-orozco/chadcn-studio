@@ -46,7 +46,7 @@ class Components::Editor::SliderField < Components::Base
     div(class: "grid gap-2") do
       label_text
       div(class: "flex items-center gap-3") do
-        render Chadcn::Slider.new(id: @id, label: @label, aria: { labelledby: "#{@id}-label" }, data: slider_attributes, **@slider)
+        render Chadcn::Slider.new(id: @id, label: @label, thumb_class: Components::Editor::HitArea::THUMB, aria: { labelledby: "#{@id}-label" }, data: slider_attributes, **@slider)
         number_box if @unit
       end
     end

@@ -55,7 +55,7 @@ class Components::Editor::GroupDialog < Components::Base
   end
 
   def panel
-    render Chadcn::Dialog::Content.new(class: PANEL, data: { testid: "#{@group.panel_id}-panel" }) do
+    render Chadcn::Dialog::Content.new(class: PANEL, close_class: Components::Editor::HitArea::CLOSE, data: { testid: "#{@group.panel_id}-panel" }) do
       render Chadcn::Dialog::Header.new do
         render(Chadcn::Dialog::Title.new { @group.label })
         render(Chadcn::Dialog::Description.new { @group.description })

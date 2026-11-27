@@ -7,7 +7,7 @@ class Components::Editor::ModeSwitch < Components::Base
   def view_template
     div(class: "group/mode flex min-h-6 items-center gap-2", data: { testid: "preview-mode" }) do
       span(class: "text-sm text-muted-foreground") { "Light" }
-      render Chadcn::Switch.new(id: "preview-dark", aria: { label: "Dark preview" }, data: { action: "chadcn--switch:checked-change->editor--preview#mode", testid: "preview-dark" })
+      render Chadcn::Switch.new(id: "preview-dark", class: Components::Editor::HitArea::SWITCH, aria: { label: "Dark preview" }, data: { action: "chadcn--switch:checked-change->editor--preview#mode", testid: "preview-dark" })
       render Chadcn::Label.new(html_for: "preview-dark", class: "min-h-6") { "Dark" }
       render Chadcn::Badge.new(variant: "secondary", class: "hidden group-has-[[aria-checked=true]]/mode:inline-flex", data: { testid: "dark-preview-badge" }) { "Dark preview" }
     end
