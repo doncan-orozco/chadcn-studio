@@ -24,6 +24,9 @@ class Generations::Presenter::Panel < Core::Presenter::Base
 
   def stream_source = __getobj__
 
+  # In the editor the way to the brand color is the Brand group's dialog.
+  def brand_control = :dialog
+
   # The editor's field starts empty.
   def prompt = nil
 

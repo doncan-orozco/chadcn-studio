@@ -137,4 +137,22 @@ class GenerationTest < ApplicationSystemTestCase
 
     assert_selector :testid, "group-brand-panel", visible: :visible
   end
+
+  test "on New theme the way out moves focus to the Brand color field" do
+    original = Rails.configuration.x.generations.hourly_cap
+    GenerateThemeJob.client = FakeGenerationClient.new
+    Rails.configuration.x.generations.hourly_cap = 1
+    visit new_theme_path
+
+    fill_in "Describe a theme", with: "calm blue"
+    click_on "Generate"
+
+    assert_selector :testid, "generation-status", text: "hourly generation limit"
+    assert_nil find(:testid, "generation-pick-color")["aria-haspopup"]
+    click_on "Pick a primary color instead"
+
+    assert_selector :field, "Brand color *", focused: true
+  ensure
+    Rails.configuration.x.generations.hourly_cap = original
+  end
 end

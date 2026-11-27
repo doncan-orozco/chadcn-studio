@@ -29,6 +29,9 @@ class Generations::Presenter::Intake < Core::Presenter::Base
   # No theme to listen to yet: the editor takes over once the theme exists.
   def stream_source = nil
 
+  # On New theme the way to the brand color is the Brand color field.
+  def brand_control = :field
+
   def prompt_param = Generations::Presenter::Panel::PROMPT_PARAM
 
   def prompt_limit = Generations::Presenter::Status::PROMPT_LIMIT

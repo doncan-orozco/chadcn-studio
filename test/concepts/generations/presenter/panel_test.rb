@@ -20,6 +20,10 @@ class Generations::Presenter::PanelTest < ActiveSupport::TestCase
     assert_predicate panel.prompt_placeholder, :present?
   end
 
+  test "the way to the brand color is the Brand group dialog" do
+    assert_equal :dialog, Generations::Presenter::Panel.new(themes(:blue), configured: true).brand_control
+  end
+
   test "a studio not configured says so in its status" do
     panel = Generations::Presenter::Panel.new(themes(:blue), configured: false)
 
