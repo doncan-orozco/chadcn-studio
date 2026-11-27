@@ -2,8 +2,9 @@
 
 # The status of a generation: pending, done or failed with its reason. Always renders the `generation_status` target
 # so a stream can replace it. The model's text is plain text (llm-generation R8). A failure is a destructive alert under
-# the field that keeps the description and offers the way on: try again, or pick the primary color by hand. A studio
-# without an API key says how to turn generation on as one muted line, never as an error. Both actions are buttons that forward to the control that already exists.
+# the field that keeps the description and offers the way on: try again, or pick the primary color by hand; both actions
+# are buttons that forward to the control that already exists. A studio without an API key is not an error: it says how
+# to turn generation on as one muted line.
 class Components::Editor::GenerationStatus < Components::Base
   # The prompt field (its form holds the CSRF token a streamed fragment cannot carry) and the Brand group's dialog
   # trigger (Components::Editor::GroupDialog, keyed by the group's panel_id), which the two actions hand the click to.

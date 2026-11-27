@@ -63,7 +63,8 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     key = ENV.delete("ANTHROPIC_API_KEY")
     get new_theme_path
 
-    assert_select "#describe #generation_status", text: /ANTHROPIC_API_KEY/
+    assert_select "#describe #generation_status[role=status].text-muted-foreground", text: /ANTHROPIC_API_KEY/
+    assert_select "#describe [role=alert], #describe [data-slot=alert]", count: 0
     assert_select "#describe form", count: 0
     assert_no_match(/Claude picks the colors/, response.body)
     assert_no_match(/Or describe it/, response.body)
