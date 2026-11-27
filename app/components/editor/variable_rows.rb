@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# The variables of a group with their light and dark values; replaced by the derivation stream.
+# The variables of a group with their light and dark values, stacked so a long oklch() wraps inside the popover instead of
+# running past it; replaced by the derivation stream.
 class Components::Editor::VariableRows < Components::Base
   def initialize(rows:)
     @rows = rows
@@ -15,9 +16,9 @@ class Components::Editor::VariableRows < Components::Base
   private
 
   def variable(row)
-    li(class: "space-y-1") do
+    li(class: "min-w-0 space-y-1") do
       span(class: "font-mono") { row.name }
-      div(class: "flex items-center gap-3 text-muted-foreground") do
+      div(class: "grid min-w-0 gap-1 text-muted-foreground") do
         value("light", "Light #{row.name}", row.light, row.light_style)
         value("dark", "Dark #{row.name}", row.dark, row.dark_style)
       end
@@ -25,9 +26,9 @@ class Components::Editor::VariableRows < Components::Base
   end
 
   def value(mode, label, text, style)
-    span(class: "flex min-w-0 items-center gap-1") do
+    span(class: "flex min-w-0 items-start gap-1") do
       swatch(style, label)
-      span(class: "truncate font-mono select-all", data: { value: mode }, title: label) { text }
+      span(class: "min-w-0 font-mono break-all select-all", data: { value: mode }, title: label) { text }
     end
   end
 

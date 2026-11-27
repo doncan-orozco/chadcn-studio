@@ -10,7 +10,7 @@ class Components::Editor::GroupDialog < Components::Base
              "group-data-[active=true]/menu-button:text-sidebar-accent-foreground " \
              "group-data-[state=open]/menu-button:text-sidebar-accent-foreground"
   PANEL = "data-[state=closed]:hidden max-sm:top-auto max-sm:bottom-0 max-sm:left-0 max-sm:max-w-none max-sm:translate-x-0 max-sm:translate-y-0 " \
-          "max-sm:rounded-b-none max-h-[85svh] overflow-y-auto sm:top-24 sm:right-4 sm:left-auto sm:max-w-sm sm:translate-x-0 sm:translate-y-0"
+          "max-sm:rounded-b-none max-h-[85svh] overflow-y-auto [&>*]:min-w-0 sm:top-24 sm:right-4 sm:left-auto sm:max-w-sm sm:translate-x-0 sm:translate-y-0"
 
   def initialize(group:)
     @group = group

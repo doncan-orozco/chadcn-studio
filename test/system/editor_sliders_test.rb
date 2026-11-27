@@ -23,6 +23,25 @@ class EditorSlidersTest < ApplicationSystemTestCase
     assert_no_selector "[data-testid=primary-lightness] [role=slider][aria-valuetext='#{before}']"
   end
 
+  test "the Surfaces popover holds its slider and its values inside its box" do
+    find(:testid, "group-surfaces").click
+
+    assert_selector :testid, "group-surfaces-panel"
+    overflowing = page.evaluate_script(<<~JS)
+      (() => {
+        const panel = document.querySelector("[data-testid=group-surfaces-panel]")
+        const box = panel.getBoundingClientRect()
+        const outside = [...panel.querySelectorAll("*")].filter((el) => {
+          const r = el.getBoundingClientRect()
+          return r.width > 0 && (r.right > box.right + 1 || r.left < box.left - 1)
+        })
+        return outside.length + Math.max(0, panel.scrollWidth - panel.clientWidth)
+      })()
+    JS
+
+    assert_equal 0, overflowing
+  end
+
   private
 
   # Mirrors Number(x.toFixed(d)) in slider_speech_controller.js: 21.0 is "21", 48.8 is "48.8".
