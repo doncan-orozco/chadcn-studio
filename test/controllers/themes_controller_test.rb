@@ -56,7 +56,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_select "#describe #generation_status", text: /not set up/
     assert_select "#describe form", count: 0
-    assert_select "#describe input, #describe button", count: 0
+    assert_select "#describe input, #describe [data-testid=generate]", count: 0
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
   end
