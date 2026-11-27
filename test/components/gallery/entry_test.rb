@@ -38,11 +38,13 @@ class Components::Gallery::EntryTest < ActiveSupport::TestCase
     assert_operator section.css("h4").size, :>=, 1
   end
 
-  test "demo links to # or to a missing anchor are inert, and links to an anchor inside the demo are kept" do
-    html = Components::Gallery::Entry.new(entry: catalog_entry("breadcrumb"), anchor: "breadcrumb").call
-    links = Nokogiri::HTML5.fragment(html).css("a[data-slot=breadcrumb-link]")
+  test "demo links keep their href and the card carries the demo controller" do
+    section = Nokogiri::HTML5.fragment(Components::Gallery::Entry.new(entry: catalog_entry("breadcrumb"), anchor: "breadcrumb").call).at_css("section")
+    links = section.css("a[data-slot=breadcrumb-link]")
 
     assert_not_empty links
-    assert links.none? { |link| link["href"] }
+    assert links.all? { |link| link["href"] }
+    assert_equal "gallery--demo", section.at_css("[data-testid=gallery-card]")["data-controller"]
+    assert_equal "click->gallery--demo#stay", section.at_css("[data-testid=gallery-card]")["data-action"]
   end
 end
