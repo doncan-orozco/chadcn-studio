@@ -2,7 +2,7 @@ require "test_helper"
 require "application_system_test_case"
 
 # What #181/#182 do not cover on the tune pages: every slider thumb is named for a screen reader, and the toast close
-# (sized by app CSS, the gem has no option for it) is at least 24x24 CSS px (WCAG 2.2 SC 2.5.8).
+# (sized through the gem's `toast_options.class_names.close_button`) is at least 24x24 CSS px (WCAG 2.2 SC 2.5.8).
 class TargetSizeTest < ApplicationSystemTestCase
   MINIMUM_TARGET_SIZE = 24
 

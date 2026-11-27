@@ -62,7 +62,9 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
   end
 
   test "the thumb is named by the label" do
-    assert_includes render_field, 'role="slider" aria-label="Corner radius"'
+    thumb = Nokogiri::HTML5.fragment(render_field).at_css("[role=slider]")
+
+    assert_equal "Corner radius", thumb["aria-label"]
   end
 
   private
