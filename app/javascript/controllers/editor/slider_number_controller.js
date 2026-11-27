@@ -19,7 +19,8 @@ export default class extends Controller {
   // `chadcn--slider:value-change`: the slider moved.
   mirror(event) {
     const [value] = event.detail.value
-    this.inputTarget.value = value
+    // While the box is being typed in, it keeps the typed text: only `change` snaps it back to the slider.
+    if (!this.typing) this.inputTarget.value = value
     this.readoutTarget.textContent = `${value}${this.unitValue}`
     const thumb = this.#thumb
     if (thumb) this.#describe(thumb, value)
@@ -33,17 +34,13 @@ export default class extends Controller {
   // frame, after the browser's own focus move (Tab), because the slider's keyboard handler focuses its thumb: focus goes
   // back to wherever it was so typing never pulls it out of the box.
   type() {
-    cancelAnimationFrame(this.walkFrame)
-    this.walkFrame = requestAnimationFrame(() => {
-      const thumb = this.#thumb
-      const delta = thumb ? this.#delta(thumb) : 0
-      if (delta !== 0) {
-        const held = document.activeElement
-        this.#walk(thumb, delta)
-        if (held && held !== thumb && held !== document.body && held.isConnected) held.focus({ preventScroll: true })
-      }
-      this.#restore()
-    })
+    this.#schedule(true)
+  }
+
+  // The box `input`: every keystroke walks the slider to the typed value so the readout, thumb, preview and row follow at
+  // once. The box is not rewritten (the user is mid-typing); partial or non-numeric text walks nothing.
+  preview() {
+    this.#schedule(false)
   }
 
   // Steps from the slider's value to the typed one (0 when the box is empty or not a number).
@@ -73,6 +70,25 @@ export default class extends Controller {
     }
     for (let index = 0; index < Math.floor(presses / PAGE_STEPS); index++) this.#press(thumb, page)
     for (let index = 0; index < presses % PAGE_STEPS; index++) this.#press(thumb, single)
+  }
+
+  #schedule(settle) {
+    cancelAnimationFrame(this.walkFrame)
+    this.walkFrame = requestAnimationFrame(() => {
+      const thumb = this.#thumb
+      const delta = thumb ? this.#delta(thumb) : 0
+      this.typing = !settle
+      try {
+        if (delta !== 0) {
+          const held = document.activeElement
+          this.#walk(thumb, delta)
+          if (held && held !== thumb && held !== document.body && held.isConnected) held.focus({ preventScroll: true })
+        }
+      } finally {
+        this.typing = false
+      }
+      if (settle) this.#restore()
+    })
   }
 
   get #thumb() {

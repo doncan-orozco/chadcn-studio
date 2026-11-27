@@ -48,13 +48,43 @@ class EditorRadiusTest < ApplicationSystemTestCase
     assert_equal "1.15rem", find_field("theme[inputs][radius]", type: :hidden, visible: :all).value
   end
 
+  test "a radius being typed shows at once, before Enter or Tab, and the box keeps the typed text" do
+    box = find(:testid, "radius-number")
+    execute_script("const box = document.getElementById('radius-number'); box.value = ''; box.focus()")
+    box.send_keys("1")
+
+    assert_selector :testid, "radius-value", text: "1rem"
+    assert_equal "1", find(:testid, "radius").find("[role=slider]")["aria-valuenow"]
+    assert_equal "1rem", evaluate_script("document.querySelector('[data-testid=preview-root]').style.getPropertyValue('--radius')")
+    assert_equal "1", box.value
+  end
+
+  test "typing a radius character by character never rewrites the box" do
+    box = find(:testid, "radius-number")
+    execute_script("const box = document.getElementById('radius-number'); box.value = ''; box.focus()")
+    box.send_keys("0", ".", "7")
+
+    assert_selector :testid, "radius-value", text: "0.7rem"
+    assert_equal "0.7", box.value
+  end
+
+  test "the Radius row subtitle follows the typed value" do
+    execute_script("const box = document.getElementById('radius-number'); box.value = ''; box.focus()")
+    find(:testid, "radius-number").send_keys("1")
+
+    assert_selector "#summary-radius", text: "1rem"
+  end
+
   test "typing the current value changes nothing" do
     box = find(:testid, "radius-number")
-    box.fill_in with: "0.625"
+    box.send_keys(:up)
+
+    assert_selector :testid, "radius-value", text: "0.65rem"
+    box.fill_in with: "0.65"
     box.send_keys(:enter)
 
-    assert_equal "0.625rem", find(:testid, "radius-value").text
-    assert_equal "0.625", find(:testid, "radius").find("[role=slider]")["aria-valuenow"]
+    assert_equal "0.65rem", find(:testid, "radius-value").text
+    assert_equal "0.65", find(:testid, "radius").find("[role=slider]")["aria-valuenow"]
   end
 
   test "a typed value just below an off-grid radius lands on it" do

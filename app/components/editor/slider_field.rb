@@ -66,7 +66,7 @@ class Components::Editor::SliderField < Components::Base
   def number_box
     render Chadcn::Input.new(
       id: "#{@id}-number", type: "number", default_value: @value, class: "w-20 shrink-0", form: "#{@id}#{DETACHED_FORM_SUFFIX}", aria: { label: "#{@label} in #{@unit}" },
-      data: { editor__slider_number_target: "input", action: "change->editor--slider-number#type", testid: "#{@id}-number" }, **@range
+      data: { editor__slider_number_target: "input", action: "input->editor--slider-number#preview change->editor--slider-number#type", testid: "#{@id}-number" }, **@range
     )
   end
 
