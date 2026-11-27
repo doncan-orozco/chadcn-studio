@@ -31,15 +31,6 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
     assert_equal Themes::Oklch.parse(@theme.dark["primary"]).to_hex, row.dark_hex
   end
 
-  test "a value that is not a color has no hex" do
-    assert_nil Themes::Presenter::Group.hex_for("0.625rem")
-    assert_nil Themes::Presenter::Group.hex_for("oklch(1 0 0 / 10%)")
-  end
-
-  test "every variable has a label of its own, not its CSS name" do
-    Chadcn::Theme::REQUIRED.each { |variable| assert_not_equal variable, Themes::Presenter::Group.label_for(variable) }
-  end
-
   test "rows link to the theme page under All values" do
     assert_equal "/themes/#{@theme.id}#all-values", Themes::Presenter::Group.new(@theme, key: "brand").values_path
   end

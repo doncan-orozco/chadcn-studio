@@ -7,15 +7,15 @@ class Views::Themes::Show::Palette < Views::Base
 
   def view_template
     h2(id: "all-values", class: "mb-2 scroll-mt-6 text-lg font-semibold") { "All values" }
-    div(data: { testid: "palette" }) { @sections.each { |heading, rows| section(heading, rows) } }
+    div(data: { testid: "palette" }) { @sections.each { |section| variables_table(section) } }
   end
 
   private
 
-  def section(heading, rows)
-    h3(class: "mt-4 mb-2 text-sm font-medium text-foreground/70") { heading }
-    render Chadcn::Table.new(data: { testid: "palette-#{heading.parameterize}" }) do |table|
-      table.caption(class: "sr-only") { "#{heading} variables of the theme, light and dark." }
+  def variables_table(section)
+    h3(class: "mt-4 mb-2 text-sm font-medium text-foreground/70") { section.heading }
+    render Chadcn::Table.new(data: { testid: "palette-#{section.slug}" }) do |table|
+      table.caption(class: "sr-only") { "#{section.heading} variables of the theme, light and dark." }
       table.header do
         table.row do
           table.head { "Variable" }
@@ -23,7 +23,7 @@ class Views::Themes::Show::Palette < Views::Base
           table.head { "Dark" }
         end
       end
-      table.body { rows.each { |row| palette_row(table, row) } }
+      table.body { section.rows.each { |row| palette_row(table, row) } }
     end
   end
 
