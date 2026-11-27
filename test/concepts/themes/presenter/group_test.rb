@@ -133,4 +133,12 @@ class Themes::Presenter::GroupTest < ActiveSupport::TestCase
 
     assert_equal Themes::Oklch.parse("oklch(0.55 0.2 250)").to_hex, Themes::Presenter::Group.new(@theme, key: "brand").hex
   end
+
+  test "an override's placeholder is the derived color as hex, or the derived value when it is not a color" do
+    row = Themes::Presenter::Group::Override.new(mode: "light", name: "--ring", derived: "oklch(1 0 0)", value: "", style: nil, field_name: "n", field_id: "i")
+
+    assert_equal "#ffffff", row.placeholder
+    assert_equal "not a color", row.with(derived: "not a color").placeholder
+    assert_equal "oklch(1 0 0 / 10%)", row.with(derived: "oklch(1 0 0 / 10%)").placeholder
+  end
 end

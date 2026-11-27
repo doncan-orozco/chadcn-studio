@@ -11,4 +11,26 @@ class Components::Editor::AdvancedOverridesTest < ActiveSupport::TestCase
     assert_includes html, 'data-editor--variable-filter-target="row"'
     assert_equal @group.overrides("light").size + @group.overrides("dark").size, names.size
   end
+
+  test "each field has a decorative swatch wired to the swatch controller" do
+    page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
+    rows = @group.overrides("light").size + @group.overrides("dark").size
+
+    assert page.has_css?("[data-controller='editor--override-swatch'] [data-testid='override-swatch'][aria-hidden='true']", count: rows)
+    assert page.has_css?("input[data-editor--override-swatch-target='input']", count: rows)
+  end
+
+  test "placeholders are the derived color as hex, except the translucent ones hex cannot say" do
+    page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
+
+    assert_match(/\A#\h{6}\z/, page.find_by_id("override-light-border")[:placeholder])
+    assert_match(%r{\Aoklch\(.+/ \d+%\)\z}, page.find_by_id("override-dark-border")[:placeholder])
+  end
+
+  test "the panel says Close keeps the overrides and Save stores them" do
+    html = Components::Editor::AdvancedOverrides.new(group: @group).call
+
+    assert_includes html, "Closing this panel keeps your overrides"
+    assert_includes html, "Save the theme to store them"
+  end
 end
