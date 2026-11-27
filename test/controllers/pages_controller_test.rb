@@ -80,7 +80,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     assert_select "main a", text: "Describe a theme", count: 0
-    assert_select "main a[href*=describe]", count: 0
+    assert_select "main a[href*=generation-prompt]", count: 0
     assert_select "main p", text: /describe/i, count: 0
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
@@ -90,7 +90,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     GenerateThemeJob.client = FakeGenerationClient.new
     get root_path
 
-    assert_select "main a[href=?]", new_theme_path(anchor: "describe"), text: "Describe a theme"
+    assert_select "main a[href=?]", new_theme_path(anchor: Components::Editor::GenerationPanel::PROMPT_ID), text: "Describe a theme"
     assert_select "main p", text: /describe a theme/
   ensure
     GenerateThemeJob.client = nil

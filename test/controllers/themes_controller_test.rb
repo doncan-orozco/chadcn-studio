@@ -54,7 +54,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     GenerateThemeJob.client = FakeGenerationClient.new
     get themes_path
 
-    assert_select "main a[href=?]", new_theme_path(anchor: "describe"), text: "Describe a theme"
+    assert_select "main a[href=?]", new_theme_path(anchor: Components::Editor::GenerationPanel::PROMPT_ID), text: "Describe a theme"
   ensure
     GenerateThemeJob.client = nil
   end
