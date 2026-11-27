@@ -16,7 +16,7 @@ class Components::Gallery::IndexTest < ActiveSupport::TestCase
   test "the nav is the filter's scroll container and names its empty state" do
     nav = @html.at_css("nav[aria-label=Components]")
 
-    assert_equal %w[editor--variable-filter gallery--index-spy], nav["data-controller"].split
+    assert_equal %w[editor--variable-filter], nav["data-controller"].split
     assert_equal "No component matches", nav["data-editor--variable-filter-empty-label-value"]
   end
 
@@ -30,13 +30,6 @@ class Components::Gallery::IndexTest < ActiveSupport::TestCase
     letters = @html.css("section > p[data-testid=gallery-index-letter]").map { |letter| letter.text.strip }
 
     assert_equal @presenter.groups.map(&:letter), letters
-  end
-
-  test "the nav binds scroll and resize to the spy passively" do
-    actions = @html.at_css("nav[aria-label=Components]")["data-action"].split
-
-    assert_includes actions, "scroll@window->gallery--index-spy#schedule:passive"
-    assert_includes actions, "resize@window->gallery--index-spy#schedule:passive"
   end
 
   test "every link is a spy target and none starts marked" do

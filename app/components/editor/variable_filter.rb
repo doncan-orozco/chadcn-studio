@@ -9,6 +9,6 @@ class Components::Editor::VariableFilter < Components::Base
   WRAPPER = "grid gap-1 pb-4"
 
   def view_template
-    render Components::Shared::ListFilter.new(id: ID, label: "Find a variable", placeholder: PLACEHOLDER, wrapper: WRAPPER, isolated: true)
+    render Components::Shared::ListFilter.new(id: ID, label: "Find a variable", placeholder: PLACEHOLDER, class: WRAPPER, isolated: true)
   end
 end

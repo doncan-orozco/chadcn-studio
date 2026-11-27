@@ -5,16 +5,16 @@
 # editor's markup in files other work owns. `isolated` adds `:stop` to the input and change actions, for a field inside a
 # form whose dirty tracking a query must not reach.
 class Components::Shared::ListFilter < Components::Base
-  def initialize(id:, label:, placeholder:, wrapper:, isolated: false)
+  def initialize(id:, label:, placeholder:, isolated: false, **attrs)
     @id = id
     @label = label
     @placeholder = placeholder
-    @wrapper = wrapper
     @isolated = isolated
+    @attrs = attrs
   end
 
   def view_template
-    div(class: @wrapper) do
+    div(**@attrs) do
       render Chadcn::Label.new(html_for: @id, class: "text-sm") { @label }
       render Chadcn::Input.new(
         id: @id, type: "search", placeholder: @placeholder, autocomplete: "off", spellcheck: "false",

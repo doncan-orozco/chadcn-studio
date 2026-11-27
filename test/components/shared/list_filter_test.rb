@@ -3,7 +3,7 @@ require "test_helper"
 class Components::Shared::ListFilterTest < ActiveSupport::TestCase
   def render_filter(**options)
     Nokogiri::HTML5.fragment(
-      Components::Shared::ListFilter.new(id: "x", label: "Find a thing", placeholder: "a, b...", wrapper: "grid", **options).call
+      Components::Shared::ListFilter.new(id: "x", label: "Find a thing", placeholder: "a, b...", class: "grid", **options).call
     )
   end
 
@@ -13,6 +13,12 @@ class Components::Shared::ListFilterTest < ActiveSupport::TestCase
     assert_equal "Find a thing", html.at_css("label[for=x]").text.strip
     assert html.at_css("input#x[type=search][placeholder='a, b...'][data-editor--variable-filter-target=query]")
     assert html.at_css("div.grid [role=status][data-editor--variable-filter-target=status]")
+  end
+
+  test "extra attributes land on the root" do
+    root = render_filter(data: { testid: "f" }).at_css("div.grid")
+
+    assert_equal "f", root["data-testid"]
   end
 
   test "by default the events are not stopped" do

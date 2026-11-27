@@ -15,8 +15,21 @@ class Views::Gallery::ShowTest < ActiveSupport::TestCase
     assert_equal content_letters, index_letters
   end
 
-  test "the spy is wired once, on the index, which is the only place that names it" do
-    assert_equal 1, @html.css("[data-controller~='gallery--index-spy']").size
-    assert_equal 1, @html.css("nav[aria-label=Components][data-controller~='gallery--index-spy']").size
+  test "the spy is mounted once, on the page wrapper, with passive scroll and resize actions" do
+    spies = @html.css("[data-controller~='gallery--index-spy']")
+
+    assert_equal 1, spies.size
+    assert_empty spies.first.css("nav[aria-label=Components][data-controller~='gallery--index-spy']")
+    assert_not_nil spies.first.at_css("nav[aria-label=Components]")
+    assert_not_nil spies.first.at_css("[data-testid=gallery-entry]")
+    assert_equal %w[scroll@window->gallery--index-spy#schedule:passive resize@window->gallery--index-spy#schedule:passive], spies.first["data-action"].split
+  end
+
+  test "every entry is a spy target whose id a link points to" do
+    ids = @html.css("section[data-gallery--index-spy-target=entry]").map { |entry| entry["id"] }
+    fragments = @html.css("nav a[data-gallery--index-spy-target=link]").map { |link| link["href"].delete_prefix("#") }
+
+    assert_equal Chadcn::Catalog.entries.size, ids.size
+    assert_equal fragments.sort, ids.sort
   end
 end
