@@ -3,9 +3,3 @@
 @import "../builds/tailwind/chadcn";
 @import "./theme/theme.css";
 /* chadcn:end */
-
-/* The toast close is a 20 px button in the gem's sonner.css; 24 px is the WCAG 2.2 minimum target. */
-[data-sonner-toast][data-styled=true] [data-close-button] {
-  width: 1.5rem;
-  height: 1.5rem;
-}
