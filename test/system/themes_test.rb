@@ -184,10 +184,10 @@ class ThemesTest < ApplicationSystemTestCase
 
     dialog = find("[role=alertdialog]")
 
-    assert_selector "[role=alertdialog] h2", text: "Delete Zinc?"
-    assert_text "variables will be lost. This cannot be undone."
-    assert_equal "Cancel", dialog.find("[data-slot=alert-dialog-cancel]").text
-    assert_equal "Delete Zinc", dialog.find("[data-slot=alert-dialog-action]").text
+    assert_equal "Delete Zinc?", find(id: dialog["aria-labelledby"]).text
+    assert_equal "Its 32 variables will be lost. This cannot be undone.", find(id: dialog["aria-describedby"]).text
+    assert_equal "Cancel", evaluate_script("document.activeElement.textContent")
+    assert_equal "Delete Zinc", dialog.find(:testid, "confirm-delete").text
   end
 
   test "cancelling the delete dialog keeps the theme" do
@@ -196,6 +196,7 @@ class ThemesTest < ApplicationSystemTestCase
     within("[role=alertdialog]") { click_button "Cancel" }
 
     assert_no_selector "[role=alertdialog]"
+    assert_equal "Delete Zinc", evaluate_script("document.activeElement.getAttribute('aria-label')")
     assert_current_path theme_path(themes(:zinc))
     assert Theme.exists?(themes(:zinc).id)
   end

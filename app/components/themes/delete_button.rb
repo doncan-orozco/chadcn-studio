@@ -8,7 +8,8 @@ class Components::Themes::DeleteButton < Components::Base
 
   VARIABLE_COUNT = (Chadcn::Theme::REQUIRED + Chadcn::Theme::ROOT_ONLY).size
 
-  def initialize(theme_id:, label: "Delete", size: "default", **attrs)
+  # label names the theme ("Delete Sunset"): it is the trigger's accessible name, the dialog title and the confirm.
+  def initialize(theme_id:, label:, size: "default", **attrs)
     @theme_id = theme_id
     @label = label
     @size = size
@@ -16,7 +17,8 @@ class Components::Themes::DeleteButton < Components::Base
   end
 
   def view_template
-    form(id: form_id, action: theme_path(@theme_id), method: "post", class: "inline") do
+    # Hidden: it is submitted by id from the portaled confirm, and must not become a flex item beside the trigger.
+    form(id: form_id, action: theme_path(@theme_id), method: "post", hidden: true) do
       input(type: "hidden", name: "_method", value: "delete")
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
     end
@@ -34,7 +36,9 @@ class Components::Themes::DeleteButton < Components::Base
 
   def trigger_button = Chadcn::Button.new(variant: "outline", size: @size, aria: { label: @label }, **button_attrs)
 
-  # The Delete action lives in the portaled content, outside the form, so it submits it by id.
+  # The confirm lives in the portaled content, outside the form, so it submits it by id. It is a plain submit button, not
+  # AlertDialog::Action: Action closes (and may unmount) the content inside the click, before the browser submits. The
+  # redirect closes the dialog, and Turbo disables the button while the DELETE is in flight.
   def confirmation
     render Chadcn::AlertDialog::Header.new do
       render(Chadcn::AlertDialog::Title.new { "#{@label}?" })
@@ -42,7 +46,7 @@ class Components::Themes::DeleteButton < Components::Base
     end
     render Chadcn::AlertDialog::Footer.new do
       render(Chadcn::AlertDialog::Cancel.new { "Cancel" })
-      render(Chadcn::AlertDialog::Action.new(variant: "destructive", type: "submit", form: form_id) { @label })
+      render(Chadcn::Button.new(variant: "destructive", type: "submit", form: form_id, data: { testid: "confirm-delete" }) { @label })
     end
   end
 
