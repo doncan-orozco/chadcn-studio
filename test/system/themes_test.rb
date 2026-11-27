@@ -25,11 +25,14 @@ class ThemesTest < ApplicationSystemTestCase
   end
 
   test "the Themes list links to describing a theme" do
+    GenerateThemeJob.client = FakeGenerationClient.new
     visit themes_path
     click_on "Describe a theme"
 
     assert_current_path new_theme_path
-    assert_field "Describe a theme", disabled: :all
+    assert_field "Describe a theme", disabled: false
+  ensure
+    GenerateThemeJob.client = nil
   end
 
   test "the header's Themes link opens the list from home" do

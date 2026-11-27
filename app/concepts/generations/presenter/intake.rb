@@ -16,6 +16,14 @@ class Generations::Presenter::Intake < Core::Presenter::Base
 
   def configured? = @configured
 
+  def title
+    "Or describe it" if configured?
+  end
+
+  def description
+    "Claude picks the colors from your words. You can adjust them in the editor." if configured?
+  end
+
   def create_path = helpers.generations_path
 
   # No theme to listen to yet: the editor takes over once the theme exists.

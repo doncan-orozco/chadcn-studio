@@ -4,9 +4,15 @@
 class Themes::Presenter::List
   attr_reader :cards
 
-  def initialize(themes)
+  # `configured` is whether the studio can generate a theme from a description: when it cannot, no page offers it.
+  def initialize(themes, configured: Generations::Presenter::Panel.configured?)
     @cards = Themes::Presenter::Card.wrap(themes)
+    @configured = configured
   end
+
+  def describable? = @configured
+
+  def intro = describable? ? "Pick a color, or describe a theme, and get a whole shadcn theme." : "Pick a color and get a whole shadcn theme."
 
   def title = "Themes"
   def empty? = cards.empty?
