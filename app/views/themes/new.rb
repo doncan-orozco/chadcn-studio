@@ -14,8 +14,8 @@ class Views::Themes::New < Views::Base
       h1(class: "text-2xl font-semibold tracking-tight") { "New theme" }
       render Chadcn::Card.new do |card|
         card.header do
-          card.title { "Name and primary color" }
-          card.description { "The rest of the palette is derived from them." }
+          card.title { "Name and brand color" }
+          card.description { "The rest of the palette is derived from the brand color." }
         end
         card.content { render Views::Themes::New::Form.new(@theme, primary_example: PRIMARY_EXAMPLE) }
       end

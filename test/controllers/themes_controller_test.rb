@@ -85,7 +85,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     GenerateThemeJob.client = nil
   end
 
-  test "GET /themes/new asks for a name and a primary color" do
+  test "GET /themes/new asks for a name and a brand color" do
     get new_theme_path
 
     assert_response :success
