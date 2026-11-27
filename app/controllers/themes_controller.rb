@@ -1,6 +1,6 @@
 class ThemesController < ApplicationController
   def index
-    render Views::Themes::Index.new(Themes::Presenter::List.new(Themes::Query::Recent.call), deleted: flash[:deleted])
+    render Views::Themes::Index.new(Themes::Presenter::List.new(Themes::Query::Recent.call, base_url: request.base_url), deleted: flash[:deleted])
   end
 
   def show

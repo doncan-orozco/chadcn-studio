@@ -35,7 +35,7 @@ class Views::Pages::Home < Views::Base
         @presenter.cards.each do |card|
           li(class: "flex items-center gap-2") do
             theme_row(card)
-            render Components::Editor::ExportDialog.new(presenter: card.sharing(base_url: view_context.request.base_url), compact: true)
+            render Components::Editor::ExportDialog.new(presenter: card.sharing, compact: true)
           end
         end
       end

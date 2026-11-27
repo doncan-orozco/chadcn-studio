@@ -5,8 +5,9 @@ class Themes::Presenter::List
   attr_reader :cards
 
   # `configured` is whether the studio can generate a theme from a description: when it cannot, no page offers it.
-  def initialize(themes, configured: Generations::Presenter::Panel.configured?)
-    @cards = Themes::Presenter::Card.wrap(themes)
+  # `base_url` reaches every card, which builds its Export dialog from it.
+  def initialize(themes, base_url:, configured: Generations::Presenter::Panel.configured?)
+    @cards = Themes::Presenter::Card.wrap(themes, base_url:)
     @configured = configured
   end
 

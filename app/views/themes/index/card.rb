@@ -25,7 +25,7 @@ class Views::Themes::Index::Card < Views::Base
           form(action: @card.edit_path, method: "get") do
             render Chadcn::Button.new(type: "submit", variant: "outline", size: "sm", aria: { label: @card.edit_label }) { @card.edit_text }
           end
-          render Components::Editor::ExportDialog.new(presenter: @card.sharing(base_url: view_context.request.base_url), compact: true)
+          render Components::Editor::ExportDialog.new(presenter: @card.sharing, compact: true)
           render Components::Themes::DeleteButton.new(theme_id: @card.id, label: "Delete #{@card.name}", size: "sm")
         end
       end

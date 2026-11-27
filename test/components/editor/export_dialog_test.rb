@@ -12,8 +12,8 @@ class Components::Editor::ExportDialogTest < ActiveSupport::TestCase
     blue = render_dialog(themes(:blue))
     slate = render_dialog(themes(:slate))
 
-    assert blue.at_css("##{Components::Editor::ExportDialog.host_id(themes(:blue))}")
-    assert slate.at_css("##{Components::Editor::ExportDialog.host_id(themes(:slate))}")
+    assert blue.at_css("##{Components::Editor::ExportDialog.host_id(themes(:blue).id)}")
+    assert slate.at_css("##{Components::Editor::ExportDialog.host_id(themes(:slate).id)}")
     assert_not_equal dialog_id(blue), dialog_id(slate)
   end
 

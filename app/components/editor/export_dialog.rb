@@ -5,7 +5,7 @@
 # the publication answers with a Turbo Stream that replaces this whole host with the dialog open on the published body.
 class Components::Editor::ExportDialog < Components::Base
   # One host and one dialog per theme, so a list of themes can carry an Export dialog on every row.
-  def self.host_id(theme) = "export-dialog-host-#{theme.id}"
+  def self.host_id(theme_id) = "export-dialog-host-#{theme_id}"
 
   # compact: the small outline trigger of a theme row, named after the theme it exports ("Export Sunset").
   def initialize(presenter:, open: false, compact: false)
@@ -15,7 +15,7 @@ class Components::Editor::ExportDialog < Components::Base
   end
 
   def view_template
-    div(id: self.class.host_id(@presenter), class: "contents") { dialog }
+    div(id: self.class.host_id(@presenter.id), class: "contents") { dialog }
   end
 
   private
