@@ -75,6 +75,28 @@ class EditorRadiusTest < ApplicationSystemTestCase
     assert_selector "#summary-radius", text: "1rem"
   end
 
+  test "an off-step radius being typed keeps its text until the box is left" do
+    box = find(:testid, "radius-number")
+    execute_script("const box = document.getElementById('radius-number'); box.value = ''; box.focus()")
+    box.send_keys("1", ".", "1", "7")
+
+    assert_selector :testid, "radius-value", text: "1.15rem"
+    assert_equal "1.17", box.value
+    box.send_keys(:tab)
+
+    assert_field "radius-number", with: "1.15"
+  end
+
+  test "Enter after typing an off-step radius snaps the box" do
+    box = find(:testid, "radius-number")
+    execute_script("const box = document.getElementById('radius-number'); box.value = ''; box.focus()")
+    box.send_keys("1", ".", "1", "7", :enter)
+
+    assert_selector :testid, "radius-value", text: "1.15rem"
+    assert_field "radius-number", with: "1.15"
+    assert_equal "radius-number", evaluate_script("document.activeElement.id")
+  end
+
   test "typing the current value changes nothing" do
     box = find(:testid, "radius-number")
     box.send_keys(:up)

@@ -11,6 +11,8 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
     assert_includes html, 'type="number"'
     assert_includes html, 'step="0.05"'
     assert_includes html, "change->editor--slider-number#type"
+    assert_includes html, "blur->editor--slider-number#type"
+    assert_includes html, "keydown.enter->editor--slider-number#type"
     assert_includes html, "input->editor--slider-number#preview"
     assert_not_includes html, "slider-number#confirm"
     assert_includes html, 'form="radius-number-form"'

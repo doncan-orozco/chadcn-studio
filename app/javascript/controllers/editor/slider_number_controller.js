@@ -11,6 +11,10 @@ export default class extends Controller {
   static targets = ["slider", "input", "readout"]
   static values = { unit: String }
 
+  typing = false
+  walking = false
+  walkFrame = null
+
   connect() {
     const thumb = this.#thumb
     if (thumb) this.#describe(thumb, thumb.getAttribute("aria-valuenow"))
@@ -34,6 +38,9 @@ export default class extends Controller {
   // frame, after the browser's own focus move (Tab), because the slider's keyboard handler focuses its thumb: focus goes
   // back to wherever it was so typing never pulls it out of the box.
   type() {
+    // The walk's own focus bounce (the slider's keyboard handler focuses its thumb), not the user leaving the box.
+    if (this.walking) return
+
     this.#schedule(true)
   }
 
@@ -78,6 +85,7 @@ export default class extends Controller {
       const thumb = this.#thumb
       const delta = thumb ? this.#delta(thumb) : 0
       this.typing = !settle
+      this.walking = true
       try {
         if (delta !== 0) {
           const held = document.activeElement
@@ -86,6 +94,7 @@ export default class extends Controller {
         }
       } finally {
         this.typing = false
+        this.walking = false
       }
       if (settle) this.#restore()
     })
