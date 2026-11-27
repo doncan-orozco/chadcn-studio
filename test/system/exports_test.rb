@@ -73,7 +73,11 @@ class ExportsTest < ApplicationSystemTestCase
     link.click
 
     assert_selector :testid, "download-css-status", text: "Downloaded theme.css"
-    assert_selector :testid, "download-css-status", text: "", exact_text: true, visible: :all, wait: 5
+    sleep 2.5 # Past the Copy button's reset time: the download line stays until the dialog closes.
+    assert_selector :testid, "download-css-status", text: "Downloaded theme.css"
+    click_on "Copy"
+    assert_selector :testid, "import-copy", text: "Copy", exact_text: true, wait: 5
+    assert_selector :testid, "download-css-status", text: "Downloaded theme.css"
   end
 
   test "unpublishing takes the theme off its URL" do
