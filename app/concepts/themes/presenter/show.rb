@@ -5,8 +5,6 @@
 class Themes::Presenter::Show < Core::Presenter::Base
   Section = Data.define(:heading, :slug, :rows)
 
-  def rows = rows_by_variable.values
-
   def sections
     brand, other = variables.partition { |variable| Themes::Presenter::Group.brand?(variable) }
     [ section("Brand", "brand", brand), section("Everything else", "other", other) ]
@@ -22,7 +20,7 @@ class Themes::Presenter::Show < Core::Presenter::Base
   def variables = Chadcn::Theme::REQUIRED + Chadcn::Theme::ROOT_ONLY
 
   def rows_by_variable
-    @rows_by_variable ||= variables.to_h { |variable| [ variable, Themes::Presenter::Variable.row(variable, light: light[variable], dark: dark[variable]) ] }
+    @rows_by_variable ||= variables.zip(Themes::Presenter::Variable.new(__getobj__).rows(variables)).to_h
   end
 
   def section(heading, slug, names)

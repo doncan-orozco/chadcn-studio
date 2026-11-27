@@ -16,12 +16,17 @@ class Themes::Presenter::VariableTest < ActiveSupport::TestCase
     assert_nil Themes::Presenter::Variable.hex("oklch(1 0 0 / 10%)")
   end
 
-  test "a row carries the label and the hex beside each oklch value" do
-    row = Themes::Presenter::Variable.row("primary", light: "oklch(0.55 0.2 250)", dark: "oklch(0.7 0.16 250)")
+  test "a row reads the wrapped theme and carries the label and the hex beside each oklch value" do
+    theme = themes(:zinc)
+    row = Themes::Presenter::Variable.new(theme).row("primary")
 
     assert_equal [ "--primary", "Brand color" ], [ row.name, row.label ]
-    assert_equal Themes::Oklch.parse("oklch(0.55 0.2 250)").to_hex, row.light_hex
-    assert_equal Themes::Oklch.parse("oklch(0.7 0.16 250)").to_hex, row.dark_hex
-    assert_equal "background-color: oklch(0.7 0.16 250)", row.dark_style
+    assert_equal Themes::Oklch.parse(theme.light["primary"]).to_hex, row.light_hex
+    assert_equal Themes::Oklch.parse(theme.dark["primary"]).to_hex, row.dark_hex
+    assert_equal "background-color: #{theme.dark['primary']}", row.dark_style
+  end
+
+  test "rows keep the order they are asked for" do
+    assert_equal %w[--ring --primary], Themes::Presenter::Variable.new(themes(:zinc)).rows(%w[ring primary]).map(&:name)
   end
 end

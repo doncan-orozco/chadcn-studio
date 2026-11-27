@@ -105,11 +105,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
   def variables = definition[:variables]
   def modes = MODES
 
-  def rows
-    variables.map do |variable|
-      Themes::Presenter::Variable.row(variable, light: light[variable], dark: dark[variable])
-    end
-  end
+  def rows = Themes::Presenter::Variable.new(__getobj__).rows(variables)
 
   # The theme page's full table; nil while the theme is unsaved (a derivation never has an id).
   def values_path = persisted? ? "#{helpers.theme_path(__getobj__)}#all-values" : nil

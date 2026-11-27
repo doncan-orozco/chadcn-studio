@@ -20,4 +20,18 @@ class Themes::Presenter::ShowTest < ActiveSupport::TestCase
     assert_equal Themes::Oklch.parse(themes(:zinc).light["primary"]).to_hex, primary.light_hex
     assert_nil radius.light_hex
   end
+
+  test "one row per variable, radius has no swatch" do
+    rows = @show.sections.flat_map(&:rows)
+    radius = rows.find { |row| row.name == "--radius" }
+
+    assert_equal Chadcn::Theme::REQUIRED.size + Chadcn::Theme::ROOT_ONLY.size, rows.size
+    assert_nil radius.light_style
+    assert_nil radius.dark_style
+    assert_equal "background-color: oklch(1 0 0)", rows.find { |row| row.name == "--background" }.light_style
+  end
+
+  test "labels" do
+    assert_equal "Delete Zinc", @show.delete_label
+  end
 end

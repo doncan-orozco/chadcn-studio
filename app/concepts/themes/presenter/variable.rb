@@ -1,8 +1,9 @@
 # frozen_string_literal: true
 
 # One theme variable in the words of someone tuning it: what it colors, and its value as the hex they would type. Shared by the editor
-# groups and the theme page so both say the same thing; the values themselves come from the theme (theme-science R1).
-class Themes::Presenter::Variable
+# groups and the theme page so both say the same thing; the values themselves come from the wrapped theme (theme-science R1).
+# `label` and `hex` stay class methods for callers with a value but no theme (the Advanced override placeholder).
+class Themes::Presenter::Variable < Core::Presenter::Base
   # What each variable colors; the CSS name stays beside it for people who export.
   LABELS = {
     "background" => "Page background", "foreground" => "Page text", "primary" => "Brand color", "primary-foreground" => "Text on brand color",
@@ -38,8 +39,15 @@ class Themes::Presenter::Variable
     nil
   end
 
-  def self.row(variable, light:, dark:)
-    Row.new(name: "--#{variable}", label: label(variable), light: light, light_style: Themes::Presenter::Card.swatch_style(light), light_hex: hex(light),
-            dark: dark, dark_style: Themes::Presenter::Card.swatch_style(dark), dark_hex: hex(dark))
+  # One row per variable, in the order given.
+  def rows(variables) = variables.map { |variable| row(variable) }
+
+  def row(variable)
+    Row.new(name: "--#{variable}", label: self.class.label(variable), light: light[variable], light_style: swatch(light[variable]), light_hex: self.class.hex(light[variable]),
+            dark: dark[variable], dark_style: swatch(dark[variable]), dark_hex: self.class.hex(dark[variable]))
   end
+
+  private
+
+  def swatch(value) = Themes::Presenter::Card.swatch_style(value)
 end
