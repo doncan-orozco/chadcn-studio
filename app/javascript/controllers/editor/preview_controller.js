@@ -1,6 +1,6 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The live preview of the theme editor (stimulus R14, theme-science R6). It reveals the "Unsaved changes" marker the view
+// The live preview of the theme editor (stimulus R14, theme-science R6). It reveals the "Unsaved changes" marker (and drops Save's `data-quiet`, its outline look) the view
 // rendered hidden (a Turbo snapshot keeps it as the DOM holds it, so a restored dirty editor still says so), and otherwise
 // only sets CSS custom properties on the preview root and toggles its `dark` class: while a slider moves it formats
 // ONE oklch string from L, C and H (or one rem length);
