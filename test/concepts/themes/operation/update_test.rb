@@ -92,4 +92,10 @@ class Themes::Operation::UpdateTest < ActiveSupport::TestCase
 
     assert_equal "#ff0000", saved.inputs["primary_hex"]
   end
+
+  test "the payload says what the save changed" do
+    payload = Themes::Operation::Update.new.call(model: @theme, params: { "name" => "Ocean", "inputs" => { "overrides" => { "light" => { "border" => "#9ca3af" } } } }).value!
+
+    assert_equal({ renamed_from: "Zinc", inputs: [], pinned: [ "border" ], unpinned: [] }, payload[:changes])
+  end
 end

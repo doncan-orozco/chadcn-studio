@@ -26,12 +26,11 @@ class ThemesController < ApplicationController
   end
 
   def update
-    before = Themes::Presenter::SavedNotice.snapshot(theme)
     result = Themes::Operation::Update.new.call(model: theme, params: update_params.to_h)
 
     if result.success?
-      saved = result.value![:model]
-      redirect_to edit_theme_path(saved), notice: Themes::Presenter::SavedNotice.for(saved, before: before)
+      payload = result.value!
+      redirect_to edit_theme_path(payload[:model]), notice: Themes::Presenter::SavedNotice.new(payload[:model], changes: payload[:changes]).to_s
     else
       render Views::Themes::Edit.new(Themes::Presenter::Editor.new(result.failure[:model])), status: :unprocessable_entity
     end

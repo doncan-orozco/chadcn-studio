@@ -11,18 +11,37 @@ class Themes::Operation::Update < Core::Operation
     super()
   end
 
+  # The payload's `changes` says what the save changed: `{ renamed_from:, inputs: [...], pinned: [...], unpinned: [...] }`.
   def call(model:, params:)
     params = params.to_h.stringify_keys
+    was = { name: model.name, inputs: model.inputs.to_h.deep_dup }
     model.name = params["name"].to_s.strip if params.key?("name")
     inputs = merged_inputs(model, (params["inputs"] || {}).to_h.stringify_keys)
     derivation = derive(model, inputs)
     model.assign_attributes(light: derivation[:palette].root, dark: derivation[:palette].dark, inputs: derivation[:inputs].deep_stringify_keys)
     model.save or fail_with_model!(model, code: :invalid)
 
-    { model: model }
+    { model: model, changes: changes_since(was, model) }
   end
 
   private
+
+  def changes_since(was, model)
+    now = model.inputs.to_h
+    old_pins = pins(was[:inputs]["overrides"])
+    new_pins = pins(now["overrides"])
+    {
+      renamed_from: (was[:name] unless was[:name] == model.name),
+      inputs: POSTED_INPUTS.reject { |key| now[key] == was[:inputs][key] },
+      pinned: new_pins.reject { |key, value| old_pins[key] == value }.keys.map(&:last).uniq,
+      unpinned: (old_pins.keys - new_pins.keys).map(&:last).uniq
+    }
+  end
+
+  # { [mode, variable] => value }
+  def pins(overrides)
+    overrides.to_h.flat_map { |mode, variables| variables.to_h.map { |name, value| [ [ mode, name ], value ] } }.to_h
+  end
 
   def merged_inputs(model, posted)
     inputs = model.inputs.to_h.merge(posted.slice(*POSTED_INPUTS).compact_blank)
