@@ -67,10 +67,23 @@ class Themes::GenerationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "the editor shows the prompt form and subscribes to the theme's stream" do
+    GenerateThemeJob.client = FakeGenerationClient.new
     get edit_theme_path(themes(:zinc))
 
     assert_select "[data-testid=generation-form]"
     assert_select "turbo-cable-stream-source"
     assert_select "#generation_status"
+  ensure
+    GenerateThemeJob.client = nil
+  end
+
+  test "the editor of a studio that cannot generate shows only the line that says so" do
+    key = ENV.delete("ANTHROPIC_API_KEY")
+    get edit_theme_path(themes(:zinc))
+
+    assert_select "[data-testid=generation-form]", count: 0
+    assert_select "#generation_status", text: /not set up/
+  ensure
+    ENV["ANTHROPIC_API_KEY"] = key if key
   end
 end

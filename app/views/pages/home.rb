@@ -11,7 +11,7 @@ class Views::Pages::Home < Views::Base
     div(class: "mx-auto max-w-2xl space-y-6 p-8") do
       div(class: "space-y-2") do
         h1(class: "text-2xl font-semibold tracking-tight") { "Chadcn Studio" }
-        p(class: "text-muted-foreground") { "Pick a color, or describe a theme, and get a whole shadcn theme." }
+        p(class: "text-muted-foreground") { @presenter.describable? ? "Pick a color, or describe a theme, and get a whole shadcn theme." : "Pick a color and get a whole shadcn theme." }
       end
       your_themes unless @presenter.empty?
       actions
@@ -24,7 +24,7 @@ class Views::Pages::Home < Views::Base
   def actions
     div(class: "flex flex-wrap items-center gap-3") do
       render Chadcn::Button.new(as_child: :a, href: new_theme_path) { "Create theme" }
-      render Chadcn::Button.new(as_child: :a, href: new_theme_path(anchor: "describe"), variant: "outline") { "Describe a theme" }
+      render Chadcn::Button.new(as_child: :a, href: new_theme_path(anchor: "describe"), variant: "outline") { "Describe a theme" } if @presenter.describable?
       render Chadcn::Button.new(as_child: :a, href: themes_path, variant: "outline") { "Browse themes" }
       render Chadcn::Button.new(as_child: :a, href: gallery_path, variant: "outline") { "Browse components" }
     end

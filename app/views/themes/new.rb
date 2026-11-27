@@ -22,7 +22,7 @@ class Views::Themes::New < Views::Base
       render Chadcn::Card.new(id: "describe") do |card|
         card.header do
           card.title { "Or describe it" }
-          card.description { "Claude picks the colors from your words. You can adjust them in the editor." }
+          card.description { "Claude picks the colors from your words. You can adjust them in the editor." } if @intake.configured?
         end
         card.content { render Components::Editor::GenerationPanel.new(panel: @intake, primary: true) }
       end
