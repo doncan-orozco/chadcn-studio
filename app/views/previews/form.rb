@@ -1,6 +1,10 @@
 # frozen_string_literal: true
 
 class Views::Previews::Form < Views::Base
+  # The email error is staged for the preview; this caption says so, so it is not read as a mistake in the user's own data.
+  SAMPLE_CAPTION = "Sample validation state, shown in your theme."
+  private_constant :SAMPLE_CAPTION
+
   def initialize(presenter)
     @presenter = presenter
   end
@@ -33,7 +37,8 @@ class Views::Previews::Form < Views::Base
       end
       render Chadcn::Field.new(data: { invalid: "true" }) do |field|
         field.label(html_for: "form-email") { "Email" }
-        field.render Chadcn::Input.new(id: "form-email", type: "email", default_value: @presenter.email_value, aria: { invalid: "true", describedby: "form-email-error" })
+        field.render Chadcn::Input.new(id: "form-email", type: "email", default_value: @presenter.email_value, aria: { invalid: "true", describedby: "form-email-sample form-email-error" })
+        field.description(id: "form-email-sample") { SAMPLE_CAPTION }
         field.error(id: "form-email-error") { @presenter.email_error }
       end
       render Chadcn::Field.new do |field|
