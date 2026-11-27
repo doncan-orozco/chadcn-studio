@@ -24,7 +24,16 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_response :success
     assert_select "main h2", text: "Your themes"
     Themes::Query::Recent.call.limit(PagesController::HOME_THEMES).each do |theme|
-      assert_select "main ul[aria-label='Your themes'] a[href=?]", edit_theme_path(theme), text: theme.name
+      assert_select "main ul[aria-label='Your themes'] a[href=?] span[data-link-name]", edit_theme_path(theme), text: theme.name
+    end
+  end
+
+  test "home says where a theme row leads: a muted Edit on each row and a line under Your themes" do
+    get root_path
+
+    assert_select "main p", text: "Open a theme to edit, rename or delete it."
+    Themes::Query::Recent.call.limit(PagesController::HOME_THEMES).each do |theme|
+      assert_select "main ul[aria-label='Your themes'] a[href=?] span.text-muted-foreground", edit_theme_path(theme), text: "Edit"
     end
   end
 
@@ -62,7 +71,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     assert_select "main ul[aria-label='Your themes'] li", PagesController::HOME_THEMES
     assert_select "main ul[aria-label='Your themes'] a", text: "Extra 0", count: 0
     extras.last(PagesController::HOME_THEMES).each do |theme|
-      assert_select "main ul[aria-label='Your themes'] a[href=?]", edit_theme_path(theme), text: theme.name
+      assert_select "main ul[aria-label='Your themes'] a[href=?] span[data-link-name]", edit_theme_path(theme), text: theme.name
     end
   end
 

@@ -31,6 +31,7 @@ class Views::Pages::Home < Views::Base
   def your_themes
     section(class: "space-y-3") do
       h2(class: "text-lg font-semibold tracking-tight") { "Your themes" }
+      p(class: "text-sm text-muted-foreground") { "Open a theme to edit, rename or delete it." }
       ul(class: "space-y-2", aria: { label: "Your themes" }) do
         @presenter.cards.each do |card|
           li(class: "flex items-center gap-2") do
@@ -42,11 +43,12 @@ class Views::Pages::Home < Views::Base
     end
   end
 
-  # The row's link opens the editor: a swatch, the name underlined at rest, a chevron. Export sits beside it, never inside it.
+  # The row's link opens the editor: a swatch, the name underlined at rest, a muted Edit, a chevron. Export sits beside it, never inside it.
   def theme_row(card)
     a(href: card.edit_path, class: ROW_LINK) do
       span(class: "size-4 shrink-0 rounded-full border", style: card.swatches.find { |swatch| swatch.name == "primary" }&.style, aria: { hidden: "true" })
       span(class: "flex-1 text-primary underline underline-offset-4", data: { link_name: true }) { card.name }
+      span(class: "text-sm text-muted-foreground") { "Edit" }
       span(class: "text-muted-foreground after:content-['›']", aria: { hidden: "true" })
     end
   end
