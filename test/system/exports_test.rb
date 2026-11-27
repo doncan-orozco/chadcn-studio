@@ -35,6 +35,8 @@ class ExportsTest < ApplicationSystemTestCase
     assert_selector :testid, "download-css"
     assert_match(%r{\Abin/rails theme:import\[http://.+/t/zinc\.css\]\z}, find(:testid, "import-command").text)
     assert_predicate themes(:zinc).reload, :published?
+    assert_selector :testid, "publication-state", text: "Published"
+    assert_selector :testid, "publication-link", text: %r{/t/zinc\.css}
     send_keys :escape
 
     assert_no_selector :testid, "export-panel"
