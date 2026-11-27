@@ -1,20 +1,11 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Hands a click to a control elsewhere on the page: submits the form of a field, or clicks a button. The generation
-// status sits outside the prompt form and the Brand group's dialog trigger, and a streamed fragment cannot carry a
-// form's CSRF token, and the Brand trigger is a gem dialog trigger inside another component (no outlet or event can reach it, so the selector value is a documented deviation from stimulus R6), so its "Try again" and "Pick a primary color" forward to the controls that already exist. The
-// element it sits on is a real button or link; a missing target leaves it a no-op. A target that is a text field is focused
-// instead of clicked, and then the button no longer claims to open a dialog.
+// Hands a click to a control elsewhere on the page: submits the form of a field, focuses a text field, or clicks a
+// button. The generation status sits outside the prompt form and outside the Brand group's dialog trigger. A streamed
+// fragment cannot carry a form's CSRF token, and the trigger is a gem dialog trigger that no outlet or event reaches,
+// so the selector value is a documented deviation from stimulus R6. A missing target leaves the button a no-op.
 export default class extends Controller {
   static values = { selector: String, method: { type: String, default: "click" } }
-
-  connect() {
-    const target = document.querySelector(this.selectorValue)
-    if (target && this.#isField(target) && this.methodValue === "click") {
-      this.element.removeAttribute("aria-haspopup")
-      this.element.removeAttribute("aria-controls")
-    }
-  }
 
   forward(event) {
     const target = document.querySelector(this.selectorValue)

@@ -7,6 +7,7 @@ class Generations::Presenter::IntakeTest < ActiveSupport::TestCase
     assert_predicate intake, :configured?
     assert_equal "/generations", intake.create_path
     assert_nil intake.stream_source
+    assert_equal :field, intake.brand_control
     assert_equal "generation[prompt]", intake.prompt_param
     assert_equal "calm blue", intake.prompt
     assert_nil intake.status

@@ -130,7 +130,7 @@ class GenerationTest < ApplicationSystemTestCase
     click_on "Generate"
 
     assert_selector :testid, "generation-status", text: "hourly generation limit"
-    assert_no_selector "[data-testid=generation-pick-color][aria-haspopup]"
+    assert_nil find(:testid, "generation-pick-color")["aria-haspopup"]
     click_on "Pick a primary color instead"
 
     assert_selector :field, "Brand color *", focused: true

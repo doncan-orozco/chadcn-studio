@@ -25,7 +25,7 @@ class Components::Editor::GenerationPanel < Components::Base
         render Chadcn::Button.new(type: "submit", variant: @primary ? "default" : "outline", data: { testid: "generate" }) { "Generate" }
       end
     end
-    render Components::Editor::GenerationStatus.new(status: status)
+    render Components::Editor::GenerationStatus.new(status: status, brand: @panel.brand_control)
   end
 
   private

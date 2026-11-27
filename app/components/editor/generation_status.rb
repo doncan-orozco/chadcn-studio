@@ -6,18 +6,23 @@
 # are buttons that forward to the control that already exists. A studio without an API key is not an error: it says how
 # to turn generation on as one muted line.
 class Components::Editor::GenerationStatus < Components::Base
-  # The prompt field (its form holds the CSRF token a streamed fragment cannot carry) and the way to the brand color, which
-  # the two actions hand the click to: the editor's Brand group dialog trigger (Components::Editor::GroupDialog, keyed by the
-  # group's panel_id), or on New theme the Brand color field itself, which the forward controller focuses. A page has one of
-  # the two, so a selector list finds whichever is there.
+  # The prompt field (its form holds the CSRF token a streamed fragment cannot carry), and the way to the brand color that
+  # "Pick a primary color instead" hands the click to: the editor's Brand group dialog trigger
+  # (Components::Editor::GroupDialog, keyed by the group's panel_id), or on New theme the Brand color field, which the
+  # forward controller focuses. Only the dialog claims to open one.
   PROMPT_FIELD = "#generation-prompt"
-  BRAND_TRIGGER = "[data-testid='group-brand'], #theme-primary"
-  LINK = "underline underline-offset-4"
   BRAND_PANEL = "group-brand"
+  BRAND = {
+    dialog: { selector: "[data-testid='#{BRAND_PANEL}']", aria: { haspopup: "dialog", controls: BRAND_PANEL } },
+    field: { selector: "#theme-primary", aria: {} }
+  }.freeze
+  LINK = "underline underline-offset-4"
   BASE = "min-h-5 text-sm empty:hidden"
 
-  def initialize(status: nil)
+  # `brand` defaults to the editor: the turbo-stream reply and the job broadcast only ever reach it.
+  def initialize(status: nil, brand: :dialog)
     @status = status
+    @brand = BRAND.fetch(brand)
   end
 
   def view_template
@@ -58,7 +63,7 @@ class Components::Editor::GenerationStatus < Components::Base
   end
 
   def color_button
-    render Chadcn::Button.new(type: "button", size: "sm", variant: "link", class: LINK, aria: { haspopup: "dialog", controls: BRAND_PANEL }, data: forwarding(:click, BRAND_TRIGGER, testid: "generation-pick-color")) { "Pick a primary color instead" }
+    render Chadcn::Button.new(type: "button", size: "sm", variant: "link", class: LINK, aria: @brand[:aria], data: forwarding(:click, @brand[:selector], testid: "generation-pick-color")) { "Pick a primary color instead" }
   end
 
   def forwarding(method, selector, testid:)

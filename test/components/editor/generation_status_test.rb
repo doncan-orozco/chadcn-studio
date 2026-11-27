@@ -10,10 +10,17 @@ class Components::Editor::GenerationStatusTest < ActiveSupport::TestCase
     assert_includes html, "Pick a primary color instead"
     assert_includes html, 'aria-haspopup="dialog"'
     assert_includes html, 'aria-controls="group-brand"'
-    assert_includes html, "#theme-primary" # on New theme the way on is the Brand color field
-    assert_includes html, "underline underline-offset-4"
     assert_includes html, "<svg"
     assert_equal 1, html.scan('role="alert"').size
+  end
+
+  test "on New theme the way on is the Brand color field, not a dialog" do
+    status = Generations::Presenter::Status.new(Generation.new, failure: :capped)
+    html = ApplicationController.render(Components::Editor::GenerationStatus.new(status: status, brand: :field), layout: false)
+
+    assert_includes html, 'data-editor--forward-selector-value="#theme-primary"'
+    assert_not_includes html, "aria-haspopup"
+    assert_not_includes html, "aria-controls"
   end
 
   test "a failure that retrying cannot fix offers only the color" do
