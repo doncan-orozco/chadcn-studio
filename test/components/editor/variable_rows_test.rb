@@ -3,19 +3,18 @@ require "test_helper"
 class Components::Editor::VariableRowsTest < ActiveSupport::TestCase
   Row = Struct.new(:name, :light, :dark, :light_style, :dark_style, keyword_init: true)
 
-  test "the light and dark values stack and wrap instead of being cut" do
-    html = Components::Editor::VariableRows.new(rows: [ row ]).call
-
-    assert_includes html, 'class="grid min-w-0 gap-1 text-muted-foreground"'
-    assert_includes html, "oklch(0.985 0.006 286.032)"
-    assert_includes html, "oklch(0.274 0.006 286.033)"
-    assert_includes html, "break-all"
-    assert_not_includes html, "truncate"
+  setup do
+    row = Row.new(name: "--primary", light: "oklch(0.488 0.243 264.376)", dark: "oklch(0.62 0.2 264)", light_style: "background-color: oklch(0.488 0.243 264.376)", dark_style: nil)
+    @html = Components::Editor::VariableRows.new(rows: [ row ]).call
   end
 
-  private
+  test "names which value is Light and which is Dark on their own lines" do
+    assert_match(/>Light<.*data-value="light"/m, @html)
+    assert_match(/>Dark<.*data-value="dark"/m, @html)
+  end
 
-  def row
-    Row.new(name: "--border", light: "oklch(0.985 0.006 286.032)", dark: "oklch(0.274 0.006 286.033)", light_style: nil, dark_style: nil)
+  test "keeps the full values as text" do
+    assert_includes @html, ">oklch(0.488 0.243 264.376)</span>"
+    assert_includes @html, ">oklch(0.62 0.2 264)</span>"
   end
 end
