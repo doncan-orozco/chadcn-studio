@@ -6,8 +6,8 @@
 module Components::Editor::HitArea
   # The dialog's 16 px X button becomes 28 px (its parent is already `absolute`).
   CLOSE = "after:absolute after:-inset-1.5 after:content-['']"
-  # The 16 px slider thumb becomes 28 px (the thumb is absolutely positioned by the gem).
-  THUMB = "after:absolute after:-inset-1.5 after:content-['']"
+  # The 16 px slider thumb becomes 28 px; `relative` anchors the box to the thumb, not to the gem's positioning wrapper.
+  THUMB = "relative after:absolute after:-inset-1.5 after:content-['']"
   # The 32 x 18.4 px switch becomes 32 x 26.4 px.
   SWITCH = "relative after:absolute after:inset-x-0 after:-inset-y-1 after:content-['']"
 end

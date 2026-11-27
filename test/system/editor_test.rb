@@ -77,6 +77,13 @@ class EditorTest < ApplicationSystemTestCase
     assert_empty unreachable_corners(close), "the dialog Close must be hit across a 24 x 24 px square"
   end
 
+  test "the export dialog Close answers a pointer anywhere in a 24 px square" do
+    find(:testid, "export").click
+    close = find("[data-state=open][data-slot=dialog-content] [data-chadcn--dialog-part=close]", match: :first)
+
+    assert_empty unreachable_corners(close), "the export dialog Close must be hit across a 24 x 24 px square"
+  end
+
   test "an advanced override survives a re-derivation, shows as overridden and clearing it re-derives" do
     open_group "advanced"
     fill_in "override-light-ring", with: "oklch(0.6 0.1 30)"
