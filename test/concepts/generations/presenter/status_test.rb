@@ -65,6 +65,8 @@ class Generations::Presenter::StatusTest < ActiveSupport::TestCase
     assert_predicate status, :failed?
     assert_equal "Describing a theme needs an Anthropic API key: set ANTHROPIC_API_KEY and restart the studio.", status.message
     assert_predicate status, :setup_needed?
+    assert_not_predicate status, :alert?
+    assert_predicate Generations::Presenter::Status.new(Generation.new, failure: :throttled), :alert?
     assert_not_predicate Generations::Presenter::Status.new(Generation.new, failure: :throttled), :setup_needed?
   end
 

@@ -55,6 +55,9 @@ class Generations::Presenter::Status < Core::Presenter::Base
   # Nothing is wrong with the description: the studio needs an operator step, so it is told as a note, not an error.
   def setup_needed? = failed? && failure_code == "not_configured"
 
+  # A failure shown as an error: everything but a studio that only needs its API key set.
+  def alert? = failed? && !setup_needed?
+
   def rationale = inputs.is_a?(Hash) ? inputs["rationale"].to_s[0, 280] : ""
 
   private
