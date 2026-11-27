@@ -59,7 +59,7 @@ class ThemesTest < ApplicationSystemTestCase
 
   test "the card's name opens the editor and its Edit button is at least 24 px tall" do
     visit themes_path
-    height = evaluate_script("document.querySelector(\"[data-testid=theme-card] a[aria-label^='Edit']\").getBoundingClientRect().height")
+    height = evaluate_script("document.querySelector(\"[data-testid=theme-card] button[aria-label^='Edit or rename']\").getBoundingClientRect().height")
 
     assert_operator height, :>=, 24
     click_on "Zinc"
@@ -74,7 +74,7 @@ class ThemesTest < ApplicationSystemTestCase
     assert_current_path edit_theme_path(themes(:zinc))
 
     visit themes_path
-    within(:testid, "theme-card", text: "Zinc") { click_on "Edit" }
+    within(:testid, "theme-card", text: "Zinc") { click_on "Edit or rename" }
 
     assert_current_path edit_theme_path(themes(:zinc))
   end
