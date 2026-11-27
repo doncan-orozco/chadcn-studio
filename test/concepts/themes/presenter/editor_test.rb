@@ -68,6 +68,20 @@ class Themes::Presenter::EditorTest < ActiveSupport::TestCase
     assert_equal "/derivations?controls=1", @editor.refresh_path
   end
 
+  test "the heading and the document title keep the stored name while a rename is unsaved" do
+    theme = themes(:zinc)
+    theme.name = "Forest"
+    editor = Themes::Presenter::Editor.new(theme)
+
+    assert_equal "Edit Zinc", editor.title
+    assert_equal "Edit Zinc - Chadcn Studio", editor.document_title
+    assert_equal "Forest", editor.name
+  end
+
+  test "a theme that is not saved yet is headed by its in-memory name" do
+    assert_equal "Edit Ocean", Themes::Presenter::Editor.new(Theme.new(name: "Ocean")).title
+  end
+
   test "the document title carries the theme name" do
     assert_equal "Edit Zinc - Chadcn Studio", @editor.document_title
   end
