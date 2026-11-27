@@ -23,7 +23,7 @@ class Components::Gallery::Entry < Components::Base
   def view_template
     section(**@attrs.except(:data), id: @anchor, class: "scroll-mt-6 space-y-3", data: { testid: "gallery-entry" }.merge(@attrs.fetch(:data, {}))) do
       h3(class: "text-lg font-medium") { @entry.title }
-      div(class: card_classes, data: { testid: "gallery-card" }) { demo }
+      div(class: card_classes, data: { testid: "gallery-card", controller: "gallery--demo", action: "click->gallery--demo#stay" }) { demo }
     end
   end
 
@@ -34,7 +34,7 @@ class Components::Gallery::Entry < Components::Base
   def demo
     # `capture` restores the buffer if the renderer raises; the captured HTML is Phlex output, already escaped.
     html = capture { render Chadcn::Catalog::TreeRenderer.new(tree: @entry.tree, component: @entry.component) }
-    raw(safe(html))
+    raw(safe(Components::Gallery::DemoOutline.call(html)))
   rescue Chadcn::Catalog::TreeRenderer::Error => error
     Rails.error.report(error, handled: true, context: { component: @entry.component })
     p(class: "text-sm text-destructive", role: "alert", data: { testid: "gallery-error" }) { "This demo could not be rendered: #{error.message}" }
