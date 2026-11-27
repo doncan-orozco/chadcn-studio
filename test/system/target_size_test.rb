@@ -1,11 +1,9 @@
 require "test_helper"
 require "application_system_test_case"
 
-# What #181/#182 do not cover on the tune pages: every slider thumb is named for a screen reader, and the toast close
-# (sized through the gem's `toast_options.class_names.close_button`) is at least 24x24 CSS px (WCAG 2.2 SC 2.5.8).
+# What the hit-area work (#181, #182, #226) does not assert on the tune pages: every slider thumb and the toast close are
+# named for a screen reader.
 class TargetSizeTest < ApplicationSystemTestCase
-  MINIMUM_TARGET_SIZE = 24
-
   setup { visit edit_theme_path(themes(:zinc)) }
 
   test "the radius slider thumb reads its name and value" do
@@ -28,14 +26,9 @@ class TargetSizeTest < ApplicationSystemTestCase
     assert_equal %w[Lightness Chroma Hue], names
   end
 
-  test "the toast close has a name and a 24 px target" do
+  test "the toast close is named" do
     click_on "Save theme"
-    close = find("[data-close-button]", visible: :all)
-    # Layout size (offsetWidth/Height): the toast's enter animation does not scale it.
-    width, height = evaluate_script("[arguments[0].offsetWidth, arguments[0].offsetHeight]", close)
 
-    assert_equal "Close toast", close["aria-label"]
-    assert_operator width, :>=, MINIMUM_TARGET_SIZE
-    assert_operator height, :>=, MINIMUM_TARGET_SIZE
+    assert_equal "Close toast", find("[data-close-button]", visible: :all)["aria-label"]
   end
 end
