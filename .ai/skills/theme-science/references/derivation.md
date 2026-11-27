@@ -39,7 +39,7 @@ REPAIR_MAX_STEPS = 10
 
 ## Steps
 
-1. **Neutral color.** `neutral(l) = Oklch.new(l, tint * NEUTRAL_CHROMA_MAX, primary.hue)`; 
+1. **Neutral color.** `neutral(l) = Oklch.new(l, tint * NEUTRAL_CHROMA_MAX, primary.hue)`.
 2. **Light surfaces.** `background`, `card`, `popover` = one surface: `oklch(1 0 0)` while `tint <= SURFACE_TINT_START`, above it `Oklch.new(1 - SURFACE_LIGHTNESS_DIP_MAX * s, SURFACE_CHROMA_MAX * s, primary.hue)` with `s = (tint - 0.5) / 0.5` (tint 1 -> `oklch(0.985 0.025 H)`); `sidebar` = neutral(0.985); `secondary`, `muted`, `accent` = neutral(0.967); `border`, `input` = neutral(0.92).
 3. **Light text.** `foreground`, `card-foreground`, `popover-foreground`, `sidebar-foreground` = neutral(0.141); `muted-foreground` = neutral(0.54) with chroma raised to `max(neutral chroma, 0.016)` so muted text keeps a hint of hue; `secondary-foreground`, `accent-foreground` = neutral(0.21).
 4. **Light brand.** `primary` = input; `primary-foreground` = candidate with the higher `Chadcn::Theme.contrast` against `primary` (white candidate `oklch(0.985 0 0)` vs dark candidate neutral(0.141)).
