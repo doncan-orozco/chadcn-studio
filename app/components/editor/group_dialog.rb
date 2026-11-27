@@ -41,7 +41,7 @@ class Components::Editor::GroupDialog < Components::Base
       div(id: @group.controls_id) { render Components::Editor::BrandControls.new(group: @group) }
       p(class: "text-xs text-foreground/70", data: { testid: "brand-live-note" }) { "Changes show live; Save keeps them." }
       details(class: "text-sm") do
-        summary(class: "cursor-pointer text-muted-foreground") { "All brand variables" }
+        summary(class: "block cursor-pointer py-1 text-muted-foreground") { "All brand variables" }
         rows
       end
     end
@@ -112,7 +112,7 @@ class Components::Editor::GroupDialog < Components::Base
     return unless @group.values_path
 
     p(class: "pt-2 text-xs") do
-      a(href: @group.values_path, class: "underline underline-offset-4", aria: { label: "See all values for #{@group.label}" }, data: { testid: "all-values-link" }) { "See all values" }
+      a(href: @group.values_path, class: "inline-block py-1 underline underline-offset-4", aria: { label: "See all values for #{@group.label}" }, data: { testid: "all-values-link" }) { "See all values" }
     end
   end
 end

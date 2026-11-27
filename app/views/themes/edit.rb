@@ -34,7 +34,7 @@ class Views::Themes::Edit < Views::Base
     path = sharing.public_path
     span(class: "flex items-center gap-2 text-sm") do
       render Chadcn::Badge.new(variant: sharing.published? ? "default" : "secondary", data: { testid: "publication-state" }) { sharing.publication_state }
-      a(href: path, class: "text-muted-foreground underline underline-offset-4", data: { testid: "publication-link" }) { path } if path
+      a(href: path, class: "inline-block py-1 text-muted-foreground underline underline-offset-4", data: { testid: "publication-link" }) { path } if path
     end
   end
 end
