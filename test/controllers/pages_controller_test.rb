@@ -18,7 +18,7 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "home lists existing themes below the buttons, each name linking to its editor" do
+  test "home lists existing themes, each name linking to its editor" do
     get root_path
 
     assert_response :success
@@ -32,10 +32,12 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     get root_path
 
     nodes = css_select("main h1, main h2, main a")
-    heading = nodes.index { |node| node.name == "h2" && node.text.strip == "Your themes" }
+    title = nodes.index { |node| node.name == "h1" }
     create = nodes.index { |node| node.name == "a" && node.text.strip == "Create theme" }
+    heading = nodes.index { |node| node.name == "h2" && node.text.strip == "Your themes" }
 
-    assert_operator nodes.index { |node| node.name == "h1" }, :<, heading
+    assert title && create && heading, "expected the h1, Create theme and the Your themes heading on home"
+    assert_operator title, :<, create
     assert_operator create, :<, heading
   end
 

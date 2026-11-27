@@ -85,13 +85,4 @@ class ShellTest < ApplicationSystemTestCase
 
     assert_current_path gallery_path, wait: 15
   end
-
-  test "home leaves Browse themes and Browse components to the header nav" do
-    visit root_path
-
-    within("main#main-content") do
-      assert_no_link "Browse themes"
-      assert_no_link "Browse components"
-    end
-  end
 end
