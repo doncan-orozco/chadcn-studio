@@ -12,6 +12,8 @@ class Themes::Presenter::Variable
   SURFACE_NAMES = { "card" => "Card", "popover" => "Popover", "secondary" => "Secondary", "muted" => "Muted", "accent" => "Accent", "sidebar" => "Sidebar",
                     "sidebar-primary" => "Sidebar brand", "sidebar-accent" => "Sidebar accent" }.freeze
 
+  private_constant :LABELS, :SURFACE_NAMES
+
   Row = Data.define(:name, :label, :light, :light_style, :light_hex, :dark, :dark_style, :dark_hex)
 
   # "Card text" for card-foreground, "Chart color 3" for chart-3; the CSS name when nothing better is known.
