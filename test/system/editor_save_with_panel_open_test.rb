@@ -5,15 +5,18 @@ require "application_system_test_case"
 class EditorSaveWithPanelOpenTest < ApplicationSystemTestCase
   setup { visit edit_theme_path(themes(:zinc)) }
 
-  test "one click on Save with the Radius panel open saves the typed radius" do
+  test "one click on Save with the Radius panel open saves the stepped radius" do
     find(:testid, "group-radius").click
-
     assert_selector :testid, "group-radius-panel"
-    find(:testid, "radius-number").fill_in with: "1"
-    click_on_in_same_tick(:testid, "radius-number", "save")
+    execute_script(<<~JS)
+      var thumb = document.querySelector('[data-testid=radius] [role=slider]');
+      thumb.focus();
+      thumb.dispatchEvent(new KeyboardEvent('keydown', { key: 'ArrowRight', bubbles: true }));
+      document.querySelector('[data-testid=save]').click();
+    JS
 
     assert_text "Zinc saved", wait: 10
-    assert_equal "1rem", themes(:zinc).reload.inputs["radius"]
+    assert_equal "0.65rem", themes(:zinc).reload.inputs["radius"]
   end
 
   test "one click on Save with the Advanced panel open saves the typed override" do
@@ -27,9 +30,16 @@ class EditorSaveWithPanelOpenTest < ApplicationSystemTestCase
 
   private
 
-  # What a quick click does: the blur commits the field, and the click follows before the next frame.
+  # What a quick click does: the blur commits the field, and the click follows before the next frame (after the microtasks
+  # that carry the field's value on to the slider and the hidden inputs).
   def click_on_in_same_tick(locator_type, locator, save_testid)
     field = locator_type == :id ? "document.getElementById('#{locator}')" : "document.querySelector('[data-testid=#{locator}]')"
-    execute_script("var f = #{field}; f.dispatchEvent(new Event('change', { bubbles: true })); document.querySelector('[data-testid=#{save_testid}]').click()")
+    execute_script(<<~JS)
+      var f = #{field};
+      f.dispatchEvent(new Event('change', { bubbles: true }));
+      var save = document.querySelector('[data-testid=#{save_testid}]');
+      var wait = function (n) { return n === 0 ? Promise.resolve() : Promise.resolve().then(function () { return wait(n - 1) }) };
+      wait(5).then(function () { save.click() });
+    JS
   end
 end
