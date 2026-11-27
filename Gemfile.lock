@@ -119,7 +119,7 @@ GEM
     cuprite (0.19)
       capybara (~> 3.0)
       ferrum (~> 0.19.1)
-    database_consistency (3.1.1)
+    database_consistency (3.1.2)
       activerecord (>= 3.2)
     date (3.6.0)
     debug (1.11.1)
@@ -507,7 +507,7 @@ CHECKSUMS
   connection_pool (3.0.2) sha256=33fff5ba71a12d2aa26cb72b1db8bba2a1a01823559fb01d29eb74c286e62e0a
   crass (1.0.8) sha256=7a0145c7a2c59f8e7923b3a69ce819c444823a00a5127d805298fea13be24efe
   cuprite (0.19) sha256=e56d59db56693bdfbffd533f715df366f03285ea4435e4c31603e146e0e02518
-  database_consistency (3.1.1) sha256=79225f39eb29a447f781b298515abc0c11674c843d7ec99084556fddc4de5504
+  database_consistency (3.1.2) sha256=3f79b1f874eaae967ff298d570a2a311b28befa49d28790f007e334ab5776a78
   date (3.6.0) sha256=18ac945c4e24ebd93534f8eab8c2fd8c5604b3e977105b3798d62a1e8d27b580
   debug (1.11.1) sha256=2e0b0ac6119f2207a6f8ac7d4a73ca8eb4e440f64da0a3136c30343146e952b6
   drb (2.2.3) sha256=0b00d6fdb50995fe4a45dea13663493c841112e4068656854646f418fda13373
