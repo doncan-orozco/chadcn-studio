@@ -14,7 +14,7 @@ class Views::Themes::Index < Views::Base
           p(class: "text-muted-foreground") { @presenter.summary }
         end
         div(class: "flex items-center gap-2") do
-          render Chadcn::Button.new(as_child: :a, href: new_theme_path(anchor: "describe"), variant: "outline") { "Describe a theme" } if @presenter.describable?
+          render Components::Editor::DescribeLink.new if @presenter.describable?
           render Chadcn::Button.new(as_child: :a, href: new_theme_path, variant: @presenter.new_theme_variant) { "New theme" }
         end
       end

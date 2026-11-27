@@ -31,6 +31,24 @@ class GenerationTest < ApplicationSystemTestCase
     assert_equal "oklch(0.55 0.2 250)", themes(:slate).reload.inputs["primary"]
   end
 
+  test "Describe a theme lands on the description field, ready to type, from home and from the list" do
+    GenerateThemeJob.client = FakeGenerationClient.new
+
+    [ root_path, themes_path ].each do |entry|
+      visit entry
+      click_on "Describe a theme"
+
+      assert_selector :field, "Describe a theme", focused: true
+      assert evaluate_script(<<~JS), "the field and the card header are in the viewport"
+        (() => {
+          const field = document.getElementById(#{Components::Editor::GenerationPanel::PROMPT_ID.to_json}).getBoundingClientRect()
+          const card = document.getElementById("describe").getBoundingClientRect()
+          return field.bottom <= window.innerHeight && card.top >= 0
+        })()
+      JS
+    end
+  end
+
   test "a theme can be generated from where a new theme starts" do
     GenerateThemeJob.client = FakeGenerationClient.new
     visit root_path

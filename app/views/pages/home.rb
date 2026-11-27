@@ -24,7 +24,7 @@ class Views::Pages::Home < Views::Base
   def actions
     div(class: "flex flex-wrap items-center gap-3") do
       render Chadcn::Button.new(as_child: :a, href: new_theme_path) { "Create theme" }
-      render Chadcn::Button.new(as_child: :a, href: new_theme_path(anchor: "describe"), variant: "outline") { "Describe a theme" } if @presenter.describable?
+      render Components::Editor::DescribeLink.new if @presenter.describable?
     end
   end
 
