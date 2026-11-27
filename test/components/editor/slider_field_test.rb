@@ -38,6 +38,29 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
     assert_not_includes html, "editor--slider-number"
   end
 
+  test "a slider with speak wires the controller that says its value" do
+    html = render_field(speak: Components::Editor::SliderField::Speech.new(scale: 100, unit: "%"))
+
+    assert_includes html, 'data-controller="editor--slider-speech"'
+    assert_includes html, 'data-editor--slider-speech-scale-value="100"'
+    assert_includes html, 'data-editor--slider-speech-unit-value="%"'
+    assert_includes html, 'data-editor--slider-speech-target="slider"'
+    assert_includes html, "chadcn--slider:value-change->editor--slider-speech#mirror"
+    assert_includes html, 'aria-label="Corner radius"'
+  end
+
+  test "speak and unit cannot be combined" do
+    assert_raises(ArgumentError) { render_field(unit: "rem", speak: Components::Editor::SliderField::Speech.new(digits: 1)) }
+  end
+
+  test "a misspelled speech option fails loudly" do
+    assert_raises(ArgumentError) { Components::Editor::SliderField::Speech.new(digit: 1) }
+  end
+
+  test "a slider without speak wires nothing" do
+    assert_not_includes render_field, "slider-speech"
+  end
+
   private
 
   def render_field(**options) = Components::Editor::SliderField.new(**SLIDER, **options).call

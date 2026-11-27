@@ -3,25 +3,38 @@
 # A labelled `Chadcn::Slider` wired to the preview controller: `value-change` while it moves (live preview, no request),
 # `value-commit` on release (derivation request).
 class Components::Editor::SliderField < Components::Base
+  # How a thumb says its value: the slider value times `scale`, rounded to `digits`, followed by `unit` (0.488 as "48.8%").
+  Speech = Data.define(:scale, :digits, :unit) do
+    def initialize(scale: 1, digits: 0, unit: "") = super
+
+    def data
+      { controller: "editor--slider-speech", editor__slider_speech_scale_value: scale, editor__slider_speech_digits_value: digits, editor__slider_speech_unit_value: unit }
+    end
+  end
   ACTIONS = {
     live: "chadcn--slider:value-change->editor--preview#slide chadcn--slider:value-commit->editor--preview#commit",
     commit: "chadcn--slider:value-commit->editor--preview#commit"
   }.freeze
   MIRROR = "chadcn--slider:value-change->editor--slider-number#mirror"
+  SPEAK = "chadcn--slider:value-change->editor--slider-speech#mirror"
   DETACHED_FORM_SUFFIX = "-number-form"
 
-  def initialize(id:, label:, value:, min:, max:, step:, channel: nil, live: true, name: nil, unit: nil)
+  def initialize(id:, label:, value:, min:, max:, step:, channel: nil, live: true, name: nil, unit: nil, speak: nil)
+    raise ArgumentError, "speak: and unit: are exclusive (a unit already speaks its value)" if speak && unit
+
     @id = id
     @label = label
     @channel = channel
     @live = live
     @unit = unit
+    @speak = speak
     @value = value.is_a?(Float) && value == value.floor ? value.to_i : value
     @range = { min: min, max: max, step: step }
     @slider = { default_value: [ @value ], name: name, **@range }
   end
 
   def view_template
+    return div(class: "grid gap-2", data: @speak.data) { field } if @speak
     return field unless @unit
 
     div(class: "grid gap-2", data: { controller: "editor--slider-number", editor__slider_number_unit_value: @unit }) { field }
@@ -58,7 +71,8 @@ class Components::Editor::SliderField < Components::Base
   end
 
   def slider_attributes
-    attributes = { editor__slider_number_target: ("slider" if @unit), action: [ ACTIONS.fetch(@live ? :live : :commit), (MIRROR if @unit) ].compact.join(" "), testid: @id }
+    attributes = { editor__slider_number_target: ("slider" if @unit), editor__slider_speech_target: ("slider" if @speak), testid: @id,
+                   action: [ ACTIONS.fetch(@live ? :live : :commit), (MIRROR if @unit), (SPEAK if @speak) ].compact.join(" ") }
     return attributes unless @channel
 
     attributes.merge(editor__preview_target: @channel, editor__preview_channel_param: @channel)
