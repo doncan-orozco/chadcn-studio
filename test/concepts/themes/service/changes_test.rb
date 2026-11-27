@@ -12,7 +12,7 @@ class Themes::Service::ChangesTest < ActiveSupport::TestCase
   test "only the tracked inputs that moved are named" do
     changes = changes({ "primary" => "a", "radius" => "1rem" }, { "primary" => "b", "radius" => "1rem", "tint" => "0.2" })
 
-    assert_equal %w[primary tint], changes.inputs
+    assert_equal %w[primary tint], changes.moved_inputs
   end
 
   test "pinned and unpinned variables are named once across light and dark" do

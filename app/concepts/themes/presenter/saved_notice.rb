@@ -23,7 +23,7 @@ class Themes::Presenter::SavedNotice < Core::Presenter::Base
   def phrases
     @phrases ||= [
       (@changes.renamed_from && "renamed from #{@changes.renamed_from}"),
-      *@changes.inputs.map { |key| "#{key} changed" },
+      *@changes.moved_inputs.map { |key| "#{key} changed" },
       *@changes.pinned.map { |variable| "#{variable} pinned" },
       *@changes.unpinned.map { |variable| "#{variable} unpinned" }
     ].compact

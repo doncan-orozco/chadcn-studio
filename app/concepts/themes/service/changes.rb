@@ -5,22 +5,23 @@
 class Themes::Service::Changes
   TRACKED_INPUTS = %w[primary tint radius].freeze
 
-  attr_reader :renamed_from, :inputs, :pinned, :unpinned
+  attr_reader :renamed_from, :moved_inputs, :pinned, :unpinned
 
   def self.snapshot(theme) = { name: theme.name, inputs: theme.inputs.to_h.deep_dup }
 
   def self.between(before:, after:) = new(before: before, after: after)
+  private_class_method :new
 
   def initialize(before:, after:)
     @renamed_from = before[:name] unless before[:name] == after[:name]
-    @inputs = TRACKED_INPUTS.reject { |key| before[:inputs][key] == after[:inputs][key] }
+    @moved_inputs = TRACKED_INPUTS.reject { |key| before[:inputs][key] == after[:inputs][key] }
     pins_before = pins_in(before[:inputs]["overrides"])
     pins_after = pins_in(after[:inputs]["overrides"])
     @pinned = variables(pins_after.reject { |key, value| pins_before[key] == value })
     @unpinned = variables(pins_before.except(*pins_after.keys))
   end
 
-  def empty? = renamed_from.nil? && inputs.empty? && pinned.empty? && unpinned.empty?
+  def empty? = renamed_from.nil? && moved_inputs.empty? && pinned.empty? && unpinned.empty?
 
   private
 

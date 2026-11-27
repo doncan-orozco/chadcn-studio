@@ -14,14 +14,14 @@ class Themes::Presenter::SavedNoticeTest < ActiveSupport::TestCase
   end
 
   test "changed inputs, pinned and unpinned variables are named" do
-    assert_equal "Zinc saved: radius changed, border pinned, ring unpinned", notice(inputs: %w[radius], pinned: %w[border], unpinned: %w[ring])
+    assert_equal "Zinc saved: radius changed, border pinned, ring unpinned", notice(moved_inputs: %w[radius], pinned: %w[border], unpinned: %w[ring])
   end
 
   test "more than three changes are counted" do
-    assert_equal "Zinc saved: renamed from Old, primary changed, tint changed, 1 more", notice(renamed_from: "Old", inputs: %w[primary tint radius])
+    assert_equal "Zinc saved: renamed from Old, primary changed, tint changed, 1 more", notice(renamed_from: "Old", moved_inputs: %w[primary tint radius])
   end
 
   private
 
-  def notice(**changes) = Themes::Presenter::SavedNotice.new(@theme, changes: Struct.new(:renamed_from, :inputs, :pinned, :unpinned).new(*{ renamed_from: nil, inputs: [], pinned: [], unpinned: [] }.merge(changes).values_at(:renamed_from, :inputs, :pinned, :unpinned))).to_s
+  def notice(**changes) = Themes::Presenter::SavedNotice.new(@theme, changes: Struct.new(:renamed_from, :moved_inputs, :pinned, :unpinned).new(*{ renamed_from: nil, moved_inputs: [], pinned: [], unpinned: [] }.merge(changes).values_at(:renamed_from, :moved_inputs, :pinned, :unpinned))).to_s
 end
