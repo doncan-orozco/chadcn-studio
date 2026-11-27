@@ -33,12 +33,12 @@ class GalleryControllerTest < ActionDispatch::IntegrationTest
     assert_includes html, %(id="#{entries.last.component}")
   end
 
-  test "each entry shows its title and scenario count, under alphabetical letter groups" do
+  test "each entry shows its title, with no scenario count, under alphabetical letter groups" do
     get gallery_path
 
     Chadcn::Catalog.entries.each do |entry|
       assert_select "section##{entry.component} h3", text: entry.title
-      assert_select "section##{entry.component} span", text: /\A#{entry.scenario_count} scenarios?\z/
+      assert_select "section##{entry.component} span", text: /scenario/i, count: 0
     end
     letters = css_select("section[aria-label^='Components starting'] > h2").map { |heading| heading.text.strip }
 
@@ -46,11 +46,16 @@ class GalleryControllerTest < ActionDispatch::IntegrationTest
     assert_equal letters.uniq, letters
   end
 
-  test "the scenario label is singular for one scenario" do
+  test "the page does not promise scenarios it does not show" do
+    get gallery_path
+
+    assert_no_match(/\d+ scenarios?/, response.body)
+  end
+
+  test "the presenter groups and anchors a single entry" do
     entry = Chadcn::Catalog::Entry.new(component: "solo", title: "Solo", scenario_id: "x", scenario_count: 1, tree: { "c" => "_div" }.freeze)
     presenter = Gallery::Presenter::Index.new(entries: [ entry ])
 
-    assert_equal "1 scenario", presenter.scenario_label(entry)
     assert_equal [ "S" ], presenter.groups.map(&:letter)
     assert_equal "#solo", presenter.anchor_href(entry)
   end

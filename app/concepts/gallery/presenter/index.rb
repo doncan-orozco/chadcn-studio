@@ -14,7 +14,6 @@ class Gallery::Presenter::Index
   def entries = @entries
   def anchor(entry) = entry.component
   def anchor_href(entry) = "##{anchor(entry)}"
-  def scenario_label(entry) = "#{entry.scenario_count} #{entry.scenario_count == 1 ? 'scenario' : 'scenarios'}"
 
   def groups
     @groups ||= @entries.group_by { |entry| entry.title[0].upcase }.map do |letter, entries|
