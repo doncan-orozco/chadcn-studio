@@ -1,11 +1,14 @@
 # frozen_string_literal: true
 
 class Views::Themes::Show < Views::Base
+  include Phlex::Rails::Helpers::ContentFor
+
   def initialize(presenter)
     @presenter = presenter
   end
 
   def view_template
+    content_for(:title, @presenter.document_title)
     div(class: "mx-auto max-w-4xl space-y-6 p-6") do
       header(class: "flex items-center justify-between gap-4") do
         div do

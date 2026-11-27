@@ -1,6 +1,8 @@
 # frozen_string_literal: true
 
 class Views::Themes::New < Views::Base
+  include Phlex::Rails::Helpers::ContentFor
+
   PRIMARY_EXAMPLE = "#1d4ed8"
   private_constant :PRIMARY_EXAMPLE
 
@@ -10,6 +12,7 @@ class Views::Themes::New < Views::Base
   end
 
   def view_template
+    content_for(:title, Core::Presenter::Base.document_title("New theme"))
     div(class: "mx-auto max-w-xl space-y-6 p-6") do
       h1(class: "text-2xl font-semibold tracking-tight") { "New theme" }
       render Chadcn::Card.new do |card|
