@@ -76,7 +76,7 @@ export default class extends Controller {
     this.modeValue = event.detail.checked ? "dark" : "light"
   }
 
-  // `editor--color:picked`: a color chosen in the native picker, already converted to oklch.
+  // `editor--color:picked`: a color chosen in the picker or typed as hex; the server converts it and keeps the hex.
   pick(event) {
     this.markDirty()
     this.primaryFieldTarget.value = event.detail.primary

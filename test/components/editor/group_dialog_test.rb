@@ -19,6 +19,12 @@ class Components::Editor::GroupDialogTest < ActiveSupport::TestCase
     %w[brand radius advanced].each { |key| refute_includes html.(key), "editor--panel-link", key }
   end
 
+  test "the inline brand group tells what Save does after the live changes" do
+    html = render_dialog(Themes::Presenter::Group.new(themes(:zinc), key: "brand"))
+
+    assert_includes html, "Changes show live; Save keeps them."
+  end
+
   test "the Advanced entry carries the trigger id the links name" do
     assert_includes render_dialog(Themes::Presenter::Group.new(themes(:zinc), key: "advanced")), 'id="group-advanced-trigger"'
   end
