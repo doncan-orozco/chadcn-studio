@@ -212,7 +212,8 @@ class EditorTest < ApplicationSystemTestCase
 
   test "the editor offers Delete beside the other actions and it returns to the list" do
     visit edit_theme_path(themes(:zinc))
-    accept_confirm { find("button[aria-label='Delete Zinc']").click }
+    find("button[aria-label='Delete Zinc']").click
+    within("[role=alertdialog]") { click_button "Delete Zinc" }
 
     assert_current_path themes_path
     assert_no_selector :testid, "theme-card", text: "Zinc"

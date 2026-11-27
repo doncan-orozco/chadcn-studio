@@ -4,7 +4,7 @@ class Components::Themes::DeleteButtonTest < ActiveSupport::TestCase
   test "renders a DELETE form with a CSRF token and a button named after the theme" do
     page = render_button(label: "Delete Zinc")
 
-    assert page.at_css("form[action='/themes/#{themes(:zinc).id}'][data-turbo-confirm] input[name=_method][value=delete]")
+    assert page.at_css("form[action='/themes/#{themes(:zinc).id}'] input[name=_method][value=delete]")
     assert page.at_css("form input[name=authenticity_token]")
     assert_equal "Delete", page.at_css("button[aria-label='Delete Zinc']").text
   end
