@@ -73,7 +73,27 @@ class ExportsTest < ApplicationSystemTestCase
     link.click
 
     assert_selector :testid, "download-css-status", text: "Downloaded theme.css"
-    assert_selector :testid, "download-css-status", text: "", exact_text: true, visible: :all, wait: 5
+    click_on "Copy"
+
+    assert_selector :testid, "import-copy", text: "Copied"
+    assert_selector :testid, "import-copy", text: "Copy", exact_text: true, wait: 5
+    assert_selector :testid, "download-css-status", text: "Downloaded theme.css"
+  end
+
+  test "the download line goes away when the dialog closes" do
+    visit edit_theme_path(themes(:slate))
+
+    click_on "Export"
+    find(:testid, "download-css").click
+
+    assert_selector :testid, "download-css-status", text: "Downloaded theme.css"
+    send_keys :escape
+
+    assert_no_selector :testid, "export-panel"
+    click_on "Export"
+
+    assert_selector :testid, "download-css"
+    assert_no_selector :testid, "download-css-status", text: "Downloaded", visible: :all
   end
 
   test "unpublishing takes the theme off its URL" do
