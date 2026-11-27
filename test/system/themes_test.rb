@@ -167,7 +167,8 @@ class ThemesTest < ApplicationSystemTestCase
 
     assert_selector :testid, "deleted-status", text: "Zinc deleted"
     assert_equal "status", find(:testid, "deleted-status")[:role]
-    assert_no_text "Theme deleted", wait: 10 # Capybara waits out the toast's lifetime; the status is the lasting one
+    assert_no_text "Theme deleted" # no toast says it a second time, in other words
+    assert_selector :testid, "deleted-status", count: 1
 
     assert_selector :testid, "deleted-status", text: "Zinc deleted"
   end

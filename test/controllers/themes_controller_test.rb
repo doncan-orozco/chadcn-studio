@@ -207,6 +207,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_difference("Theme.count", -1) { delete theme_path(themes(:zinc)) }
 
     assert_redirected_to themes_path
+    assert_nil flash[:notice], "a delete must not also toast"
   end
 
   test "after DELETE the list names the deleted theme in a status, once" do
@@ -214,6 +215,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     follow_redirect!
 
     assert_select "[role=status][data-testid=deleted-status]", text: "Zinc deleted"
+    assert_not_includes response.body, "Theme deleted"
 
     get themes_path
 
