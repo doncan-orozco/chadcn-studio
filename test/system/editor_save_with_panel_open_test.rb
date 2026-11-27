@@ -7,6 +7,7 @@ class EditorSaveWithPanelOpenTest < ApplicationSystemTestCase
 
   test "one click on Save with the Radius panel open saves the stepped radius" do
     find(:testid, "group-radius").click
+
     assert_selector :testid, "group-radius-panel"
     execute_script(<<~JS)
       var thumb = document.querySelector('[data-testid=radius] [role=slider]');
