@@ -42,7 +42,7 @@ class Components::Editor::ExportDialog::BodyTest < ActiveSupport::TestCase
     sharing = Exports::Presenter::Sharing.new(themes(:zinc), base_url: "https://studio.test")
     row = Nokogiri::HTML.fragment(ApplicationController.render(Components::Editor::ExportDialog::Body.new(presenter: sharing, compact: true), layout: false))
 
-    assert row.at_css("input[name=variant][value=compact]")
-    assert_nil render_body(themes(:zinc)).at_css("input[name=variant]")
+    assert row.at_css("input[name=trigger][value=row]")
+    assert_nil render_body(themes(:zinc)).at_css("input[name=trigger]")
   end
 end

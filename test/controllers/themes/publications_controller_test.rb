@@ -73,7 +73,7 @@ class Themes::PublicationsControllerTest < ActionDispatch::IntegrationTest
   end
 
   test "publishing from a row's dialog keeps the row's compact, named trigger" do
-    post theme_publication_path(themes(:zinc)), params: { from: "export_dialog", variant: "compact" }, as: :turbo_stream
+    post theme_publication_path(themes(:zinc)), params: { from: "export_dialog", trigger: "row" }, as: :turbo_stream
 
     assert_select "turbo-stream[target=?] button[aria-label=?]", Components::Editor::ExportDialog.host_id(themes(:zinc).id), "Export Zinc"
   end

@@ -5,8 +5,8 @@ class Components::Editor::ExportDialog::Body < Components::Base
   include Phlex::Rails::Helpers::FormAuthenticityToken
 
   ORIGIN = "export_dialog"
-  # The publish form says which trigger its dialog came from, so the response rebuilds that very trigger.
-  COMPACT = "compact"
+  # The publish form says which trigger its dialog came from (`trigger=row`), so the response rebuilds that very trigger.
+  TRIGGER_ROW = "row"
 
   def initialize(presenter:, compact: false)
     @presenter = presenter
@@ -23,7 +23,7 @@ class Components::Editor::ExportDialog::Body < Components::Base
     form(action: @presenter.publication_path, method: "post", class: "grid gap-3", data: { testid: "export-draft" }) do
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
       input(type: "hidden", name: "from", value: ORIGIN)
-      input(type: "hidden", name: "variant", value: COMPACT) if @compact
+      input(type: "hidden", name: "trigger", value: TRIGGER_ROW) if @compact
       p(class: "text-sm text-muted-foreground") { "This theme is a draft. Publish it to get its download links and import command." }
       render Chadcn::Button.new(type: "submit", data: { testid: "export-publish" }) { "Publish and show import command" }
     end
