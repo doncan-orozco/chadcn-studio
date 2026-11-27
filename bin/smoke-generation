@@ -1,0 +1,53 @@
+#!/usr/bin/env ruby
+# One live generation against the Anthropic API (costs money, needs ANTHROPIC_API_KEY). Never writes to the database.
+# Usage: ANTHROPIC_API_KEY=... bin/smoke-generation   Exit: 0 ok, 1 refused/unavailable/invalid/no cache read, 2 refused to run.
+ENV["RAILS_ENV"] ||= "development"
+require_relative "../config/environment"
+
+def abort_unless(condition, message, status: 1)
+  return if condition
+
+  warn "FAIL: #{message}"
+  exit status
+end
+
+abort_unless !Rails.env.test?, "refusing to run in the test environment", status: 2
+abort_unless ENV["ANTHROPIC_API_KEY"].present?, "ANTHROPIC_API_KEY is not set", status: 2
+
+PROMPT = "warm editorial, terracotta, soft corners".freeze
+client = Generations::Service::Client.new(client: Anthropic::Client.new(timeout: Generations::Service::Client::TIMEOUT))
+
+results = 2.times.map do |index|
+  result = begin
+    client.palette_inputs(prompt: PROMPT)
+  rescue Generations::Transient => error
+    warn "FAIL: call #{index + 1} unavailable (#{error.message})"
+    exit 1
+  end
+  usage = result.usage
+  puts "call #{index + 1}: status=#{result.status} refusal=#{result.refusal_category.inspect} " \
+       "input=#{usage&.input_tokens} output=#{usage&.output_tokens} " \
+       "cache_creation=#{usage.try(:cache_creation_input_tokens)} cache_read=#{usage&.cache_read_input_tokens}"
+  abort_unless result.ok?, "call #{index + 1} ended #{result.status}"
+  result
+end
+
+puts "model: #{Generations::Service::Client::MODEL}  date: #{Time.now.utc.iso8601}"
+puts "inputs: #{results.first.inputs.to_json}"
+
+# The mapping of Generations::Operation::Complete#theme_inputs (private there; that operation also writes the database).
+raw = results.first.inputs
+primary = raw.fetch("primary")
+inputs = {
+  primary: Themes::Oklch.new(primary.fetch("l"), primary.fetch("c"), primary.fetch("h")).to_s,
+  tint: raw["tint"], radius: "#{raw['radius_rem']}rem", chart_offsets: raw["chart_offsets"]
+}.compact
+outcome = Themes::Operation::Derive.new.call(inputs: inputs)
+abort_unless outcome.success?, "derive failed: #{outcome.failure.inspect}"
+payload = outcome.value!
+report = Chadcn::Theme.validate(payload[:palette], strict: true)
+abort_unless report[:errors].empty?, "strict validation: #{report[:errors].inspect}"
+puts "repairs: #{payload[:repairs].inspect}  warnings: #{report[:warnings].size}"
+
+abort_unless results.last.usage&.cache_read_input_tokens.to_i.positive?, "second call shows no cache read"
+puts "SMOKE OK"
