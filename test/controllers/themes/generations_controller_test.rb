@@ -82,7 +82,7 @@ class Themes::GenerationsControllerTest < ActionDispatch::IntegrationTest
     get edit_theme_path(themes(:zinc))
 
     assert_select "[data-testid=generation-form]", count: 0
-    assert_select "#generation_status", text: /not set up/
+    assert_select "#generation_status", text: /ANTHROPIC_API_KEY/
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
   end

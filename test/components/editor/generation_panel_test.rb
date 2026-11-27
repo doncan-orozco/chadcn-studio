@@ -6,7 +6,7 @@ class Components::Editor::GenerationPanelTest < ActiveSupport::TestCase
 
     assert_no_match(/<input[^>]* disabled[ >=]/, html)
     assert_no_match(/<button[^>]* disabled[ >=]/, html)
-    assert_no_match(/not set up/, html)
+    assert_no_match(/ANTHROPIC_API_KEY/, html)
     assert_includes html, "turbo-cable-stream-source"
   end
 
@@ -17,7 +17,7 @@ class Components::Editor::GenerationPanelTest < ActiveSupport::TestCase
     assert_no_match(/turbo-cable-stream-source/, html)
     assert_no_match(/<input/, html)
     assert_no_match(/data-testid="generate"/, html)
-    assert_includes html, "Generation is not set up in this studio."
+    assert_includes html, "set ANTHROPIC_API_KEY and restart the studio"
     assert_includes html, 'id="generation_status"'
   end
 

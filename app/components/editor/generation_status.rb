@@ -2,7 +2,8 @@
 
 # The status of a generation: pending, done or failed with its reason. Always renders the `generation_status` target
 # so a stream can replace it. The model's text is plain text (llm-generation R8). A failure is a destructive alert under
-# the field that keeps the description and offers the way on: try again, or pick the primary color by hand. Both actions are buttons that forward to the control that already exists.
+# the field that keeps the description and offers the way on: try again, or pick the primary color by hand. A studio
+# without an API key says how to turn generation on as one muted line, never as an error. Both actions are buttons that forward to the control that already exists.
 class Components::Editor::GenerationStatus < Components::Base
   # The prompt field (its form holds the CSRF token a streamed fragment cannot carry) and the Brand group's dialog
   # trigger (Components::Editor::GroupDialog, keyed by the group's panel_id), which the two actions hand the click to.
@@ -16,7 +17,7 @@ class Components::Editor::GenerationStatus < Components::Base
   end
 
   def view_template
-    failed = @status&.failed?
+    failed = @status&.failed? && !@status.setup_needed?
     div(id: "generation_status", role: failed ? nil : "status", class: classes(failed), data: { testid: "generation-status", state: @status&.state }) do
       if failed
         failure

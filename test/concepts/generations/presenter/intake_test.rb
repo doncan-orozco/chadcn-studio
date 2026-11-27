@@ -21,6 +21,6 @@ class Generations::Presenter::IntakeTest < ActiveSupport::TestCase
     assert_nil intake.title
     assert_nil intake.description
     assert_predicate intake.status, :failed?
-    assert_includes intake.status.message, "not set up"
+    assert_includes intake.status.message, "ANTHROPIC_API_KEY"
   end
 end

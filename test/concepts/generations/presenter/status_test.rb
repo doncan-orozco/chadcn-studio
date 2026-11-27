@@ -63,7 +63,9 @@ class Generations::Presenter::StatusTest < ActiveSupport::TestCase
     status = Generations::Presenter::Status.new(Generation.new, failure: :not_configured)
 
     assert_predicate status, :failed?
-    assert_equal "Generation is not set up in this studio.", status.message
+    assert_equal "Describing a theme needs an Anthropic API key: set ANTHROPIC_API_KEY and restart the studio.", status.message
+    assert_predicate status, :setup_needed?
+    assert_not_predicate Generations::Presenter::Status.new(Generation.new, failure: :throttled), :setup_needed?
   end
 
   test "a failure of the generation can be retried; one that never started or a limit cannot" do

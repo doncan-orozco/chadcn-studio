@@ -12,7 +12,7 @@ class Generations::Presenter::Status < Core::Presenter::Base
     "busy" => "A theme is already being generated. Wait for it to finish.",
     "throttled" => "Too many generations in a short time. Try again in a minute.",
     "capped" => "The studio has reached its hourly generation limit, try again later.",
-    "not_configured" => "Generation is not set up in this studio.",
+    "not_configured" => "Describing a theme needs an Anthropic API key: set ANTHROPIC_API_KEY and restart the studio.",
     "prompt" => "Describe the theme in 1 to #{PROMPT_LIMIT} characters."
   }.freeze
   private_constant :MESSAGES
@@ -51,6 +51,9 @@ class Generations::Presenter::Status < Core::Presenter::Base
 
   # A failure the person can answer by submitting the description again.
   def retryable? = failed? && UNRETRYABLE.exclude?(failure_code)
+
+  # Nothing is wrong with the description: the studio needs an operator step, so it is told as a note, not an error.
+  def setup_needed? = failed? && failure_code == "not_configured"
 
   def rationale = inputs.is_a?(Hash) ? inputs["rationale"].to_s[0, 280] : ""
 

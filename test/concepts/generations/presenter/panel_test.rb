@@ -24,7 +24,7 @@ class Generations::Presenter::PanelTest < ActiveSupport::TestCase
     panel = Generations::Presenter::Panel.new(themes(:blue), configured: false)
 
     assert_equal :failed, panel.status.state
-    assert_match(/not set up/, panel.status.message)
+    assert_match(/ANTHROPIC_API_KEY/, panel.status.message)
   end
 
   test "a studio without a key or an injected client is not configured" do
