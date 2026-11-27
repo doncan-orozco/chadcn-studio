@@ -31,6 +31,15 @@ class GenerationTest < ApplicationSystemTestCase
     assert_equal "oklch(0.55 0.2 250)", themes(:slate).reload.inputs["primary"]
   end
 
+  test "Describe a theme lands on the description field, ready to type" do
+    GenerateThemeJob.client = FakeGenerationClient.new
+    visit root_path
+    click_on "Describe a theme"
+
+    assert_selector :field, "Describe a theme", focused: true
+    assert evaluate_script("document.getElementById('generation-prompt').getBoundingClientRect().bottom <= window.innerHeight")
+  end
+
   test "a theme can be generated from where a new theme starts" do
     GenerateThemeJob.client = FakeGenerationClient.new
     visit root_path
