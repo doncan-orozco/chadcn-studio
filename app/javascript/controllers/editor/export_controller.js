@@ -8,6 +8,7 @@ export default class extends Controller {
   static values = { copiedLabel: String, downloadedLabel: String, resetMs: { type: Number, default: 2000 } }
 
   #timer = null
+  #downloadFrame = null
   #originalLabel = null
 
   connect() {
@@ -15,6 +16,9 @@ export default class extends Controller {
   }
 
   disconnect() {
+    cancelAnimationFrame(this.#downloadFrame)
+    this.#downloadFrame = null
+    if (this.hasDownloadStatusTarget) this.downloadStatusTarget.textContent = ""
     this.#restore()
   }
 
@@ -30,8 +34,10 @@ export default class extends Controller {
   downloaded() {
     if (!this.hasDownloadStatusTarget) return
 
+    cancelAnimationFrame(this.#downloadFrame)
     this.downloadStatusTarget.textContent = "" // Cleared first so a repeat download is announced again.
-    requestAnimationFrame(() => {
+    this.#downloadFrame = requestAnimationFrame(() => {
+      this.#downloadFrame = null
       if (this.hasDownloadStatusTarget) this.downloadStatusTarget.textContent = this.downloadedLabelValue
     })
   }
