@@ -3,7 +3,7 @@ require "test_helper"
 class Exports::Presenter::SharingTest < ActiveSupport::TestCase
   def sharing(theme) = Exports::Presenter::Sharing.new(theme, base_url: "https://studio.test")
 
-  test "a draft offers to share a link" do
+  test "a draft offers to publish" do
     assert_equal "Publish", sharing(themes(:zinc)).publication_label
     assert_not sharing(themes(:zinc)).unpublish?
   end
