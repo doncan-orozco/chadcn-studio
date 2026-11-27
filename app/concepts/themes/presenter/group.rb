@@ -1,6 +1,6 @@
 # frozen_string_literal: true
 
-# One group of the editor sidebar (Brand color, Surfaces and text...): its label, summary and the variables it covers.
+# One group of the editor sidebar (Brand color, Backgrounds, cards and text...): its label, summary and the variables it covers.
 # The partition comes from the gem's variable set (theme-science R1); nothing here derives or validates a color.
 class Themes::Presenter::Group < Core::Presenter::Base
   COLORS = Chadcn::Theme::REQUIRED
@@ -16,7 +16,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
 
   DEFINITIONS = {
     "brand" => { label: "Brand color", description: "Pick the primary color; the rest of the palette follows.", variables: BRAND },
-    "surfaces" => { label: "Surfaces and text", description: "Backgrounds, cards, borders and the text on them.", variables: SURFACES },
+    "surfaces" => { label: "Backgrounds, cards and text", description: "Page and card backgrounds, borders and the text on them.", variables: SURFACES },
     "radius" => { label: "Radius", description: "How round corners are.", variables: RADIUS },
     "charts" => { label: "Charts", description: "The five chart colors.", variables: CHARTS },
     "sidebar" => { label: "Sidebar", description: "The sidebar mirror of the palette.", variables: SIDEBAR },
@@ -25,9 +25,17 @@ class Themes::Presenter::Group < Core::Presenter::Base
   KEYS = DEFINITIONS.keys.freeze
 
   # What a collapsed group says, in the user's words: the brand color is named from the primary, the rest say what they change.
-  SUMMARIES = { "surfaces" => "Backgrounds, cards and text", "charts" => "Five chart colors", "sidebar" => "Sidebar colors" }.freeze
+  SUMMARIES = { "surfaces" => "Page, card and border colors", "charts" => "Five chart colors", "sidebar" => "Sidebar colors" }.freeze
   # Upper bound of each hue name on the oklch wheel; pink also owns the wrap-around above the last bound.
   HUE_NAMES = [ [ 15, "pink" ], [ 40, "red" ], [ 75, "orange" ], [ 115, "yellow" ], [ 170, "green" ], [ 210, "teal" ], [ 275, "blue" ], [ 335, "purple" ] ].freeze
+  # What each variable colors, in the words of someone tuning a theme; the CSS name stays beside it for people who export.
+  VARIABLE_LABELS = {
+    "background" => "Page background", "foreground" => "Page text", "primary" => "Brand color", "primary-foreground" => "Text on brand color",
+    "border" => "Borders", "input" => "Input borders", "ring" => "Focus ring", "sidebar-border" => "Sidebar borders", "sidebar-ring" => "Sidebar focus ring", "radius" => "Corner radius"
+  }.freeze
+  # Variables that come as a surface and its text: "card" is the background, "card-foreground" the text on it.
+  SURFACE_NAMES = { "card" => "Card", "popover" => "Popover", "secondary" => "Secondary", "muted" => "Muted", "accent" => "Accent", "sidebar" => "Sidebar",
+                    "sidebar-primary" => "Sidebar brand", "sidebar-accent" => "Sidebar accent" }.freeze
   GRAY_CHROMA = 0.03
   DARK_LIGHTNESS = 0.4
   LIGHT_LIGHTNESS = 0.8
@@ -35,7 +43,7 @@ class Themes::Presenter::Group < Core::Presenter::Base
   WHITE_LIGHTNESS = 0.9
 
   Row = Data.define(:name, :light, :light_style, :dark, :dark_style)
-  Override = Data.define(:mode, :name, :derived, :value, :style, :field_name, :field_id) do
+  Override = Data.define(:mode, :name, :label, :derived, :value, :style, :field_name, :field_id) do
     def overridden? = value.present?
 
     # The derived value in the hex a person would type; the oklch string when hex cannot say it (translucent, or not a color).
@@ -154,10 +162,24 @@ class Themes::Presenter::Group < Core::Presenter::Base
     Themes::Oklch.new(0.5, 0, 0)
   end
 
+  # "Card text" for card-foreground, "Chart color 3" for chart-3; the CSS name when nothing better is known.
+  def variable_label(variable)
+    VARIABLE_LABELS.fetch(variable) do
+      stem = variable.delete_suffix("-foreground")
+      chart_number = variable[/\Achart-(\d)\z/, 1]
+      next "Chart color #{chart_number}" if chart_number
+
+      surface = SURFACE_NAMES[stem]
+      next variable unless surface
+
+      "#{surface} #{stem == variable ? 'background' : 'text'}"
+    end
+  end
+
   def swatch(value) = Themes::Presenter::Card.swatch_style(value)
 
   def override_row(mode, variable, derived)
-    Override.new(mode: mode, name: "--#{variable}", derived: derived, value: stored_overrides(mode)[variable].to_s,
+    Override.new(mode: mode, name: "--#{variable}", label: variable_label(variable), derived: derived, value: stored_overrides(mode)[variable].to_s,
                  style: swatch(derived), field_name: "theme[inputs][overrides][#{mode}][#{variable}]", field_id: "override-#{mode}-#{variable}")
   end
 

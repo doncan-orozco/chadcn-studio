@@ -12,6 +12,14 @@ class Components::Editor::AdvancedOverridesTest < ActiveSupport::TestCase
     assert_equal @group.overrides("light").size + @group.overrides("dark").size, names.size
   end
 
+  test "each field is labelled in words with the CSS name beside it" do
+    page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
+    label = page.find("label[for='override-light-border']")
+
+    assert_includes label.text, "Borders"
+    assert_includes label.find("span.font-mono").text, "--border"
+  end
+
   test "each field has a decorative swatch wired to the swatch controller" do
     page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
     rows = @group.overrides("light").size + @group.overrides("dark").size
