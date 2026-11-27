@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 class Views::Pages::Home < Views::Base
-  ROW_LINK = "flex min-h-8 w-full items-center gap-3 rounded-md px-2 text-sm font-medium hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
+  ROW_LINK = "flex min-h-8 min-w-0 flex-1 items-center gap-3 rounded-md px-2 text-sm font-medium hover:bg-accent focus-visible:ring-[3px] focus-visible:ring-ring/50 focus-visible:outline-none"
 
   def initialize(presenter)
     @presenter = presenter
@@ -32,12 +32,17 @@ class Views::Pages::Home < Views::Base
     section(class: "space-y-3") do
       h2(class: "text-lg font-semibold tracking-tight") { "Your themes" }
       ul(class: "space-y-2", aria: { label: "Your themes" }) do
-        @presenter.cards.each { |card| li { theme_row(card) } }
+        @presenter.cards.each do |card|
+          li(class: "flex items-center gap-2") do
+            theme_row(card)
+            render Components::Editor::ExportDialog.new(presenter: card.sharing(base_url: view_context.request.base_url), compact: true)
+          end
+        end
       end
     end
   end
 
-  # The whole row is the link: a swatch, the name underlined at rest, a chevron.
+  # The row's link opens the editor: a swatch, the name underlined at rest, a chevron. Export sits beside it, never inside it.
   def theme_row(card)
     a(href: card.edit_path, class: ROW_LINK) do
       span(class: "size-4 shrink-0 rounded-full border", style: card.swatches.find { |swatch| swatch.name == "primary" }&.style, aria: { hidden: "true" })

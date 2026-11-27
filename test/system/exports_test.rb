@@ -109,4 +109,28 @@ class ExportsTest < ApplicationSystemTestCase
 
     assert_selector :testid, "export-draft"
   end
+
+  test "home exports a published theme from its row without opening the editor" do
+    visit root_path
+
+    find("button[aria-label='Export Slate']").click
+    find(:testid, "download-css").click
+
+    assert_current_path root_path
+    assert_selector :testid, "download-css-status", text: "Downloaded theme.css"
+    assert_match(%r{/t/slate\.css\]\z}, find(:testid, "import-command").text)
+  end
+
+  test "the themes list exports from a card, and a draft publishes from the card's dialog" do
+    visit themes_path
+
+    find("button[aria-label='Export Zinc']").click
+    assert_selector :testid, "export-draft"
+    click_on "Publish and show import command"
+
+    assert_current_path themes_path
+    assert_selector :testid, "download-css"
+    assert_match(%r{/t/zinc\.css\]\z}, find(:testid, "import-command").text)
+    assert_predicate themes(:zinc).reload, :published?
+  end
 end

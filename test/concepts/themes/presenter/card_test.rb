@@ -34,4 +34,11 @@ class Themes::Presenter::CardTest < ActiveSupport::TestCase
     assert_equal "Published", Themes::Presenter::Card.new(themes(:slate)).status_label
     assert_match(/\ACreated \w+ \d+, \d{4}\z/, @card.created_label)
   end
+
+  test "sharing is the editor's export presenter for this theme" do
+    sharing = @card.sharing(base_url: "http://example.test")
+
+    assert_equal "Export Blue", sharing.dialog_title
+    assert_equal "http://example.test/t/blue.css", sharing.css.url
+  end
 end

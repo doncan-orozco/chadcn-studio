@@ -13,7 +13,7 @@ class Themes::PublicationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_predicate themes(:zinc).reload, :published?
-    assert_select "turbo-stream[action=replace][target=export-dialog-host] [data-testid=import-command]"
+    assert_select "turbo-stream[action=replace][target=?] [data-testid=import-command]", "export-dialog-host-#{themes(:zinc).id}"
     assert_select "turbo-stream[action=replace][target=publish-toggle-form] [data-testid=publish-toggle]", /Unpublish/
   end
 

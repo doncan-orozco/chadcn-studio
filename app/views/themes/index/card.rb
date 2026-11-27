@@ -18,11 +18,12 @@ class Views::Themes::Index::Card < Views::Base
       card.footer(class: "justify-between") do
         render Chadcn::Badge.new(variant: @card.badge_variant) { @card.status_label }
         # relative lifts only the controls above the stretched title link; the rest of the footer still opens the editor.
-        div(class: "relative flex items-center gap-2") do
+        div(class: "relative flex flex-wrap items-center justify-end gap-2") do
           # A GET-form button, not a link: the title must stay the card's only link to the editor, so this footer control submits a GET.
           form(action: @card.edit_path, method: "get") do
             render Chadcn::Button.new(type: "submit", variant: "outline", size: "sm", aria: { label: @card.edit_label }) { @card.edit_text }
           end
+          render Components::Editor::ExportDialog.new(presenter: @card.sharing(base_url: view_context.request.base_url), compact: true)
           render Components::Themes::DeleteButton.new(theme_id: @card.id, label: "Delete #{@card.name}", size: "sm")
         end
       end
