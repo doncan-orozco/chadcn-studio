@@ -8,24 +8,21 @@ export default class extends Controller {
   static targets = ["link"]
 
   connect() {
-    this.update = () => {
-      this.frame = null
-      this.#mark(this.#current())
-    }
-    this.schedule = () => {
-      if (this.frame) return
-      this.frame = requestAnimationFrame(this.update)
-    }
-    window.addEventListener("scroll", this.schedule, { passive: true })
-    window.addEventListener("resize", this.schedule, { passive: true })
     this.schedule()
   }
 
   disconnect() {
-    window.removeEventListener("scroll", this.schedule)
-    window.removeEventListener("resize", this.schedule)
     if (this.frame) cancelAnimationFrame(this.frame)
     this.frame = null
+  }
+
+  // Bound to scroll and resize by the view; one frame at a time.
+  schedule() {
+    if (this.frame) return
+    this.frame = requestAnimationFrame(() => {
+      this.frame = null
+      this.#mark(this.#current())
+    })
   }
 
   #current() {
@@ -50,7 +47,12 @@ export default class extends Controller {
   }
 
   #entryFor(link) {
-    const anchor = decodeURIComponent(link.hash.slice(1))
-    return anchor === "" ? null : document.getElementById(anchor)
+    try {
+      const anchor = decodeURIComponent(link.hash.slice(1))
+      return anchor === "" ? null : document.getElementById(anchor)
+    } catch (error) {
+      if (error instanceof URIError) return null
+      throw error
+    }
   }
 }

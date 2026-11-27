@@ -16,4 +16,14 @@ class Components::Editor::VariableFilterTest < ActiveSupport::TestCase
     assert_includes html, "input->editor--variable-filter#filter:stop"
     assert_includes html, "change->editor--variable-filter#filter:stop"
   end
+
+  test "another list can name its own field and drop the stop modifier" do
+    html = Components::Editor::VariableFilter.new(id: "x", label: "Find a thing", placeholder: "a, b...", stop: false).call
+
+    assert_includes html, 'id="x"'
+    assert_includes html, "Find a thing"
+    assert_includes html, "input->editor--variable-filter#filter "
+    assert_not_includes html, ":stop"
+    assert_includes html, "keydown.enter->editor--variable-filter#preventSubmit"
+  end
 end

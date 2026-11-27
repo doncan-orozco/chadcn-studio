@@ -44,21 +44,28 @@ class GalleryTest < ApplicationSystemTestCase
     visit gallery_path
 
     assert_selector "nav[aria-label='Components'] a[aria-current='location']", count: 1, visible: :all
-    first = find("nav[aria-label='Components'] a[aria-current='location']", visible: :all)[:href].split("#").last
+    initial_entry_id = find("nav[aria-label='Components'] a[aria-current='location']", visible: :all)[:href].split("#").last
 
+    assert_not_equal initial_entry_id, last_entry_id
     page.execute_script("document.getElementById(arguments[0]).scrollIntoView()", last_entry_id)
 
     assert_selector "nav[aria-label='Components'] a[aria-current='location'][href='##{last_entry_id}']", count: 1, visible: :all
     assert_selector "nav[aria-label='Components'] a[aria-current='location']", count: 1, visible: :all
-    assert_not_equal first, last_entry_id
   end
 
-  test "the current marker is more than color: the link carries aria-current styling classes" do
+  test "the current marker is more than color: the current link is heavier than the others" do
     visit gallery_path
 
-    link = find("nav[aria-label='Components'] a[aria-current='location']", visible: :all)
+    weights = evaluate_script(<<~JS)
+      (() => {
+        const links = [...document.querySelectorAll("nav[aria-label='Components'] a")]
+        const current = links.find((link) => link.getAttribute("aria-current") === "location")
+        const other = links.find((link) => link !== current)
+        return [current, other].map((link) => parseInt(getComputedStyle(link).fontWeight, 10))
+      })()
+    JS
 
-    assert_includes link[:class], "aria-[current=location]:font-medium"
+    assert_operator weights.first, :>, weights.last
   end
 
   test "typing in the index filter narrows the links and hides a letter with none left" do
@@ -86,7 +93,7 @@ class GalleryTest < ApplicationSystemTestCase
   private
 
   def last_entry_id
-    @last_entry_id ||= all("[data-testid='gallery-entry']", visible: :all).last[:id]
+    @last_entry_id ||= all(:testid, "gallery-entry", visible: :all).last[:id]
   end
 
   def sidebars_outside_their_card
