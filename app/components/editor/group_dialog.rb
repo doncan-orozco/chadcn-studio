@@ -55,7 +55,7 @@ class Components::Editor::GroupDialog < Components::Base
   end
 
   def panel
-    render Chadcn::Dialog::Content.new(class: PANEL, data: { testid: "#{@group.panel_id}-panel" }) do
+    render Chadcn::Dialog::Content.new(class: PANEL, close_class: Components::Editor::HitArea::CLOSE, data: { testid: "#{@group.panel_id}-panel" }) do
       render Chadcn::Dialog::Header.new do
         render(Chadcn::Dialog::Title.new { @group.label })
         render(Chadcn::Dialog::Description.new { @group.description })
@@ -112,7 +112,7 @@ class Components::Editor::GroupDialog < Components::Base
     return unless @group.values_path
 
     p(class: "pt-2 text-xs") do
-      a(href: @group.values_path, class: "underline underline-offset-4", data: { testid: "all-values-link" }) { "See all values" }
+      a(href: @group.values_path, class: "underline underline-offset-4", aria: { label: "See all values for #{@group.label}" }, data: { testid: "all-values-link" }) { "See all values" }
     end
   end
 end

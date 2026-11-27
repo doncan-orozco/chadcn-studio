@@ -11,15 +11,17 @@ class Themes::Operation::Update < Core::Operation
     super()
   end
 
+  # The payload's `changes` (Themes::Service::Changes) says what the save changed.
   def call(model:, params:)
     params = params.to_h.stringify_keys
+    before = Themes::Service::Changes.snapshot(model)
     model.name = params["name"].to_s.strip if params.key?("name")
     inputs = merged_inputs(model, (params["inputs"] || {}).to_h.stringify_keys)
     derivation = derive(model, inputs)
     model.assign_attributes(light: derivation[:palette].root, dark: derivation[:palette].dark, inputs: derivation[:inputs].deep_stringify_keys)
     model.save or fail_with_model!(model, code: :invalid)
 
-    { model: model }
+    { model: model, changes: Themes::Service::Changes.between(before: before, after: Themes::Service::Changes.snapshot(model)) }
   end
 
   private

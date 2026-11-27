@@ -53,7 +53,7 @@ class Views::Previews::Form < Views::Base
       end
       render Chadcn::Field.new do |field|
         field.label { "Volume" }
-        field.render Chadcn::Slider.new(default_value: @presenter.volume, aria: { label: "Volume" })
+        field.render Chadcn::Slider.new(default_value: @presenter.volume, label: "Volume")
       end
     end
   end

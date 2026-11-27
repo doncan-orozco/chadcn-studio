@@ -221,7 +221,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     patch theme_path(theme), params: { theme: { name: "Ocean" } }
 
     assert_redirected_to edit_theme_path(theme)
-    assert_equal "Ocean saved", flash[:notice]
+    assert_equal "Ocean saved: renamed from Zinc", flash[:notice]
   end
 
   test "GET /themes/:id/edit reads Save theme and renders the unsaved marker hidden" do
@@ -245,7 +245,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     patch theme_path(theme), params: { theme: { name: "<b>x</b>" } }
     follow_redirect!
 
-    assert_includes response.body, "&lt;b&gt;x&lt;/b&gt; saved"
+    assert_includes response.body, "&lt;b&gt;x&lt;/b&gt; saved: renamed from Zinc"
     assert_select "b", 0
   end
 end
