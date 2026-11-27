@@ -32,6 +32,45 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_includes response.body, "No themes yet"
   end
 
+  test "GET /themes does not offer describing a theme while generation is off" do
+    key = ENV.delete("ANTHROPIC_API_KEY")
+    get themes_path
+
+    assert_select "main a", text: "Describe a theme", count: 0
+  ensure
+    ENV["ANTHROPIC_API_KEY"] = key if key
+  end
+
+  test "GET /themes offers describing a theme once generation is configured" do
+    GenerateThemeJob.client = FakeGenerationClient.new
+    get themes_path
+
+    assert_select "main a[href=?]", new_theme_path(anchor: "describe"), text: "Describe a theme"
+  ensure
+    GenerateThemeJob.client = nil
+  end
+
+  test "GET /themes/new shows only the not-set-up line while generation is off" do
+    key = ENV.delete("ANTHROPIC_API_KEY")
+    get new_theme_path
+
+    assert_select "#describe #generation_status", text: /not set up/
+    assert_select "#describe form", count: 0
+    assert_select "#describe input, #describe button", count: 0
+  ensure
+    ENV["ANTHROPIC_API_KEY"] = key if key
+  end
+
+  test "GET /themes/new offers the prompt and Generate once generation is configured" do
+    GenerateThemeJob.client = FakeGenerationClient.new
+    get new_theme_path
+
+    assert_select "#describe form input[name=?]:not([disabled])", "generation[prompt]"
+    assert_select "#describe button[data-testid=generate]:not([disabled])"
+  ensure
+    GenerateThemeJob.client = nil
+  end
+
   test "GET /themes/new asks for a name and a primary color" do
     get new_theme_path
 

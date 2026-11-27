@@ -22,6 +22,11 @@ class Themes::Presenter::ListTest < ActiveSupport::TestCase
     assert_equal "default", Themes::Presenter::List.new(Theme.none).new_theme_variant
   end
 
+  test "describing a theme is offered only when generation is configured" do
+    assert_predicate Themes::Presenter::List.new(Theme.all, configured: true), :describable?
+    refute_predicate Themes::Presenter::List.new(Theme.all, configured: false), :describable?
+  end
+
   test "one theme is singular" do
     assert_equal "1 theme, newest first.", Themes::Presenter::List.new(Theme.where(slug: "zinc")).summary
   end
