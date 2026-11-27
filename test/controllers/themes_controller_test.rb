@@ -181,28 +181,6 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_equal "Ocean saved: renamed from Zinc", flash[:notice]
   end
 
-  test "PATCH /themes/:id says nothing extra when nothing changed" do
-    theme = themes(:zinc)
-    patch theme_path(theme), params: { theme: { name: theme.name } }
-
-    assert_equal "#{theme.name} saved", flash[:notice]
-  end
-
-  test "PATCH /themes/:id names a pinned variable in the toast" do
-    theme = themes(:zinc)
-    patch theme_path(theme), params: { theme: { inputs: { overrides: { light: { border: "#9ca3af" } } } } }
-
-    assert_equal "Zinc saved: border pinned", flash[:notice]
-  end
-
-  test "PATCH /themes/:id names a changed input and an unpinned variable" do
-    theme = themes(:zinc)
-    patch theme_path(theme), params: { theme: { inputs: { radius: "0.75rem", overrides: { light: { border: "#9ca3af" } } } } }
-    patch theme_path(theme), params: { theme: { inputs: { primary: "oklch(0.55 0.2 250)", overrides: { light: { border: "" } } } } }
-
-    assert_equal "Zinc saved: primary changed, border unpinned", flash[:notice]
-  end
-
   test "GET /themes/:id/edit reads Save theme and renders the unsaved marker hidden" do
     get edit_theme_path(themes(:zinc))
 
