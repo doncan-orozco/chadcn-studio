@@ -6,8 +6,7 @@ class Components::Editor::GenerationPanel < Components::Base
   include Phlex::Rails::Helpers::FormAuthenticityToken
   include Phlex::Rails::Helpers::TurboStreamFrom
 
-  # The prompt field's id: the "Describe a theme" links point their fragment at it, so arriving scrolls it into view and the
-  # browser focuses it (those links skip Turbo, which would only scroll).
+  # The prompt field's id: Components::Editor::DescribeLink points its fragment at it.
   PROMPT_ID = "generation-prompt"
 
   # `primary` makes Generate the page's filled button: the editor keeps Save as its own, so there it stays an outline.
@@ -36,10 +35,11 @@ class Components::Editor::GenerationPanel < Components::Base
 
   def status = @panel.status
 
+  # scroll-mt-32 keeps the label and the card header above the field when a fragment link lands on it.
   def prompt_attributes
     attributes = {
       id: PROMPT_ID, name: @panel.prompt_param, maxlength: @panel.prompt_limit, required: true,
-      placeholder: @panel.prompt_placeholder, default_value: @panel.prompt, class: "w-80", aria: { describedby: "generation_status" }
+      placeholder: @panel.prompt_placeholder, default_value: @panel.prompt, class: "w-80 scroll-mt-32", aria: { describedby: "generation_status" }
     }
     attributes[:aria][:invalid] = "true" if status&.failed?
     attributes
