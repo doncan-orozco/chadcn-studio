@@ -1,7 +1,7 @@
 # frozen_string_literal: true
 
 # The toast after a save: "Ocean saved: primary changed, border pinned". Says what this save changed, not only whose theme it was.
-# `changes` is the Update operation's account of the save (`renamed_from`, `inputs`, `pinned`, `unpinned`).
+# `changes` is the Update operation's account of the save (a Themes::Service::Changes).
 class Themes::Presenter::SavedNotice < Core::Presenter::Base
   MAX_NAMED_CHANGES = 3
 
@@ -22,10 +22,10 @@ class Themes::Presenter::SavedNotice < Core::Presenter::Base
 
   def phrases
     @phrases ||= [
-      (@changes[:renamed_from] && "renamed from #{@changes[:renamed_from]}"),
-      *@changes[:inputs].map { |key| "#{key} changed" },
-      *@changes[:pinned].map { |variable| "#{variable} pinned" },
-      *@changes[:unpinned].map { |variable| "#{variable} unpinned" }
+      (@changes.renamed_from && "renamed from #{@changes.renamed_from}"),
+      *@changes.inputs.map { |key| "#{key} changed" },
+      *@changes.pinned.map { |variable| "#{variable} pinned" },
+      *@changes.unpinned.map { |variable| "#{variable} unpinned" }
     ].compact
   end
 end

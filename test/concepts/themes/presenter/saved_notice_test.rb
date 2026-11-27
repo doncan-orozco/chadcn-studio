@@ -23,5 +23,5 @@ class Themes::Presenter::SavedNoticeTest < ActiveSupport::TestCase
 
   private
 
-  def notice(**changes) = Themes::Presenter::SavedNotice.new(@theme, changes: { renamed_from: nil, inputs: [], pinned: [], unpinned: [] }.merge(changes)).to_s
+  def notice(**changes) = Themes::Presenter::SavedNotice.new(@theme, changes: Struct.new(:renamed_from, :inputs, :pinned, :unpinned).new(*{ renamed_from: nil, inputs: [], pinned: [], unpinned: [] }.merge(changes).values_at(:renamed_from, :inputs, :pinned, :unpinned))).to_s
 end

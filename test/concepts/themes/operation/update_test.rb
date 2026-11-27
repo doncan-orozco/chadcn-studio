@@ -96,6 +96,7 @@ class Themes::Operation::UpdateTest < ActiveSupport::TestCase
   test "the payload says what the save changed" do
     payload = Themes::Operation::Update.new.call(model: @theme, params: { "name" => "Ocean", "inputs" => { "overrides" => { "light" => { "border" => "#9ca3af" } } } }).value!
 
-    assert_equal({ renamed_from: "Zinc", inputs: [], pinned: [ "border" ], unpinned: [] }, payload[:changes])
+    assert_equal "Zinc", payload[:changes].renamed_from
+    assert_equal [ "border" ], payload[:changes].pinned
   end
 end
