@@ -29,8 +29,8 @@ class ThemesController < ApplicationController
     result = Themes::Operation::Update.new.call(model: theme, params: update_params.to_h)
 
     if result.success?
-      saved = result.value![:model]
-      redirect_to edit_theme_path(saved), notice: "#{saved.name} saved"
+      payload = result.value!
+      redirect_to edit_theme_path(payload[:model]), notice: Themes::Presenter::SavedNotice.new(payload[:model], changes: payload[:changes]).to_s
     else
       render Views::Themes::Edit.new(Themes::Presenter::Editor.new(result.failure[:model])), status: :unprocessable_entity
     end
@@ -50,7 +50,7 @@ class ThemesController < ApplicationController
 
   private
 
-  def theme = Theme.find(params[:id])
+  def theme = @theme ||= Theme.find(params[:id])
 
   def create_params = params.expect(theme: %i[name primary]).to_h.symbolize_keys.slice(:name, :primary)
 
