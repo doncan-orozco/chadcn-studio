@@ -26,6 +26,10 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
     assert_includes html, "chadcn--slider:value-change->editor--slider-number#mirror"
   end
 
+  test "the slider shrinks with its row instead of pushing past it" do
+    assert_match(/<span[^>]*class="[^"]*\bmin-w-0\b[^"]*\bflex-1\b/, render_field(unit: "rem"))
+  end
+
   test "a whole float prints like the browser does" do
     html = render_field(unit: "rem", value: 1.0)
 

@@ -35,6 +35,10 @@ class Components::Editor::GroupDialogTest < ActiveSupport::TestCase
     assert_match(/<a [^>]*aria-label="See all values for Backgrounds, cards and text"[^>]*>See all values<\/a>/, html)
   end
 
+  test "the popover's content may shrink its children, so nothing runs past its box" do
+    assert_includes render_dialog, "[&>*]:min-w-0"
+  end
+
   private
 
   def render_dialog(subject = group)
