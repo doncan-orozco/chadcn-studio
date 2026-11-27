@@ -13,6 +13,14 @@ class EditorTest < ApplicationSystemTestCase
     assert_selector :testid, "preview-root"
   end
 
+  test "each brand slider thumb has an accessible name" do
+    open_group "brand"
+
+    { "primary-lightness" => "Lightness", "primary-chroma" => "Chroma", "primary-hue" => "Hue" }.each do |testid, name|
+      assert_equal name, find(:testid, testid).find("[role=slider]")["aria-label"]
+    end
+  end
+
   test "the lightness slider moves the preview without a request and releasing it derives the rest" do
     open_group "brand"
     thumb = find(:testid, "primary-lightness").find("[role=slider]")
