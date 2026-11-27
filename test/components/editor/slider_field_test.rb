@@ -61,6 +61,12 @@ class Components::Editor::SliderFieldTest < ActiveSupport::TestCase
     assert_not_includes render_field, "slider-speech"
   end
 
+  test "the thumb is named by the label" do
+    thumb = Nokogiri::HTML5.fragment(render_field).at_css("[role=slider]")
+
+    assert_equal "Corner radius", thumb["aria-label"]
+  end
+
   private
 
   def render_field(**options) = Components::Editor::SliderField.new(**SLIDER, **options).call
