@@ -20,7 +20,7 @@ class Components::Themes::DeleteButton < Components::Base
       input(type: "hidden", name: "_method", value: "delete")
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
     end
-    render Chadcn::AlertDialog.new(id: "delete-theme-#{@theme_id}-dialog") do
+    render Chadcn::AlertDialog.new(id: dialog_id) do
       render Chadcn::AlertDialog::Trigger.new(as_child: trigger_button) { "Delete" }
       render Chadcn::AlertDialog::Content.new { confirmation }
     end
@@ -28,8 +28,9 @@ class Components::Themes::DeleteButton < Components::Base
 
   private
 
-  # Every attribute the caller passes reaches the button; the destructive look is prepended to its class.
   def form_id = "delete-theme-#{@theme_id}-form"
+
+  def dialog_id = "delete-theme-#{@theme_id}-dialog"
 
   def trigger_button = Chadcn::Button.new(variant: "outline", size: @size, aria: { label: @label }, **button_attrs)
 
@@ -45,5 +46,6 @@ class Components::Themes::DeleteButton < Components::Base
     end
   end
 
+  # Every attribute the caller passes reaches the button; the destructive look is prepended to its class.
   def button_attrs = @attrs.merge(class: [ DESTRUCTIVE_OUTLINE, @attrs[:class] ].compact.join(" "))
 end
