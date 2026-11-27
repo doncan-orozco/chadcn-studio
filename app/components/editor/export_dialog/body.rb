@@ -43,11 +43,19 @@ class Components::Editor::ExportDialog::Body < Components::Base
   def import_command
     div(class: "grid gap-1", role: "group", aria: { labelledby: "import-command-label" }) do
       p(id: "import-command-label", class: "text-sm font-medium leading-none") { "Import into a chadcn app" }
-      div(class: "flex items-start gap-2") do
-        code(class: "flex-1 break-all rounded-md border bg-muted px-3 py-2 font-mono text-xs", data: { testid: "import-command", editor__export_target: "source" }) { @presenter.css.import_command }
+      code(class: "block w-full overflow-x-auto rounded-md border bg-muted px-3 py-2 font-mono text-xs", data: { testid: "import-command", editor__export_target: "source" }) { wrappable(@presenter.css.import_command) }
+      div(class: "flex justify-end") do
         render Chadcn::Button.new(type: "button", variant: "outline", data: { testid: "import-copy", editor__export_target: "button", action: "editor--export#copy" }) { "Copy" }
       end
       span(class: "sr-only", role: "status", data: { testid: "import-copy-status", editor__export_target: "status" })
+    end
+  end
+
+  # Emits the text with a wrap opportunity after "/" and ":" and before "[", so a line breaks only between tokens.
+  def wrappable(text)
+    text.split(%r{(?<=[/:])|(?=\[)}).each do |token|
+      plain token
+      wbr
     end
   end
 end
