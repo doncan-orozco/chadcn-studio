@@ -3,61 +3,62 @@ require "application_system_test_case"
 
 # The tune controls are named for a screen reader and are at least 24x24 CSS px (WCAG 2.2 SC 2.5.8).
 class TargetSizeTest < ApplicationSystemTestCase
-  MIN = 24
+  MINIMUM_TARGET_SIZE = 24
 
-  # Layout size (offsetWidth), which an opening dialog's or toast's zoom animation does not scale. The first visible match: a slider also renders hidden twins (the bubble input) that measure 0x0.
-  def assert_target(selector)
-    width, height = evaluate_script(<<~JS)
-      (() => {
-        const box = [...document.querySelectorAll(#{selector.to_json})].map((el) => ({ width: el.offsetWidth, height: el.offsetHeight })).find((r) => r.width > 0)
-        return box ? [box.width, box.height] : [0, 0]
-      })()
-    JS
-
-    assert_operator width, :>=, MIN, "#{selector} is #{width}px wide"
-    assert_operator height, :>=, MIN, "#{selector} is #{height}px tall"
-  end
+  setup { visit edit_theme_path(themes(:zinc)) }
 
   test "the radius slider thumb has a name and a 24 px target" do
-    visit edit_theme_path(themes(:zinc))
     find(:testid, "group-radius").click
     thumb = find(:testid, "radius").find("[role=slider]")
 
     assert_equal "Corner radius", thumb["aria-label"]
     assert_equal "0.625rem", thumb["aria-valuetext"]
-    assert_target "[data-testid=radius] [role=slider]"
-    assert_target "[data-testid=group-radius-panel] [data-slot=dialog-close]"
+    assert_target thumb
+  end
+
+  test "the group dialog close has a 24 px target" do
+    find(:testid, "group-radius").click
+
+    assert_selector :testid, "group-radius-panel"
+    assert_target find(:testid, "group-radius-panel").find("[data-slot=dialog-close]")
   end
 
   test "the surfaces slider thumb has a name and a 24 px target" do
-    visit edit_theme_path(themes(:zinc))
     find(:testid, "group-surfaces").click
     thumb = find(:testid, "neutral-tint").find("[role=slider]")
 
     assert_equal "Neutral tint", thumb["aria-label"]
-    assert_target "[data-testid=neutral-tint] [role=slider]"
+    assert_target thumb
   end
 
   test "the brand sliders are named" do
-    visit edit_theme_path(themes(:zinc))
+    names = %w[primary-lightness primary-chroma primary-hue].map { |id| find(:testid, id).find("[role=slider]")["aria-label"] }
 
-    assert_equal %w[Chroma Hue Lightness], all("[data-testid^=primary-] [role=slider]", visible: :all).map { |thumb| thumb["aria-label"] }.sort
+    assert_equal %w[Lightness Chroma Hue], names
   end
 
   test "the export dialog close has a 24 px target" do
-    visit edit_theme_path(themes(:zinc))
     find(:testid, "export").click
 
     assert_selector :testid, "export-panel"
-    assert_target "[data-testid=export-panel] [data-slot=dialog-close]"
+    assert_target find(:testid, "export-panel").find("[data-slot=dialog-close]")
   end
 
   test "the toast close has a name and a 24 px target" do
-    visit edit_theme_path(themes(:zinc))
     click_on "Save theme"
+    close = find("[data-close-button]", visible: :all)
 
-    assert_selector "[data-close-button]", visible: :all
-    assert_equal "Close toast", find("[data-close-button]", visible: :all)["aria-label"]
-    assert_target "[data-close-button]"
+    assert_equal "Close toast", close["aria-label"]
+    assert_target close
+  end
+
+  private
+
+  # Layout size (offsetWidth/Height): an opening dialog's or toast's zoom animation does not scale it.
+  def assert_target(element)
+    width, height = evaluate_script("[arguments[0].offsetWidth, arguments[0].offsetHeight]", element)
+
+    assert_operator width, :>=, MINIMUM_TARGET_SIZE, "is #{width}px wide"
+    assert_operator height, :>=, MINIMUM_TARGET_SIZE, "is #{height}px tall"
   end
 end
