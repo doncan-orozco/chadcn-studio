@@ -13,4 +13,18 @@ class Gallery::Presenter::IndexTest < ActiveSupport::TestCase
     assert_equal @presenter.entries.size, @presenter.groups.sum { |group| group.entries.size }
     assert(@presenter.groups.all? { |group| group.entries.all? { |entry| entry.title[0].upcase == group.letter } })
   end
+
+  test "no entries gives no groups" do
+    presenter = Gallery::Presenter::Index.new(entries: [])
+
+    assert_empty presenter.groups
+    assert_equal 0, presenter.count
+  end
+
+  test "entries given out of order are sorted, so the group letters are too" do
+    entries = %w[Zebra Apple Mango].map { |title| Struct.new(:title).new(title) }
+    presenter = Gallery::Presenter::Index.new(entries:)
+
+    assert_equal %w[A M Z], presenter.groups.map(&:letter)
+  end
 end

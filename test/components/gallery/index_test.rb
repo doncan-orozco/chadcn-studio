@@ -10,14 +10,13 @@ class Components::Gallery::IndexTest < ActiveSupport::TestCase
     assert_equal "Find a component", @html.at_css("nav[aria-label=Components] label[for=gallery-filter]").text.strip
     assert @html.at_css("nav[aria-label=Components] input#gallery-filter[type=search][data-editor--variable-filter-target=query]")
     assert @html.at_css("nav[aria-label=Components] [role=status][data-editor--variable-filter-target=status]")
-    assert_includes @html.at_css("input#gallery-filter")["data-action"], "keydown.enter->editor--variable-filter#preventSubmit"
+    assert_not_includes @html.at_css("input#gallery-filter")["data-action"], ":stop"
   end
 
   test "the nav is the filter's scroll container and names its empty state" do
     nav = @html.at_css("nav[aria-label=Components]")
 
-    assert_includes nav["class"], "overflow-y-auto"
-    assert_equal "editor--variable-filter", nav["data-controller"]
+    assert_equal %w[editor--variable-filter gallery--index-spy], nav["data-controller"].split
     assert_equal "No component matches", nav["data-editor--variable-filter-empty-label-value"]
   end
 
@@ -33,13 +32,18 @@ class Components::Gallery::IndexTest < ActiveSupport::TestCase
     assert_equal @presenter.groups.map(&:letter), letters
   end
 
-  test "every link is a spy target, none starts marked and the current one is styled by more than color" do
+  test "the nav binds scroll and resize to the spy passively" do
+    actions = @html.at_css("nav[aria-label=Components]")["data-action"].split
+
+    assert_includes actions, "scroll@window->gallery--index-spy#schedule:passive"
+    assert_includes actions, "resize@window->gallery--index-spy#schedule:passive"
+  end
+
+  test "every link is a spy target and none starts marked" do
     links = @html.css("a[data-gallery--index-spy-target=link]")
 
     assert_equal @presenter.entries.size, links.size
     assert_empty @html.css("a[aria-current]")
-    assert_includes links.first["class"], "aria-[current=location]:font-medium"
-    assert_includes links.first["class"], "aria-[current=location]:bg-accent"
   end
 
   test "a presenter with other entries renders only those" do

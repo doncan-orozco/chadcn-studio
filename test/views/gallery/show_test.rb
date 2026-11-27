@@ -15,11 +15,8 @@ class Views::Gallery::ShowTest < ActiveSupport::TestCase
     assert_equal content_letters, index_letters
   end
 
-  test "the page wires the spy once and binds scroll and resize to it passively" do
-    spies = @html.css("[data-controller~='gallery--index-spy']")
-
-    assert_equal 1, spies.size
-    assert_includes spies.first["data-action"], "scroll@window->gallery--index-spy#schedule:passive"
-    assert_includes spies.first["data-action"], "resize@window->gallery--index-spy#schedule:passive"
+  test "the spy is wired once, on the index, which is the only place that names it" do
+    assert_equal 1, @html.css("[data-controller~='gallery--index-spy']").size
+    assert_equal 1, @html.css("nav[aria-label=Components][data-controller~='gallery--index-spy']").size
   end
 end

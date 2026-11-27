@@ -2,15 +2,12 @@
 
 # Every component of the gem's catalog under the current theme; the demos come from `Chadcn::Catalog`, never from this app.
 class Views::Gallery::Show < Views::Base
-  SPY_ACTIONS = "scroll@window->gallery--index-spy#schedule:passive resize@window->gallery--index-spy#schedule:passive"
-  private_constant :SPY_ACTIONS
-
   def initialize(presenter)
     @presenter = presenter
   end
 
   def view_template
-    div(class: "mx-auto flex max-w-6xl gap-8 p-6", data: { controller: "gallery--index-spy", action: SPY_ACTIONS }) do
+    div(class: "mx-auto flex max-w-6xl gap-8 p-6") do
       render Components::Gallery::Index.new(@presenter)
       div(class: "min-w-0 flex-1 space-y-10") do
         header do

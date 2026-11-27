@@ -1,7 +1,7 @@
 import { Controller } from "@hotwired/stimulus"
 
-// Marks the index link of the catalog entry being read: `aria-current="location"` on that link, styled by the view. The
-// entry is found from the link's own `#anchor`, so the view stays the single place that names ids. It is the last entry
+// Marks the index link of the catalog entry being read: `aria-current="location"` on that link, styled by the component. The
+// entry is found from the link's own `#anchor`, so the markup stays the single place that names ids. It is the last entry
 // whose top has passed the reading line (the top third of the window); at the end of the page it is the last entry, which
 // can never reach that line. A link whose entry is not on the page is left alone.
 export default class extends Controller {
@@ -14,9 +14,10 @@ export default class extends Controller {
   disconnect() {
     if (this.frame) cancelAnimationFrame(this.frame)
     this.frame = null
+    this.linkTargets.forEach((link) => link.removeAttribute("aria-current"))
   }
 
-  // Bound to scroll and resize by the view; one frame at a time.
+  // Bound to scroll and resize by the component; one frame at a time.
   schedule() {
     if (this.frame) return
     this.frame = requestAnimationFrame(() => {
@@ -41,8 +42,9 @@ export default class extends Controller {
 
   #mark(current) {
     this.linkTargets.forEach((link) => {
-      if (link === current) link.setAttribute("aria-current", "location")
-      else link.removeAttribute("aria-current")
+      const marked = link.getAttribute("aria-current") === "location"
+      if (link === current && !marked) link.setAttribute("aria-current", "location")
+      else if (link !== current && link.hasAttribute("aria-current")) link.removeAttribute("aria-current")
     })
   }
 

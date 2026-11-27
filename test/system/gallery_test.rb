@@ -56,6 +56,7 @@ class GalleryTest < ApplicationSystemTestCase
   test "the current marker is more than color: the current link is heavier than the others" do
     visit gallery_path
 
+    assert_selector "nav[aria-label='Components'] a[aria-current='location']", count: 1, visible: :all
     weights = evaluate_script(<<~JS)
       (() => {
         const links = [...document.querySelectorAll("nav[aria-label='Components'] a")]
@@ -74,6 +75,7 @@ class GalleryTest < ApplicationSystemTestCase
     fill_in "Find a component", with: "accordion"
 
     assert_selector "nav[aria-label='Components'] li:not([hidden]) a", text: "Accordion", visible: :all
+    assert_no_selector "nav[aria-label='Components'] li:not([hidden]) a", text: "Alert dialog", visible: :all
     assert_operator all("nav[aria-label='Components'] li:not([hidden])", visible: :all).size, :<, total
     assert_equal 1, all("nav[aria-label='Components'] section:not([hidden])", visible: :all).size
   end
