@@ -21,7 +21,7 @@ class Components::Editor::ExportDialog < Components::Base
     render Chadcn::Dialog.new(id: "export-dialog", default_open: @open) do
       render Chadcn::Dialog::Trigger.new(as_child: Chadcn::Button.new(variant: "outline", data: { testid: "export" })) { "Export" }
       render Chadcn::Dialog::Portal.new do
-        render Chadcn::Dialog::Content.new(data: { testid: "export-panel" }) do
+        render Chadcn::Dialog::Content.new(close_class: Components::Editor::HitArea::CLOSE, data: { testid: "export-panel" }) do
           heading
           render Body.new(presenter: @presenter)
         end
