@@ -2,12 +2,12 @@
 
 # The status of a generation: pending, done or failed with its reason. Always renders the `generation_status` target
 # so a stream can replace it. The model's text is plain text (llm-generation R8). A failure is a destructive alert under
-# the field that keeps the description and offers the way on: try again, or pick the primary color by hand; both actions
+# the field that keeps the description and offers the way on: try again, or pick the brand color by hand; both actions
 # are buttons that forward to the control that already exists. A studio without an API key is not an error: it says how
 # to turn generation on as one muted line.
 class Components::Editor::GenerationStatus < Components::Base
   # The prompt field (its form holds the CSRF token a streamed fragment cannot carry), and the way to the brand color that
-  # "Pick a primary color instead" hands the click to: the editor's Brand group dialog trigger
+  # "Pick a brand color instead" hands the click to: the editor's Brand group dialog trigger
   # (Components::Editor::GroupDialog, keyed by the group's panel_id), or on New theme the Brand color field, which the
   # forward controller focuses. Only the dialog claims to open one.
   PROMPT_FIELD = "#generation-prompt"
@@ -63,7 +63,7 @@ class Components::Editor::GenerationStatus < Components::Base
   end
 
   def color_button
-    render Chadcn::Button.new(type: "button", size: "sm", variant: "link", class: LINK, aria: @brand[:aria], data: forwarding(:click, @brand[:selector], testid: "generation-pick-color")) { "Pick a primary color instead" }
+    render Chadcn::Button.new(type: "button", size: "sm", variant: "link", class: LINK, aria: @brand[:aria], data: forwarding(:click, @brand[:selector], testid: "generation-pick-color")) { "Pick a brand color instead" }
   end
 
   def forwarding(method, selector, testid:)

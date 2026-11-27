@@ -124,7 +124,7 @@ class GenerationTest < ApplicationSystemTestCase
     assert_selector :testid, "generation-status", text: "A confident blue with soft corners."
   end
 
-  test "a failed generation links to the primary color" do
+  test "a failed generation links to the brand color" do
     GenerateThemeJob.client = FakeGenerationClient.refusing
     visit edit_theme_path(themes(:slate))
 
@@ -133,7 +133,7 @@ class GenerationTest < ApplicationSystemTestCase
     perform_enqueued_jobs
 
     assert_equal "dialog", find(:testid, "generation-pick-color")["aria-haspopup"]
-    click_button "Pick a primary color instead"
+    click_button "Pick a brand color instead"
 
     assert_selector :testid, "group-brand-panel", visible: :visible
   end
@@ -149,7 +149,7 @@ class GenerationTest < ApplicationSystemTestCase
 
     assert_selector :testid, "generation-status", text: "hourly generation limit"
     assert_nil find(:testid, "generation-pick-color")["aria-haspopup"]
-    click_on "Pick a primary color instead"
+    click_on "Pick a brand color instead"
 
     assert_selector :field, "Brand color *", focused: true
   ensure

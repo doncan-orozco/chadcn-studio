@@ -7,7 +7,7 @@ class Components::Editor::GenerationStatusTest < ActiveSupport::TestCase
     assert_includes html, 'data-slot="alert"'
     assert_includes html, "Your description is kept in the field."
     assert_includes html, "Try again"
-    assert_includes html, "Pick a primary color instead"
+    assert_includes html, "Pick a brand color instead"
     assert_includes html, 'aria-haspopup="dialog"'
     assert_includes html, 'aria-controls="group-brand"'
     assert_includes html, "<svg"
@@ -27,7 +27,7 @@ class Components::Editor::GenerationStatusTest < ActiveSupport::TestCase
     html = render_status(Generations::Presenter::Status.new(Generation.new, failure: :busy))
 
     assert_includes html, "Wait for it to finish"
-    assert_includes html, "Pick a primary color instead"
+    assert_includes html, "Pick a brand color instead"
     assert_not_includes html, "Try again"
     assert_not_includes html, "description is kept"
   end
@@ -39,7 +39,7 @@ class Components::Editor::GenerationStatusTest < ActiveSupport::TestCase
     assert_includes html, "text-muted-foreground"
     assert_not_includes html, 'role="alert"'
     assert_not_includes html, 'data-slot="alert"'
-    assert_not_includes html, "Pick a primary color instead"
+    assert_not_includes html, "Pick a brand color instead"
   end
 
   test "pending and done stay plain text in a status region" do
