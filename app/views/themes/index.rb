@@ -1,12 +1,15 @@
 # frozen_string_literal: true
 
 class Views::Themes::Index < Views::Base
+  include Phlex::Rails::Helpers::ContentFor
+
   def initialize(presenter, deleted: nil)
     @presenter = presenter
     @deleted = deleted
   end
 
   def view_template
+    content_for(:title, @presenter.document_title)
     div(class: "mx-auto max-w-6xl space-y-6 p-6") do
       header(class: "flex items-center justify-between gap-4") do
         div do
@@ -26,7 +29,7 @@ class Views::Themes::Index < Views::Base
 
   private
 
-  # The lasting confirmation of a delete: the toast announces it and is gone in seconds; this status stays until the next visit.
+  # The one confirmation of a delete (no toast says it too): it names the theme and stays until the next visit.
   def deleted_status
     return if @deleted.blank?
 

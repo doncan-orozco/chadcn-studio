@@ -3,6 +3,10 @@ require "test_helper"
 class Themes::Presenter::ListTest < ActiveSupport::TestCase
   BASE = "http://example.test"
 
+  test "names the page in the browser title" do
+    assert_equal "Themes - Chadcn Studio", Themes::Presenter::List.new([], base_url: BASE).document_title
+  end
+
   test "wraps each theme in a card and counts them" do
     list = Themes::Presenter::List.new(Theme.order(:slug), base_url: BASE)
 

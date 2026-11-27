@@ -40,9 +40,9 @@ class ThemesController < ApplicationController
     result = Themes::Operation::Destroy.new.call(model: theme)
 
     if result.success?
-      # The toast says it for a moment; `deleted` is the lasting line the list keeps showing (the layout keeps it out of the toaster).
+      # One message, in the theme's own words: `deleted` is the lasting line the list shows (the layout keeps it out of the toaster), so there is no toast beside it.
       flash[:deleted] = "#{result.value![:model].name} deleted"
-      redirect_to themes_path, notice: "Theme deleted", status: :see_other
+      redirect_to themes_path, status: :see_other
     else
       redirect_to theme_path(result.failure[:model]), alert: "Theme could not be deleted", status: :see_other
     end

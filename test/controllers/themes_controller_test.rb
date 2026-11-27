@@ -216,6 +216,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     assert_difference("Theme.count", -1) { delete theme_path(themes(:zinc)) }
 
     assert_redirected_to themes_path
+    assert_nil flash[:notice], "a delete must not also toast"
   end
 
   test "after DELETE the list names the deleted theme in a status, once" do
@@ -223,6 +224,7 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
     follow_redirect!
 
     assert_select "[role=status][data-testid=deleted-status]", text: "Zinc deleted"
+    assert_not_includes response.body, "Theme deleted"
 
     get themes_path
 
@@ -266,5 +268,19 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_includes response.body, "&lt;b&gt;x&lt;/b&gt; saved: renamed from Zinc"
     assert_select "b", 0
+  end
+
+  test "each themes page sets its own browser title, as the editor does" do
+    get themes_path
+
+    assert_select "title", text: "Themes - Chadcn Studio"
+
+    get new_theme_path
+
+    assert_select "title", text: "New theme - Chadcn Studio"
+
+    get theme_path(themes(:zinc))
+
+    assert_select "title", text: "Zinc - Chadcn Studio"
   end
 end

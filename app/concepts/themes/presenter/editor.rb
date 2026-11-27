@@ -62,7 +62,6 @@ class Themes::Presenter::Editor < Core::Presenter::Base
   def refresh_path = helpers.derivations_path(controls: 1)
   # The heading names the stored theme: a rename that was rejected stays in the field, not in the heading, until Save succeeds.
   def title = "Edit #{persisted? ? name_in_database : name}"
-  def document_title = "#{title} - Chadcn Studio"
 
   private
 
