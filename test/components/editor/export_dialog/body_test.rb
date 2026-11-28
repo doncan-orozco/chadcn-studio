@@ -45,6 +45,15 @@ class Components::Editor::ExportDialog::BodyTest < ActiveSupport::TestCase
     assert_nil form.at_css("input[name=trigger]")
   end
 
+  test "a row's published body sends its compact trigger with Unpublish" do
+    sharing = Exports::Presenter::Sharing.new(themes(:slate), base_url: "https://studio.test")
+    html = Nokogiri::HTML.fragment(ApplicationController.render(Components::Editor::ExportDialog::Body.new(presenter: sharing, compact: true), layout: false))
+    form = html.at_css("[data-testid=export-unpublish-form]")
+
+    assert_equal "delete", form.at_css("input[name=_method]")["value"]
+    assert form.at_css("input[name=trigger][value=row]")
+  end
+
   test "a draft theme offers to publish and shows no import command" do
     theme = themes(:zinc)
     html = render_body(theme)

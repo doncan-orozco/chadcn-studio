@@ -42,6 +42,22 @@ class ExportsTest < ApplicationSystemTestCase
     assert_selector :testid, "publication-state", text: "Not published"
   end
 
+  test "home unpublishes a theme from its row and the dialog stays open on its draft body" do
+    visit root_path
+
+    find("button[aria-label='Export #{themes(:slate).name}']").click
+    find(:testid, "export-unpublish").click
+
+    assert_current_path root_path
+    assert_selector :testid, "export-panel"
+    assert_selector :testid, "export-draft", text: "anyone with its link"
+    assert_no_selector :testid, "download-css"
+    assert_not_predicate themes(:slate).reload, :published?
+    send_keys :escape
+
+    assert_selector "button[aria-label='Export #{themes(:slate).name}']", count: 1
+  end
+
   test "a draft publishes from inside the dialog and the dialog stays open" do
     visit edit_theme_path(themes(:zinc))
 
