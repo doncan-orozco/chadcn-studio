@@ -8,20 +8,38 @@ class Components::Editor::AdvancedOverrides < Components::Base
   end
 
   def view_template
-    div(class: "grid gap-6") do
-      p(class: "text-sm text-muted-foreground") { "Type a hex color such as #9ca3af, or an oklch(...) value. Clear a field to follow the rule again." }
-      p(class: "text-sm text-muted-foreground", data: { testid: "overrides-close-note" }) { "Closing this panel keeps your overrides; they are shown as oklch once applied. Save the theme to store them." }
-      @group.modes.each { |mode| section_for(mode) }
+    div(class: "grid gap-4") do
+      p(class: "text-sm text-muted-foreground", data: { testid: "overrides-note" }) do
+        "Type a hex color such as #9ca3af, or an oklch(...) value; clear a field to follow the rule again. Closing this panel keeps your overrides; Save the theme to store them."
+      end
+      render Chadcn::Tabs.new(default_value: @group.modes.first) do |tabs|
+        tabs.list(aria: { label: "Mode" }) do
+          @group.modes.each { |mode| tabs.trigger(value: mode, data: { testid: "overrides-mode-#{mode}" }) { mode.capitalize } }
+        end
+        @group.modes.each { |mode| tabs.content(value: mode, force_mount: true, class: "data-[state=inactive]:hidden") { section_for(mode) } }
+      end
     end
   end
 
   private
 
+  # One mode's fields under the names of the sidebar groups they belong to. Both panels stay mounted so the hidden mode's fields still post with the form.
   def section_for(mode)
-    section(class: "grid gap-3", aria: { labelledby: "overrides-#{mode}-heading" }) do
-      h3(id: "overrides-#{mode}-heading", class: "text-sm font-semibold") { "#{mode.capitalize} mode" }
-      @group.overrides(mode).each { |override| field(override) }
+    div(class: "grid gap-4") do
+      grouped(@group.overrides(mode)).each do |group, overrides|
+        section(class: "grid gap-3", aria: { labelledby: "overrides-#{mode}-#{group.first}-heading" }) do
+          h3(id: "overrides-#{mode}-#{group.first}-heading", class: "text-sm font-semibold") { group.last[:label] }
+          overrides.each { |override| field(override) }
+        end
+      end
     end
+  end
+
+  # The overrides keyed by the sidebar group that holds their variable, in the sidebar's order; the order within a group is kept.
+  def grouped(overrides)
+    groups = ::Themes::Presenter::Group::DEFINITIONS.except("advanced")
+    by_group = overrides.group_by { |override| groups.find { |_, definition| definition[:variables].include?(override.name.delete_prefix("--")) }&.first }
+    groups.filter_map { |key, definition| [ [ key, definition ], by_group[key] ] if by_group[key] }
   end
 
   def field(override)
