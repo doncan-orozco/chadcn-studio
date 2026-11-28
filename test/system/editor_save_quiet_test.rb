@@ -17,6 +17,19 @@ class EditorSaveQuietTest < ApplicationSystemTestCase
     assert_not_equal quiet, save_background
   end
 
+  test "Export is the one primary while saved and hands it to Save at the first edit" do
+    primary = token_background("bg-primary")
+
+    assert_selector(:button, "Export") { |export| export[:"data-dirty"].nil? && background_of(export) == primary }
+    assert_not_equal primary, background("Save theme")
+
+    fill_in "Name", with: "Renamed"
+
+    # Colours transition, so each side is awaited rather than read once.
+    assert_selector(:button, "Export") { |export| export[:"data-dirty"] && background_of(export) != primary }
+    assert_selector(:button, "Save theme") { |save| background_of(save) == primary }
+  end
+
   test "a rejected Save comes back with the default Save" do
     # Blank the name without an input event: only the server's rejection can drop data-quiet and show Unsaved changes.
     execute_script("const name = document.getElementById('theme-name'); name.removeAttribute('required'); name.value = ''")
@@ -32,7 +45,11 @@ class EditorSaveQuietTest < ApplicationSystemTestCase
 
   private
 
-  def save_background = find_button("Save theme").evaluate_script("getComputedStyle(this).backgroundColor")
+  def save_background = background("Save theme")
+
+  def background_of(button) = button.evaluate_script("getComputedStyle(this).backgroundColor")
+
+  def background(label) = find_button(label).evaluate_script("getComputedStyle(this).backgroundColor")
 
   # The computed colour of a semantic token, read from a probe so the test never hard-codes a colour.
   def token_background(utility)

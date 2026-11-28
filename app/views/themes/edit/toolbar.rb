@@ -13,7 +13,7 @@ class Views::Themes::Edit::Toolbar < Views::Base
   FORM_ID = "editor-form"
   # While the status says Saved, Save wears the outline look: a copy of `Chadcn::Button::VARIANTS["outline"]` behind `data-[quiet]:`,
   # dark mode included (Tailwind needs the literal classes). The preview controller drops `data-quiet` at the first edit and the
-  # default look returns. Pressed and focus states are the button's own.
+  # default look returns (and Export, the primary while saved, goes outline). Pressed and focus states are the button's own.
   QUIET = "data-[quiet]:border data-[quiet]:bg-background data-[quiet]:text-foreground data-[quiet]:shadow-xs " \
           "data-[quiet]:hover:bg-accent data-[quiet]:hover:text-accent-foreground " \
           "dark:data-[quiet]:border-input dark:data-[quiet]:bg-input/30 dark:data-[quiet]:hover:bg-input/50"
