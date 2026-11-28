@@ -28,12 +28,12 @@ class PagesControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
-  test "home says where a theme row leads: a muted Edit on each row and a line under Your themes" do
+  test "home says where a theme row leads: one Edit or rename cue on each row and a line under Your themes" do
     get root_path
 
     assert_select "main p", text: "Open a theme to edit, rename or delete it."
     Themes::Query::Recent.call.limit(PagesController::HOME_THEMES).each do |theme|
-      assert_select "main ul[aria-label='Your themes'] a[href=?] span:not([data-link-name])", edit_theme_path(theme), text: "Edit"
+      assert_select "main ul[aria-label='Your themes'] a[href=?] span:not([data-link-name])", edit_theme_path(theme), text: "Edit or rename"
     end
   end
 

@@ -57,31 +57,12 @@ class ThemesTest < ApplicationSystemTestCase
     assert_selector :testid, "palette"
   end
 
-  test "the card's name opens the editor and its Edit button is at least 24 px tall" do
+  test "the card's Edit or rename link opens the editor and is at least 24 px tall" do
     visit themes_path
-    height = evaluate_script("document.querySelector(\"[data-testid=theme-card] button[aria-label^='Edit or rename']\").getBoundingClientRect().height")
+    height = evaluate_script("document.querySelector(\"[data-testid=theme-card] a[aria-label^='Edit or rename']\").getBoundingClientRect().height")
 
     assert_operator height, :>=, 24
-    click_on "Zinc"
-
-    assert_current_path edit_theme_path(themes(:zinc))
-  end
-
-  test "clicking the card body opens the editor, and the Edit button still works above the stretched link" do
-    visit themes_path
-    find(:testid, "theme-card", text: "Zinc").click
-
-    assert_current_path edit_theme_path(themes(:zinc))
-
-    visit themes_path
     within(:testid, "theme-card", text: "Zinc") { click_on "Edit or rename" }
-
-    assert_current_path edit_theme_path(themes(:zinc))
-  end
-
-  test "clicking the empty footer strip of a card opens the editor" do
-    visit themes_path
-    find(:testid, "theme-card", text: "Zinc").find("[data-slot=card-footer]").click(x: -150, y: 0)
 
     assert_current_path edit_theme_path(themes(:zinc))
   end
@@ -135,12 +116,12 @@ class ThemesTest < ApplicationSystemTestCase
     assert_field "Brand color", with: "oklch(0.488 0.217 264.376)"
   end
 
-  test "home's theme rows are links at least 24 px tall with a resting underline" do
+  test "home's theme rows are links at least 24 px tall and the name carries no underline" do
     visit root_path
     row = "document.querySelector(\"ul[aria-label='Your themes'] a\")"
 
     assert_operator evaluate_script("#{row}.getBoundingClientRect().height"), :>=, 24
-    assert_includes evaluate_script("getComputedStyle(#{row}.querySelector('[data-link-name]')).textDecorationLine"), "underline"
+    assert_not_includes evaluate_script("getComputedStyle(#{row}.querySelector('[data-link-name]')).textDecorationLine"), "underline"
   end
 
   test "home puts the Create theme button above the saved themes, the only default button on the page" do
@@ -152,12 +133,10 @@ class ThemesTest < ApplicationSystemTestCase
     assert_selector "main a[data-variant=default]", count: 1
   end
 
-  test "a card's title reads as a link at rest" do
+  test "a card's title is plain text, not a link" do
     visit themes_path
 
-    title = find(:testid, "theme-card", text: "Zinc").find("a", text: "Zinc", match: :first)
-
-    assert_includes title.evaluate_script("getComputedStyle(this).textDecorationLine"), "underline"
+    assert_no_selector "[data-testid=theme-card] [data-slot=card-title] a"
   end
 
   test "after a delete the list keeps a status that names the theme" do
