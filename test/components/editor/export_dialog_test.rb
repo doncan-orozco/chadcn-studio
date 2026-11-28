@@ -24,6 +24,17 @@ class Components::Editor::ExportDialogTest < ActiveSupport::TestCase
     assert_nil trigger["aria-label"]
   end
 
+  test "the editor's trigger is the default look that goes outline once the editor is dirty; a row's stays outline" do
+    editor = render_dialog(themes(:blue)).at_css("[data-testid=export]")
+    row = render_dialog(themes(:blue), compact: true).at_css("[data-testid=export]")
+
+    assert_equal "export", editor["data-editor--preview-target"]
+    assert_includes editor["class"], "data-[dirty]:bg-background"
+    assert_includes editor["class"], "bg-primary"
+    assert_nil row["data-editor--preview-target"]
+    assert_not_includes row["class"], "bg-primary"
+  end
+
   test "a row's trigger is small and named after its theme, starting with the visible text" do
     trigger = render_dialog(themes(:blue), compact: true).at_css("[data-testid=export]")
 

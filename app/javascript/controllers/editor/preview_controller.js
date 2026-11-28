@@ -1,7 +1,8 @@
 import { Controller } from "@hotwired/stimulus"
 
-// The live preview of the theme editor (stimulus R14, theme-science R6). It reveals the "Unsaved changes" marker (and drops Save's `data-quiet`, its outline look) the view
-// rendered hidden (a Turbo snapshot keeps it as the DOM holds it, so a restored dirty editor still says so), and otherwise
+// The live preview of the theme editor (stimulus R14, theme-science R6). At the first edit it reveals the "Unsaved changes" marker the view rendered hidden,
+// drops Save's `data-quiet` and gives Export's trigger `data-dirty`, so Save takes the primary look (a Turbo snapshot keeps all
+// three as the DOM holds them, so a restored dirty editor still says so). Otherwise
 // only sets CSS custom properties on the preview root and toggles its `dark` class: while a slider moves it formats
 // ONE oklch string from L, C and H (or one rem length);
 // everything else (foregrounds, ring, charts...) arrives from the server as a whole palette after the slider is released.
@@ -10,7 +11,7 @@ const DECIMALS = 3
 const formatNumber = (value) => Number(Number(value).toFixed(DECIMALS)).toString()
 
 export default class extends Controller {
-  static targets = ["root", "palette", "primaryField", "radiusField", "lightness", "chroma", "hue", "radius", "form", "derive", "refresh", "unsaved", "saved", "save"]
+  static targets = ["root", "palette", "primaryField", "radiusField", "lightness", "chroma", "hue", "radius", "form", "derive", "refresh", "unsaved", "saved", "save", "export"]
   static values = { mode: { type: String, default: "light" } }
 
   connect() {
@@ -33,6 +34,12 @@ export default class extends Controller {
       return
     }
     this.#apply()
+  }
+
+  // Export is the page's primary while the theme is saved (the default look); once the editor is dirty it goes outline and Save takes
+  // the primary. The publication stream replaces the Export host, so a fresh trigger asks where the editor stands.
+  exportTargetConnected(element) {
+    if (this.hasUnsavedTarget && !this.unsavedTarget.hidden) element.dataset.dirty = ""
   }
 
   modeValueChanged() {
@@ -93,6 +100,7 @@ export default class extends Controller {
     if (this.hasUnsavedTarget) this.unsavedTarget.hidden = false
     if (this.hasSavedTarget) this.savedTarget.hidden = true
     if (this.hasSaveTarget) delete this.saveTarget.dataset.quiet
+    if (this.hasExportTarget) this.exportTarget.dataset.dirty = ""
   }
 
   // `chadcn--switch:checked-change`: the dark switch of the editor toggles the preview root only.
