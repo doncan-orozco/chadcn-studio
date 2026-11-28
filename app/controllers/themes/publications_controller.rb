@@ -1,16 +1,10 @@
 class Themes::PublicationsController < ApplicationController
   def create
-    result = Themes::Operation::Publish.new.call(model: theme)
-    return render_dialog(result.value![:model]) if result.success? && from_export_dialog?
-
-    respond_to_result result, notice: "Theme published"
+    respond_to_result Themes::Operation::Publish.new.call(model: theme), notice: "Theme published"
   end
 
   def destroy
-    result = Themes::Operation::Unpublish.new.call(model: theme)
-    return render_dialog(result.value![:model]) if result.success? && from_export_dialog?
-
-    respond_to_result result, notice: "Theme unpublished"
+    respond_to_result Themes::Operation::Unpublish.new.call(model: theme), notice: "Theme unpublished"
   end
 
   private
@@ -19,7 +13,10 @@ class Themes::PublicationsController < ApplicationController
 
   def from_export_dialog? = request.format.turbo_stream? && params[:from] == Components::Editor::ExportDialog::Body::ORIGIN
 
+  # From the Export dialog a success answers with the dialog rebuilt on its new body; elsewhere it goes back to the editor.
   def respond_to_result(result, notice:)
+    return render_dialog(result.value![:model]) if result.success? && from_export_dialog?
+
     if result.success?
       redirect_to edit_theme_path(result.value![:model]), notice: notice, status: :see_other
     else
