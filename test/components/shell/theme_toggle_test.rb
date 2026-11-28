@@ -1,17 +1,17 @@
 require "test_helper"
 
 class Components::Shell::ThemeToggleTest < ActiveSupport::TestCase
-  test "the group is captioned Studio interface, says it leaves the preview alone, and exposes three pressed-state buttons" do
+  test "one Studio appearance button opens a menu of Light, Dark and System, and the hint is only a screen-reader description" do
     fragment = Nokogiri::HTML5.fragment(Components::Shell::ThemeToggle.new.call)
+    trigger = fragment.at_css("[data-testid=theme-trigger]")
 
-    assert_equal "Studio interface", fragment.at_css("#studio-appearance").text
-    assert_equal "studio-appearance", fragment.at_css("[data-testid=theme-toggle]")["aria-labelledby"]
-    assert_equal "studio-appearance-hint", fragment.at_css("[data-testid=theme-toggle]")["aria-describedby"]
+    assert_equal "Studio appearance", trigger.text.strip
+    assert_equal "menu", trigger["aria-haspopup"]
+    assert_equal "studio-appearance-hint", trigger["aria-describedby"]
     assert_equal Components::Shell::ThemeToggle::HINT, fragment.at_css("#studio-appearance-hint").text
-    assert_not_includes fragment.at_css("#studio-appearance-hint")["class"], "sr-only"
-    assert_includes fragment.at_css("#studio-appearance-hint")["class"], "whitespace-nowrap"
-    assert_includes fragment.at_css("#studio-appearance-hint")["class"], "lg:inline"
+    assert_includes fragment.at_css("#studio-appearance-hint")["class"], "sr-only"
+    assert_equal %w[Light Dark System], fragment.css("template [role=menuitemradio]").map { |item| item.text.strip }
+    assert_equal 1, fragment.css("button").size
     assert_nil fragment.at_css("[title]")
-    assert_equal 3, fragment.css("button[aria-pressed=false]").size
   end
 end

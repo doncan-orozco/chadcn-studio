@@ -6,26 +6,27 @@ class Core::ShellTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-testid=shell]"
-    assert_select "[data-testid=theme-toggle] [data-action='chadcn--theme#setDark']"
+    assert_select "[data-testid=theme-toggle] [data-testid=theme-trigger]", text: "Studio appearance"
     assert_select "section[aria-live=polite]"
     assert_select "[data-testid=sidebar]", count: 0
   end
 
-  test "the brand link is a 24 px target and the scheme buttons expose a pressed state" do
+  test "the brand link is a 24 px target and the appearance menu is wired to the theme controller" do
     get root_path
 
     assert_select "a[href='/'].min-h-6"
     assert_select "[data-testid=theme-toggle][data-controller~='chadcn--theme'][data-controller~='shell--theme-toggle']"
     %w[light dark system].each do |mode|
-      assert_select "[data-testid=theme-#{mode}][aria-pressed=false]"
+      assert_select "template [data-testid=theme-#{mode}][role=menuitemradio]"
     end
   end
 
-  test "the header toggle is captioned as the studio's interface" do
+  test "the header names the studio's appearance once and keeps the hint for screen readers" do
     get root_path
 
-    assert_select "[data-testid=theme-toggle][aria-labelledby=studio-appearance][aria-describedby=studio-appearance-hint]"
-    assert_select "#studio-appearance", text: "Studio interface"
+    assert_select "[data-testid=theme-trigger][aria-describedby=studio-appearance-hint]", text: "Studio appearance"
+    assert_select "#studio-appearance-hint.sr-only", text: "Does not change the theme preview."
+    assert_select "#studio-appearance", count: 0
   end
 
   test "the frame renders an html_safe sidebar and refuses a plain string" do
