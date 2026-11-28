@@ -15,6 +15,13 @@ class Views::Gallery::ShowTest < ActiveSupport::TestCase
     assert_equal content_letters, index_letters
   end
 
+  test "the letter headings are visually hidden, so component names are the only visible headings" do
+    headings = @html.css("section[aria-label^='Components starting'] > h2")
+
+    assert_not_empty headings
+    assert(headings.all? { |heading| heading["class"].split == [ "sr-only" ] })
+  end
+
   test "the spy is mounted once, on the page wrapper, with passive scroll and resize actions" do
     spies = @html.css("[data-controller~='gallery--index-spy']")
 
