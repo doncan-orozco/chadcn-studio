@@ -17,6 +17,7 @@ class ShellTest < ApplicationSystemTestCase
 
   test "the appearance menu opens from one Studio appearance button and checks the active scheme" do
     visit root_path
+
     assert_no_selector "[data-testid=theme-dark]"
 
     choose_appearance "dark"
