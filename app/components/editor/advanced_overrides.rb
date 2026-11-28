@@ -10,7 +10,7 @@ class Components::Editor::AdvancedOverrides < Components::Base
   def view_template
     div(class: "grid gap-4") do
       p(class: "text-sm text-muted-foreground", data: { testid: "overrides-note" }) do
-        "Type a hex color such as #9ca3af, or an oklch(...) value; clear a field to follow the rule again. Closing this panel keeps your overrides; Save the theme to store them."
+        "Type a hex color to pin a variable; the gray text in each field is the color the rule gives. Clear a field to follow the rule again. Closing this panel keeps your overrides; Save the theme to store them."
       end
       render Chadcn::Tabs.new(default_value: @group.modes.first) do |tabs|
         tabs.list(aria: { label: "Mode" }) do
@@ -35,11 +35,16 @@ class Components::Editor::AdvancedOverrides < Components::Base
     end
   end
 
-  # The overrides keyed by the sidebar group that holds their variable, in the sidebar's order; the order within a group is kept.
+  # The fields a person reaches for most first, then the rest under the names of the sidebar groups, in the sidebar's order.
   def grouped(overrides)
     groups = ::Themes::Presenter::Group::DEFINITIONS.except("advanced")
-    by_group = overrides.group_by { |override| groups.find { |_, definition| definition[:variables].include?(override.name.delete_prefix("--")) }&.first }
-    groups.filter_map { |key, definition| [ [ key, definition ], by_group[key] ] if by_group[key] }
+    pinned = ::Themes::Presenter::Group::PINNED_FIRST
+    by_group = overrides.group_by do |override|
+      variable = override.name.delete_prefix("--")
+      pinned.include?(variable) ? "pinned" : groups.find { |_, definition| definition[:variables].include?(variable) }&.first
+    end
+    sections = { "pinned" => { label: "Most used" } }.merge(groups)
+    sections.filter_map { |key, definition| [ [ key, definition ], by_group[key] ] if by_group[key] }
   end
 
   def field(override)

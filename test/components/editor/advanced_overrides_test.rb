@@ -3,11 +3,11 @@ require "test_helper"
 class Components::Editor::AdvancedOverridesTest < ActiveSupport::TestCase
   setup { @group = Themes::Presenter::Group.new(themes(:zinc), key: "advanced") }
 
-  test "every field is a filterable row named by its variable, the brand color first" do
+  test "every field is a filterable row named by its variable, primary first" do
     html = Components::Editor::AdvancedOverrides.new(group: @group).call
     names = html.scan(/data-variable="([^"]+)"/).flatten
 
-    assert_equal "primary", names.first
+    assert_equal %w[primary border ring], names.first(3)
     assert_includes html, 'data-editor--variable-filter-target="row"'
     assert_equal @group.overrides("light").size + @group.overrides("dark").size, names.size
   end
@@ -48,7 +48,7 @@ class Components::Editor::AdvancedOverridesTest < ActiveSupport::TestCase
     page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
     headings = page.all("[role=tabpanel][data-state=active] h3").map(&:text)
 
-    assert_equal [ "Brand color", "Backgrounds, cards and text", "Radius", "Charts", "Sidebar" ], headings
+    assert_equal [ "Most used", "Brand color", "Backgrounds, cards and text", "Radius", "Charts", "Sidebar" ], headings
   end
 
   test "gives one instruction line, not two paragraphs" do
