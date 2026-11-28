@@ -11,17 +11,19 @@ class Views::Previews::Form < Views::Base
 
   def view_template
     div(class: "mx-auto max-w-xl space-y-6 p-6") do
-      h2(class: "text-2xl font-semibold tracking-tight") { @presenter.title }
+      div(class: "flex items-center justify-between gap-3") do
+        h2(class: "text-2xl font-semibold tracking-tight") { @presenter.title }
+        div(class: "flex items-center gap-2") do
+          render Chadcn::Button.new(variant: "outline") { "Cancel" }
+          render Chadcn::Button.new { "Create account" }
+        end
+      end
       render Chadcn::Card.new do |card|
         card.header do
           card.title { "Create account" }
           card.description { "Tell us a little about you." }
         end
         card.content { fields }
-        card.footer(class: "justify-between") do
-          render Chadcn::Button.new(variant: "outline") { "Cancel" }
-          render Chadcn::Button.new { "Create account" }
-        end
       end
       danger
     end
@@ -41,13 +43,6 @@ class Views::Previews::Form < Views::Base
         field.description(id: "form-email-sample") { SAMPLE_CAPTION }
         field.error(id: "form-email-error") { @presenter.email_error }
       end
-      render Chadcn::Field.new do |field|
-        field.label(html_for: "form-bio") { "Bio" }
-        field.render Chadcn::Textarea.new(id: "form-bio", placeholder: "A few words")
-        field.description { "Shown on your public profile." }
-      end
-      role
-      plan
       render Chadcn::Field.new(orientation: "horizontal") do |field|
         field.render Chadcn::Checkbox.new(id: "form-terms", default_checked: true)
         field.label(html_for: "form-terms") { "Accept the terms" }
@@ -56,6 +51,13 @@ class Views::Previews::Form < Views::Base
         field.label(html_for: "form-news") { "Product news" }
         field.render Chadcn::Switch.new(id: "form-news", default_checked: true)
       end
+      render Chadcn::Field.new do |field|
+        field.label(html_for: "form-bio") { "Bio" }
+        field.render Chadcn::Textarea.new(id: "form-bio", placeholder: "A few words")
+        field.description { "Shown on your public profile." }
+      end
+      role
+      plan
       render Chadcn::Field.new do |field|
         field.label { "Volume" }
         field.render Chadcn::Slider.new(default_value: @presenter.volume, label: "Volume")
