@@ -5,7 +5,7 @@
 class Components::Editor::AdvancedOverrides < Components::Base
   def initialize(group:)
     @group = group
-    @sections = ::Themes::Presenter::OverrideSections.new(group)
+    @override_sections = ::Themes::Presenter::OverrideSections.new(group)
   end
 
   def view_template
@@ -27,10 +27,10 @@ class Components::Editor::AdvancedOverrides < Components::Base
   # One mode's fields under the sidebar's group names. Both panels stay mounted so the hidden mode's fields still post with the form.
   def section_for(mode)
     div(class: "grid gap-4") do
-      @sections.sections(mode).each do |part|
-        section(class: "grid gap-3", aria: { labelledby: "overrides-#{mode}-#{part.key}-heading" }) do
-          h3(id: "overrides-#{mode}-#{part.key}-heading", class: "text-sm font-semibold") { part.label }
-          part.overrides.each { |override| field(override) }
+      @override_sections.sections(mode).each do |fields_group|
+        section(class: "grid gap-3", aria: { labelledby: "overrides-#{mode}-#{fields_group.key}-heading" }) do
+          h3(id: "overrides-#{mode}-#{fields_group.key}-heading", class: "text-sm font-semibold") { fields_group.label }
+          fields_group.overrides.each { |override| field(override) }
         end
       end
     end
