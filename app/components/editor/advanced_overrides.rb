@@ -5,6 +5,7 @@
 class Components::Editor::AdvancedOverrides < Components::Base
   def initialize(group:)
     @group = group
+    @sections = ::Themes::Presenter::OverrideSections.new(group)
   end
 
   def view_template
@@ -23,28 +24,16 @@ class Components::Editor::AdvancedOverrides < Components::Base
 
   private
 
-  # One mode's fields under the names of the sidebar groups they belong to. Both panels stay mounted so the hidden mode's fields still post with the form.
+  # One mode's fields under the sidebar's group names. Both panels stay mounted so the hidden mode's fields still post with the form.
   def section_for(mode)
     div(class: "grid gap-4") do
-      grouped(@group.overrides(mode)).each do |group, overrides|
-        section(class: "grid gap-3", aria: { labelledby: "overrides-#{mode}-#{group.first}-heading" }) do
-          h3(id: "overrides-#{mode}-#{group.first}-heading", class: "text-sm font-semibold") { group.last[:label] }
-          overrides.each { |override| field(override) }
+      @sections.sections(mode).each do |part|
+        section(class: "grid gap-3", aria: { labelledby: "overrides-#{mode}-#{part.key}-heading" }) do
+          h3(id: "overrides-#{mode}-#{part.key}-heading", class: "text-sm font-semibold") { part.label }
+          part.overrides.each { |override| field(override) }
         end
       end
     end
-  end
-
-  # The fields a person reaches for most first, then the rest under the names of the sidebar groups, in the sidebar's order.
-  def grouped(overrides)
-    groups = ::Themes::Presenter::Group::DEFINITIONS.except("advanced")
-    pinned = ::Themes::Presenter::Group::PINNED_FIRST
-    by_group = overrides.group_by do |override|
-      variable = override.name.delete_prefix("--")
-      pinned.include?(variable) ? "pinned" : groups.find { |_, definition| definition[:variables].include?(variable) }&.first
-    end
-    sections = { "pinned" => { label: "Most used" } }.merge(groups)
-    sections.filter_map { |key, definition| [ [ key, definition ], by_group[key] ] if by_group[key] }
   end
 
   def field(override)

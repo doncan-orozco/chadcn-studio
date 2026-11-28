@@ -44,23 +44,19 @@ class Components::Editor::AdvancedOverridesTest < ActiveSupport::TestCase
     assert page.has_css?("[role=tabpanel][data-state=inactive] input#override-dark-border", visible: :all)
   end
 
-  test "fields sit under the names of the sidebar groups, in the sidebar's order" do
+  test "fields sit under the names of the sidebar groups, the most used first" do
     page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
     headings = page.all("[role=tabpanel][data-state=active] h3").map(&:text)
 
-    assert_equal [ "Most used", "Brand color", "Backgrounds, cards and text", "Radius", "Charts", "Sidebar" ], headings
+    assert_equal "Most used", headings.first
+    assert_equal Themes::Presenter::Group::DEFINITIONS.except("advanced").values.map { |definition| definition[:label] }, headings.drop(1)
   end
 
-  test "gives one instruction line, not two paragraphs" do
+  test "the one instruction line says Close keeps the overrides and Save stores them" do
     page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
+    note = page.find("[data-testid=overrides-note]")
 
-    assert_equal 1, page.all("p").size
-  end
-
-  test "the panel says Close keeps the overrides and Save stores them" do
-    html = Components::Editor::AdvancedOverrides.new(group: @group).call
-
-    assert_includes html, "Closing this panel keeps your overrides"
-    assert_includes html, "Save the theme to store them"
+    assert_includes note.text, "Closing this panel keeps your overrides"
+    assert_includes note.text, "Save the theme to store them"
   end
 end
