@@ -26,7 +26,8 @@ class Views::Gallery::Show < Views::Base
 
   def group_section(group)
     section(aria: { label: group.label }, class: "space-y-6") do
-      h2(class: "border-b pb-2 text-sm font-semibold text-muted-foreground") { group.letter }
+      # The group keeps its name for assistive technology; the component names inside are the only visible section headings.
+      h2(class: "sr-only") { group.letter }
       group.entries.each { |entry| render Components::Gallery::Entry.new(entry:, anchor: @presenter.anchor(entry), data: { gallery__index_spy_target: "entry" }) }
     end
   end
