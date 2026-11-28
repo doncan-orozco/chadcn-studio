@@ -1,6 +1,8 @@
 class ThemesController < ApplicationController
+  include NewThemeMarks
+
   def index
-    render Views::Themes::Index.new(Themes::Presenter::List.new(Themes::Query::Recent.call, base_url: request.base_url, fresh_ids: session[:new_theme_ids]), deleted: flash[:deleted])
+    render Views::Themes::Index.new(Themes::Presenter::List.new(Themes::Query::Recent.call, base_url: request.base_url, fresh_ids: fresh_theme_ids), deleted: flash[:deleted])
   end
 
   def show
@@ -22,7 +24,7 @@ class ThemesController < ApplicationController
   end
 
   def edit
-    session[:new_theme_ids] = Array(session[:new_theme_ids]) - [ theme.id ] unless flash[:landed]
+    acknowledge_landing(theme)
     render Views::Themes::Edit.new(Themes::Presenter::Editor.new(theme))
   end
 
