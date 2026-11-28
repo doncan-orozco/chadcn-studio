@@ -67,6 +67,24 @@ class TargetSizeTest < ApplicationSystemTestCase
     assert_in_delta 8, disc_distance_from_track(slider, :end), 0.5
   end
 
+  test "the dark switch paints an 18 px track with round ends inside its 24 px box" do
+    painted = find(:testid, "preview-dark").evaluate_script(<<~JS)
+      (function (el) {
+        var style = getComputedStyle(el), top = parseFloat(style.borderTopWidth), radius = style.borderTopLeftRadius.split(" ").map(parseFloat);
+        return [el.offsetHeight - 2 * top, radius[0], (radius[1] || radius[0]) - top];
+      })(this)
+    JS
+
+    assert_in_delta 18.4, painted[0], 0.5
+    assert_in_delta painted[1], painted[2], 0.1, "the painted track's corner radius is the same across and down"
+  end
+
+  test "the toast close paints a 20 px circle inside its 24 px box" do
+    click_on "Save theme"
+
+    assert_in_delta 20, find("[data-close-button]", visible: :all).evaluate_script("this.clientWidth"), 0.5
+  end
+
   test "a theme row link is a target of at least 24 x 24" do
     visit root_path
     link = find("ul[aria-label='Your themes'] li > a", match: :first)

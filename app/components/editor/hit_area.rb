@@ -16,8 +16,10 @@ module Components::Editor::HitArea
   # reaches 4 px further on each side and the track keeps its old extent, so the disc meets the track ends where the 16 px
   # thumb did. Goes on the slider's `class:` beside THUMB.
   THUMB_TRACK = "-mx-1 [&>[data-slot=slider-track]]:mx-1"
-  # The 32 x 18.4 px switch becomes 32 x 24: the track is painted in the padding box, inside 2.8 px of transparent border
-  # above and below; the 1 px side border becomes padding so the thumb keeps its travel. With that border no longer the focus
+  # The 32 x 18.4 px switch becomes 32 x 24: the track is painted in the padding box, inside 3 px of transparent border
+  # above and below (a whole pixel: a border is floored to device pixels, so 2.8 px would paint 2; the track is 18 px, as
+  # near the gem's 18.4 as a whole pixel gets; the outer radius is 9 px across and 12 px down, so the painted corners stay 9 px semicircles);
+  # the 1 px side border becomes padding so the thumb keeps its travel. With that border no longer the focus
   # cue (`focus-visible:border-ring`), the focus ring is full strength instead of half.
-  SWITCH = "data-[size=default]:h-6 border-x-0 border-y-[0.175rem] px-px bg-clip-padding focus-visible:border-transparent focus-visible:ring-ring shadow-none drop-shadow-xs"
+  SWITCH = "data-[size=default]:h-6 rounded-[9px/12px] border-x-0 border-y-[3px] px-px bg-clip-padding focus-visible:border-transparent focus-visible:ring-ring shadow-none drop-shadow-xs"
 end
