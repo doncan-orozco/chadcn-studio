@@ -19,6 +19,6 @@ class Views::Previews::FormTest < ActiveSupport::TestCase
 
     assert page.has_xpath?("//button[normalize-space()='Create account'][following::*[@id='form-bio']]")
     assert page.has_xpath?("//*[@id='form-terms'][following::*[@id='form-bio']]")
-    assert page.has_css?("#form-terms[aria-checked=true], #form-terms[checked]")
+    assert page.has_css?("#form-terms[role=checkbox][aria-checked=true]")
   end
 end
