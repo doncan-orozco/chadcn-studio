@@ -46,7 +46,7 @@ class Components::Editor::SliderField < Components::Base
     div(class: "grid min-w-0 gap-2") do
       label_text
       div(class: "flex min-w-0 items-center gap-3") do
-        render Chadcn::Slider.new(id: @id, label: @label, thumb_class: Components::Editor::HitArea::THUMB, class: "min-w-0 flex-1", aria: { labelledby: "#{@id}-label" }, data: slider_attributes, **@slider)
+        render Chadcn::Slider.new(id: @id, label: @label, thumb_class: Components::Editor::HitArea::THUMB, class: "min-w-0 flex-1 #{Components::Editor::HitArea::THUMB_TRACK}", aria: { labelledby: "#{@id}-label" }, data: slider_attributes, **@slider)
         number_box if @unit
       end
     end

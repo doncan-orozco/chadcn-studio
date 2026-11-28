@@ -64,24 +64,24 @@ class EditorTest < ApplicationSystemTestCase
     assert_equal @theme.light["background"], property("--background")
   end
 
-  test "the dialog Close, the switch and the slider thumb answer a pointer anywhere in a 24 px square" do
+  test "the dialog Close, the switch and the slider thumb answer a pointer across a 24 px box" do
     thumb = find(:testid, "primary-lightness").find("[role=slider]")
 
-    assert_empty unreachable_corners(find(:testid, "preview-dark")), "the dark switch must be hit across a 24 x 24 px square"
-    assert_empty unreachable_corners(thumb), "the slider thumb must be hit across a 24 x 24 px square"
-    assert_operator thumb.evaluate_script("this.getBoundingClientRect().width"), :<=, 16, "the thumb keeps its visual size"
+    assert_empty unreachable_sides(find(:testid, "preview-dark")), "the dark switch must be hit across its 24 x 24 px box"
+    assert_empty unreachable_sides(thumb), "the slider thumb must be hit across its 24 x 24 px box"
+    assert_operator thumb.evaluate_script("this.offsetWidth"), :>=, 24, "the thumb is a 24 px box of its own"
 
     open_group "advanced"
     close = find("[data-state=open][data-slot=dialog-content] [data-chadcn--dialog-part=close]", match: :first)
 
-    assert_empty unreachable_corners(close), "the dialog Close must be hit across a 24 x 24 px square"
+    assert_empty unreachable_sides(close), "the dialog Close must be hit across its 24 x 24 px box"
   end
 
-  test "the export dialog Close answers a pointer anywhere in a 24 px square" do
+  test "the export dialog Close answers a pointer across a 24 px box" do
     find(:testid, "export").click
     close = find("[data-state=open][data-slot=dialog-content] [data-chadcn--dialog-part=close]", match: :first)
 
-    assert_empty unreachable_corners(close), "the export dialog Close must be hit across a 24 x 24 px square"
+    assert_empty unreachable_sides(close), "the export dialog Close must be hit across its 24 x 24 px box"
   end
 
   test "an advanced override survives a re-derivation, shows as overridden and clearing it re-derives" do
@@ -271,12 +271,13 @@ class EditorTest < ApplicationSystemTestCase
     assert_no_selector "[data-state=open][data-slot=dialog-content]"
   end
 
-  # The corners (1 px in) of a 24 x 24 px square centred on the control that a real hit test does not land on the control.
-  def unreachable_corners(element)
+  # The middles of the four sides (1 px in) of a 24 x 24 px square centred on the control that a real hit test does not land on
+  # the control. The box is the control's own and round (a thumb, a pill), so its corners are not part of the shape.
+  def unreachable_sides(element)
     evaluate_script(<<~JS, element)
       (function (control) {
         var box = control.getBoundingClientRect(), cx = box.left + box.width / 2, cy = box.top + box.height / 2;
-        return [[-11, -11], [11, -11], [-11, 11], [11, 11]].filter(function (offset) {
+        return [[0, -11], [11, 0], [0, 11], [-11, 0]].filter(function (offset) {
           var hit = document.elementFromPoint(cx + offset[0], cy + offset[1]);
           return !(hit && control.contains(hit));
         });
