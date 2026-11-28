@@ -29,8 +29,8 @@ class Views::Themes::Edit::Groups < Views::Base
   # "Describe a theme" lives under the groups, at the width of the sidebar. A studio that cannot generate shows nothing here:
   # someone tuning a theme has no use for the setup line (New theme says how to turn it on).
   def generation
-    panel = Generations::Presenter::Panel.for(@presenter.__getobj__)
-    return unless panel.configured?
+    panel = @presenter.generation_panel
+    return unless panel
 
     div(class: "border-t p-2 [&_form]:flex-col [&_form]:items-stretch [&_input]:w-full") do
       render Components::Editor::GenerationPanel.new(panel: panel)

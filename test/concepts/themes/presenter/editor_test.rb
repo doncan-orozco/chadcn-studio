@@ -85,4 +85,17 @@ class Themes::Presenter::EditorTest < ActiveSupport::TestCase
   test "the document title carries the theme name" do
     assert_equal "Edit Zinc - Chadcn Studio", @editor.document_title
   end
+
+  test "the generation panel is offered only when the studio can generate" do
+    key = ENV.delete("ANTHROPIC_API_KEY")
+
+    assert_nil @editor.generation_panel
+
+    GenerateThemeJob.client = FakeGenerationClient.new
+
+    assert_kind_of Generations::Presenter::Panel, @editor.generation_panel
+  ensure
+    GenerateThemeJob.client = nil
+    ENV["ANTHROPIC_API_KEY"] = key if key
+  end
 end
