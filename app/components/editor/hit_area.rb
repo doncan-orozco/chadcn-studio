@@ -12,6 +12,10 @@ module Components::Editor::HitArea
   # hover and focus rings are inset so they fill the 4 px band around the disc exactly where the old 4 px ring sat.
   THUMB = "size-6 border-0 bg-transparent bg-[radial-gradient(circle,var(--color-white)_0_7px,var(--color-primary)_7px_8px,transparent_8px)] " \
           "shadow-none drop-shadow-xs hover:ring-inset focus-visible:ring-inset"
+  # The 24 px thumb box makes the gem's slider stop a thumb's centre 12 px from each end of its root instead of 8; the root
+  # reaches 4 px further on each side and the track keeps its old extent, so the disc meets the track ends where the 16 px
+  # thumb did. Goes on the slider's `class:` beside THUMB.
+  THUMB_TRACK = "-mx-1 [&>[data-slot=slider-track]]:mx-1"
   # The 32 x 18.4 px switch becomes 32 x 24: the track is painted in the padding box, inside 2.8 px of transparent border
   # above and below; the 1 px side border becomes padding so the thumb keeps its travel. With that border no longer the focus
   # cue (`focus-visible:border-ring`), the focus ring is full strength instead of half.

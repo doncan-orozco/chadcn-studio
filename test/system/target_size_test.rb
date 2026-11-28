@@ -55,4 +55,36 @@ class TargetSizeTest < ApplicationSystemTestCase
     assert_operator close.evaluate_script("this.offsetWidth"), :>=, 24
     assert_operator close.evaluate_script("this.offsetHeight"), :>=, 24
   end
+
+  test "the slider disc meets the track end at the minimum and the maximum, as the 16 px thumb did" do
+    find(:testid, "group-radius").click
+    slider = find(:testid, "group-radius-panel").find("[role=slider]", match: :first)
+    slider.send_keys(:home)
+
+    assert_in_delta 8, disc_distance_from_track(slider, :start), 0.5
+    slider.send_keys(:end)
+
+    assert_in_delta 8, disc_distance_from_track(slider, :end), 0.5
+  end
+
+  test "a theme row link is a target of at least 24 x 24" do
+    visit root_path
+    link = find("ul[aria-label='Your themes'] li > a", match: :first)
+
+    assert_operator link.evaluate_script("this.offsetHeight"), :>=, 24
+    assert_operator link.evaluate_script("this.offsetWidth"), :>=, 24
+  end
+
+  private
+
+  # How far the disc's centre is from the track's start (or end), in CSS px.
+  def disc_distance_from_track(thumb, side)
+    thumb.evaluate_script(<<~JS, side.to_s)
+      (function (thumb, side) {
+        var track = thumb.closest("[data-slot=slider]").querySelector("[data-slot=slider-track]").getBoundingClientRect();
+        var box = thumb.getBoundingClientRect(), centre = box.left + box.width / 2;
+        return side === "start" ? centre - track.left : track.right - centre;
+      })(this, arguments[0])
+    JS
+  end
 end
