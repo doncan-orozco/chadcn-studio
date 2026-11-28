@@ -14,7 +14,8 @@ class Themes::DerivationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "turbo-stream[target=summary-brand] template", text: "Blue"
     assert_select "turbo-stream[target=summary-radius] template", text: "0.5rem"
     assert_select "turbo-stream[target=rows-charts] template li", count: 5
-    assert_select "turbo-stream[target=advanced-overrides] template [data-testid=override-row]", minimum: 30
+    assert_select "turbo-stream[target=advanced-overrides-light] template [data-testid=override-row]", minimum: 30
+    assert_select "turbo-stream[target=advanced-overrides]", count: 0
     assert_select "turbo-stream[target=editor-errors] template", text: ""
   end
 
@@ -30,7 +31,7 @@ class Themes::DerivationsControllerTest < ActionDispatch::IntegrationTest
     derive(primary: "oklch(0.55 0.2 250)", overrides: { light: { ring: "oklch(0.6 0.1 30)", "chart-1": "" } })
 
     assert_response :success
-    assert_select "turbo-stream[target=advanced-overrides] template [data-overridden=true]", count: 1
+    assert_select "turbo-stream[target=advanced-overrides-light] template [data-overridden=true]", count: 1
     assert_select "turbo-stream[target=summary-advanced] template", text: "1 overridden"
     assert_includes response.body, "oklch(0.6 0.1 30)"
   end

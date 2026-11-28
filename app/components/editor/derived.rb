@@ -33,7 +33,15 @@ class Components::Editor::Derived < Components::Base
   def group_streams(group)
     replace(group.summary_id) { plain group.summary }
     replace(group.rows_id) { render Components::Editor::VariableRows.new(rows: group.rows) } unless group.variables.empty? || group.key == "advanced"
-    replace(group.controls_id) { render Components::Editor::AdvancedOverrides.new(group: group) } if group.key == "advanced"
+    advanced_streams(group) if group.key == "advanced"
+  end
+
+  # Only the fields inside each mode's panel are swapped: the Tabs root and its selected mode stay put.
+  def advanced_streams(group)
+    sections = ::Themes::Presenter::OverrideSections.new(group)
+    group.modes.each do |mode|
+      replace(sections.panel_id(mode)) { render Components::Editor::OverrideFields.new(mode: mode, sections: sections.sections(mode)) }
+    end
   end
 
   # `update` keeps the target element, so ids and the controllers hosted on them stay put.

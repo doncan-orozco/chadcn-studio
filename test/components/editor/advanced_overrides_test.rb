@@ -24,21 +24,46 @@ class Components::Editor::AdvancedOverridesTest < ActiveSupport::TestCase
     page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
     rows = @group.overrides("light").size + @group.overrides("dark").size
 
-    assert page.has_css?("[data-controller='editor--override-swatch'] [data-testid='override-swatch'][aria-hidden='true']", count: rows)
-    assert page.has_css?("input[data-editor--override-swatch-target='input']", count: rows)
+    assert page.has_css?("[data-controller='editor--override-swatch'] [data-testid='override-swatch'][aria-hidden='true']", count: rows, visible: :all)
+    assert page.has_css?("input[data-editor--override-swatch-target='input']", count: rows, visible: :all)
   end
 
   test "placeholders are the derived color as hex, except the translucent ones hex cannot say" do
     page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
 
     assert_match(/\A#\h{6}\z/, page.find_by_id("override-light-border")[:placeholder])
-    assert_match(%r{\Aoklch\(.+/ \d+%\)\z}, page.find_by_id("override-dark-border")[:placeholder])
+    assert_match(%r{\Aoklch\(.+/ \d+%\)\z}, page.find_by_id("override-dark-border", visible: :all)[:placeholder])
   end
 
-  test "the panel says Close keeps the overrides and Save stores them" do
-    html = Components::Editor::AdvancedOverrides.new(group: @group).call
+  test "opens on Light with a Light and Dark switch, and keeps both modes' fields in the form" do
+    page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
 
-    assert_includes html, "Closing this panel keeps your overrides"
-    assert_includes html, "Save the theme to store them"
+    assert_equal %w[Light Dark], page.all("[role=tab]").map(&:text)
+    assert_equal "true", page.find("[data-testid=overrides-mode-light]")["aria-selected"]
+    assert page.has_css?("[role=tabpanel][data-state=active] [data-testid=override-row]", count: @group.overrides("light").size)
+    assert page.has_css?("[role=tabpanel][data-state=inactive] input#override-dark-border", visible: :all)
+  end
+
+  test "fields sit under the names of the sidebar groups, the most used first" do
+    page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
+    headings = page.all("[role=tabpanel][data-state=active] h3").map(&:text)
+
+    assert_equal "Most used", headings.first
+    assert_equal Themes::Presenter::Group::DEFINITIONS.except("advanced").values.map { |definition| definition[:label] }, headings.drop(1)
+  end
+
+  test "the one instruction line says Close keeps the overrides and Save stores them" do
+    page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
+    note = page.find("[data-testid=overrides-note]")
+
+    assert_includes note.text, "Closing this panel keeps your overrides"
+    assert_includes note.text, "Save the theme to store them"
+  end
+
+  test "each mode's fields sit in their own stream target inside the panel, so a re-derivation keeps the chosen mode" do
+    page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
+
+    assert page.has_css?("[role=tabpanel] #advanced-overrides-light [data-testid=override-row]", count: @group.overrides("light").size)
+    assert page.has_css?("[role=tabpanel] #advanced-overrides-dark input#override-dark-border", visible: :all)
   end
 end
