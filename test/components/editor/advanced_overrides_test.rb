@@ -59,4 +59,11 @@ class Components::Editor::AdvancedOverridesTest < ActiveSupport::TestCase
     assert_includes note.text, "Closing this panel keeps your overrides"
     assert_includes note.text, "Save the theme to store them"
   end
+
+  test "each mode's fields sit in their own stream target inside the panel, so a re-derivation keeps the chosen mode" do
+    page = Capybara.string(Components::Editor::AdvancedOverrides.new(group: @group).call)
+
+    assert page.has_css?("[role=tabpanel] #advanced-overrides-light [data-testid=override-row]", count: @group.overrides("light").size)
+    assert page.has_css?("[role=tabpanel] #advanced-overrides-dark input#override-dark-border", visible: :all)
+  end
 end

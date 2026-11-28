@@ -4,7 +4,7 @@
 # Brand color, Backgrounds... in the sidebar's order. Wraps the advanced group; a variable no section names is not shown.
 class Themes::Presenter::OverrideSections < Core::Presenter::Base
   MOST_USED = "most-used"
-  GROUPS = Themes::Presenter::Group::DEFINITIONS.except("advanced")
+  GROUPS = Themes::Presenter::Group::DEFINITIONS.except("advanced").freeze
   LABELS = { MOST_USED => "Most used" }.merge(GROUPS.transform_values { |definition| definition[:label] }).freeze
   SECTION_BY_VARIABLE = GROUPS.each_with_object({}) { |(key, definition), index| definition[:variables].each { |variable| index[variable] = key } }
                               .merge(Themes::Presenter::Group::PINNED_FIRST.index_with(MOST_USED)).freeze
@@ -12,6 +12,9 @@ class Themes::Presenter::OverrideSections < Core::Presenter::Base
   private_constant :GROUPS, :LABELS, :SECTION_BY_VARIABLE
 
   Section = Data.define(:key, :label, :overrides)
+
+  # The element the derivation stream updates inside one mode's panel; the Tabs around it stay, so the chosen mode survives.
+  def panel_id(mode) = "advanced-overrides-#{mode}"
 
   # The sections of the mode that have at least one field, each with its fields in the order the group gives them.
   def sections(mode)

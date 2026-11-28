@@ -60,4 +60,18 @@ class PinVariableTest < ApplicationSystemTestCase
     assert_equal [ "ring", "sidebar-ring" ], all(:testid, "override-row", visible: :visible).map { |row| row["data-variable"] }.uniq
     assert_no_selector :testid, "unsaved"
   end
+
+  test "a Dark override stays on Dark after the re-derivation" do
+    find(:testid, "group-advanced").click
+    find(:testid, "overrides-mode-dark").click
+
+    assert_no_selector "#override-light-primary", visible: :visible
+
+    fill_in "override-dark-primary", with: "#3366ff"
+    find_field("override-dark-primary").send_keys(:enter)
+
+    assert_selector :testid, "overridden", count: 1
+    assert_equal "true", find(:testid, "overrides-mode-dark")["aria-selected"]
+    assert_selector "#override-dark-primary", visible: :visible
+  end
 end
