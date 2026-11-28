@@ -25,6 +25,23 @@ class ExportsTest < ApplicationSystemTestCase
     assert_match(%r{\Abin/rails theme:import\[http://.+/t/zinc\.css\]\z}, find(:testid, "import-command").text)
   end
 
+  test "a published theme unpublishes from inside the dialog and the dialog stays open on its draft body" do
+    visit edit_theme_path(themes(:slate))
+
+    click_on "Export"
+
+    assert_selector :testid, "dialog-published", text: "Published"
+    find(:testid, "export-unpublish").click
+
+    assert_selector :testid, "export-panel"
+    assert_selector :testid, "export-draft", text: "anyone with its link"
+    assert_no_selector :testid, "download-css"
+    assert_not_predicate themes(:slate).reload, :published?
+    send_keys :escape
+
+    assert_selector :testid, "publication-state", text: "Not published"
+  end
+
   test "a draft publishes from inside the dialog and the dialog stays open" do
     visit edit_theme_path(themes(:zinc))
 

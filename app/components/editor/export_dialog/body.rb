@@ -24,18 +24,33 @@ class Components::Editor::ExportDialog::Body < Components::Base
       input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
       input(type: "hidden", name: "from", value: ORIGIN)
       input(type: "hidden", name: "trigger", value: TRIGGER_ROW) if @compact
-      p(class: "text-sm text-muted-foreground") { "This theme is a draft. Publish it to get its download links and import command." }
+      p(class: "text-sm text-muted-foreground") { "This theme is a draft. Publishing makes it readable by anyone with its link, and you can unpublish it at any time." }
       render Chadcn::Button.new(type: "submit", data: { testid: "export-publish" }) { "Publish and show import command" }
     end
   end
 
   def download_links
     div(class: "grid gap-4", data: { controller: "editor--export", editor__export_downloaded_label_value: @presenter.css.downloaded_label, editor__export_copied_label_value: "Copied" }) do
+      published_row
       div(class: "grid gap-2") do
         div(class: "flex gap-2") { download_buttons }
         span(class: "text-sm text-muted-foreground", role: "status", data: { testid: "download-css-status", editor__export_target: "downloadStatus" })
       end
       import_command
+    end
+  end
+
+  # The state and the way back, beside the public URL: Unpublish answers with the dialog open on its draft body.
+  def published_row
+    div(class: "flex items-center justify-between gap-2") do
+      render Chadcn::Badge.new(data: { testid: "dialog-published" }) { "Published" }
+      form(action: @presenter.publication_path, method: "post", data: { testid: "export-unpublish-form" }) do
+        input(type: "hidden", name: "_method", value: "delete")
+        input(type: "hidden", name: "authenticity_token", value: form_authenticity_token)
+        input(type: "hidden", name: "from", value: ORIGIN)
+        input(type: "hidden", name: "trigger", value: TRIGGER_ROW) if @compact
+        render Chadcn::Button.new(type: "submit", variant: "outline", data: { testid: "export-unpublish" }) { "Unpublish" }
+      end
     end
   end
 

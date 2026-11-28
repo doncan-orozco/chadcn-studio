@@ -27,6 +27,24 @@ class Components::Editor::ExportDialog::BodyTest < ActiveSupport::TestCase
     assert_not_includes command.inner_html, "/<wbr>/"
   end
 
+  test "the draft offer says the theme becomes public and can be undone" do
+    text = render_body(themes(:zinc)).at_css("[data-testid=export-draft]").text
+
+    assert_match(/anyone with its link/, text)
+    assert_match(/unpublish it at any time/, text)
+  end
+
+  test "a published theme shows a Published badge and an Unpublish form for the dialog" do
+    html = render_body(themes(:slate))
+    form = html.at_css("[data-testid=export-unpublish-form]")
+
+    assert_equal "Published", html.at_css("[data-testid=dialog-published]").text.strip
+    assert_equal "Unpublish", html.at_css("[data-testid=export-unpublish]").text.strip
+    assert_equal "delete", form.at_css("input[name=_method]")["value"]
+    assert_equal "export_dialog", form.at_css("input[name=from]")["value"]
+    assert_nil form.at_css("input[name=trigger]")
+  end
+
   test "a draft theme offers to publish and shows no import command" do
     theme = themes(:zinc)
     html = render_body(theme)

@@ -7,7 +7,10 @@ class Themes::PublicationsController < ApplicationController
   end
 
   def destroy
-    respond_to_result Themes::Operation::Unpublish.new.call(model: theme), notice: "Theme unpublished"
+    result = Themes::Operation::Unpublish.new.call(model: theme)
+    return render_dialog(result.value![:model]) if result.success? && from_export_dialog?
+
+    respond_to_result result, notice: "Theme unpublished"
   end
 
   private
@@ -24,7 +27,7 @@ class Themes::PublicationsController < ApplicationController
     end
   end
 
-  # Publishing from inside the Export dialog: the dialog comes back open on the published body, the toggle and the header state follow.
+  # Publishing or unpublishing from inside the Export dialog: the dialog comes back open on the new body (links or draft offer), the toggle and the header state follow.
   def render_dialog(model)
     sharing = Exports::Presenter::Sharing.new(model, base_url: request.base_url)
     compact = params[:trigger] == Components::Editor::ExportDialog::Body::TRIGGER_ROW
