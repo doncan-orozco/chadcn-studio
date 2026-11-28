@@ -15,11 +15,10 @@ class Views::Previews::FormTest < ActiveSupport::TestCase
   end
 
   test "the primary action and a checked control come before the long fields" do
-    html = Views::Previews::Form.new(Previews::Presenter::Form.new).call
-    primary = html.index("Create account</button>")
+    page = Capybara.string(Views::Previews::Form.new(Previews::Presenter::Form.new).call)
 
-    assert primary
-    assert_operator primary, :<, html.index('id="form-bio"')
-    assert_operator html.index('id="form-terms"'), :<, html.index('id="form-bio"')
+    assert page.has_xpath?("//button[normalize-space()='Create account'][following::*[@id='form-bio']]")
+    assert page.has_xpath?("//*[@id='form-terms'][following::*[@id='form-bio']]")
+    assert page.has_css?("#form-terms[aria-checked=true], #form-terms[checked]")
   end
 end
