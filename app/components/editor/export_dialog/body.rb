@@ -61,12 +61,9 @@ class Components::Editor::ExportDialog::Body < Components::Base
   end
 
   def download_buttons
-    render Chadcn::Button.new(as_child: :a, href: download_href(@presenter.css.path), download: @presenter.css.filename, data: { testid: "download-css", action: "editor--export#downloaded" }) { @presenter.css.download_label }
-    render Chadcn::Button.new(as_child: :a, href: download_href(@presenter.json.path), download: @presenter.json.filename, variant: "outline", data: { testid: "download-json" }) { "Download JSON" }
+    render Chadcn::Button.new(as_child: :a, href: @presenter.css.download_path, download: @presenter.css.filename, data: { testid: "download-css", action: "editor--export#downloaded" }) { @presenter.css.download_label }
+    render Chadcn::Button.new(as_child: :a, href: @presenter.json.download_path, download: @presenter.json.filename, variant: "outline", data: { testid: "download-json" }) { "Download JSON" }
   end
-
-  # A draft has no public URL: its download asks the studio's export for it with `draft`.
-  def download_href(path) = @presenter.published? ? path : "#{path}?draft=1"
 
   def import_command
     div(class: "grid gap-1", role: "group", aria: { labelledby: "import-command-label" }) do

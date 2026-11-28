@@ -15,4 +15,5 @@ class Exports::Presenter::Json < Core::Presenter::Base
   def filename = "#{slug}.json"
   def content_type = CONTENT_TYPE
   def path = helpers.theme_export_path(slug, format: "json")
+  def download_path = published? ? path : helpers.theme_export_path(slug, format: "json", draft: 1)
 end
