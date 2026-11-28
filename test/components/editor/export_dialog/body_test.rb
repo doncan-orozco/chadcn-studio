@@ -65,6 +65,18 @@ class Components::Editor::ExportDialog::BodyTest < ActiveSupport::TestCase
     assert_nil html.at_css("[data-testid=import-command]")
   end
 
+  test "a draft is downloadable right away through the studio's draft export, a published theme through its public URL" do
+    draft = render_body(themes(:zinc))
+    published = render_body(themes(:slate))
+
+    assert_equal "/t/zinc.css?draft=1", draft.at_css("[data-testid=download-css]")["href"]
+    assert_equal "/t/zinc.json?draft=1", draft.at_css("[data-testid=download-json]")["href"]
+    assert_equal "theme.css", draft.at_css("[data-testid=download-css]")["download"]
+    assert draft.at_css("[data-testid=download-css-status]")
+    assert_equal "/t/slate.css", published.at_css("[data-testid=download-css]")["href"]
+    assert_equal "/t/slate.json", published.at_css("[data-testid=download-json]")["href"]
+  end
+
   test "a row's draft form tells the server its trigger was compact, the editor's does not" do
     sharing = Exports::Presenter::Sharing.new(themes(:zinc), base_url: "https://studio.test")
     row = Nokogiri::HTML.fragment(ApplicationController.render(Components::Editor::ExportDialog::Body.new(presenter: sharing, compact: true), layout: false))

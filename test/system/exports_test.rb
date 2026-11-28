@@ -1,13 +1,15 @@
 require "application_system_test_case"
 
 class ExportsTest < ApplicationSystemTestCase
-  test "a draft has no export links, publishing makes them appear" do
+  test "a draft downloads right away, publishing adds the import command" do
     visit edit_theme_path(themes(:zinc))
 
     click_on "Export"
 
     assert_selector :testid, "export-draft"
-    assert_no_selector :testid, "download-css"
+    assert_selector :testid, "download-css"
+    assert_selector :testid, "download-json"
+    assert_no_selector :testid, "import-command"
     send_keys :escape
 
     assert_selector :testid, "publication-state", text: "Not published"
@@ -35,7 +37,8 @@ class ExportsTest < ApplicationSystemTestCase
 
     assert_selector :testid, "export-panel"
     assert_selector :testid, "export-draft", text: "anyone with its link"
-    assert_no_selector :testid, "download-css"
+    assert_selector :testid, "download-css"
+    assert_no_selector :testid, "import-command"
     assert_not_predicate themes(:slate).reload, :published?
     send_keys :escape
 
@@ -51,7 +54,8 @@ class ExportsTest < ApplicationSystemTestCase
     assert_current_path root_path
     assert_selector :testid, "export-panel"
     assert_selector :testid, "export-draft", text: "anyone with its link"
-    assert_no_selector :testid, "download-css"
+    assert_selector :testid, "download-css"
+    assert_no_selector :testid, "import-command"
     assert_not_predicate themes(:slate).reload, :published?
     send_keys :escape
 

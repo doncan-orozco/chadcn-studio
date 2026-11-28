@@ -30,6 +30,34 @@ class Themes::ExportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "a draft is served to the studio's own download and stays 404 on its public URL" do
+    get theme_export_path("zinc", format: "css", draft: 1)
+
+    assert_response :success
+    assert_match(/attachment; filename="theme\.css"/, response.headers["Content-Disposition"])
+    assert_equal themes(:zinc).palette, Chadcn::Theme.parse(response.body)
+
+    get theme_export_path("zinc", format: "json", draft: 1)
+
+    assert_response :success
+    assert_equal "zinc", JSON.parse(response.body)["slug"]
+
+    get theme_export_path("zinc", format: "css")
+
+    assert_response :not_found
+  end
+
+  test "a draft download still 404s for an unknown slug and for a palette that no longer validates" do
+    get theme_export_path("nope", format: "css", draft: 1)
+
+    assert_response :not_found
+
+    themes(:zinc).update_column(:light, themes(:zinc).light.except("primary"))
+    get theme_export_path("zinc", format: "css", draft: 1)
+
+    assert_response :not_found
+  end
+
   test "an unknown slug or a missing format is 404" do
     get theme_export_path("nope", format: "css")
 

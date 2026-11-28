@@ -14,4 +14,9 @@ class Exports::Query::PublishedTest < ActiveSupport::TestCase
     assert_empty Exports::Query::Published.call({ slug: "" })
     assert_empty Exports::Query::Published.call({})
   end
+
+  test "include_drafts lets a draft through and still needs its slug" do
+    assert_equal [ themes(:zinc) ], Exports::Query::Published.call({ slug: "zinc", include_drafts: true }).to_a
+    assert_empty Exports::Query::Published.call({ slug: "", include_drafts: true })
+  end
 end
