@@ -14,7 +14,7 @@ class Themes::Presenter::SavedNotice < Core::Presenter::Base
 
   def to_s
     return "#{name} saved" if @changes.empty?
-    return "Renamed #{@changes.renamed_from} to #{name}" if only_renamed?
+    return "Renamed #{@changes.renamed_from} to #{name}" if @changes.only_renamed?
 
     named = phrases.first(MAX_NAMED_CHANGES)
     named << "#{phrases.size - MAX_NAMED_CHANGES} more" if phrases.size > MAX_NAMED_CHANGES
@@ -23,22 +23,17 @@ class Themes::Presenter::SavedNotice < Core::Presenter::Base
 
   private
 
-  def only_renamed? = @changes.renamed_from && phrases.size == 1
-
   def phrases
     @phrases ||= [
       (@changes.renamed_from && "renamed from #{@changes.renamed_from}"),
       *@changes.moved_inputs.map { |key| INPUT_PHRASES.fetch(key) },
-      *@changes.pinned.map { |variable| "#{variable_name(variable)} pinned#{mode_note(variable)}" },
-      *@changes.unpinned.map { |variable| "#{variable_name(variable)} unpinned" }
+      *@changes.pinned.map { |variable| "#{variable_name(variable)} pinned#{mode_note(@changes.pinned_mode(variable))}" },
+      *@changes.unpinned.map { |variable| "#{variable_name(variable)} unpinned#{mode_note(@changes.unpinned_mode(variable))}" }
     ].compact
   end
 
   def variable_name(variable) = Themes::Presenter::Variable.label(variable).downcase
 
-  # "(light mode)" when the pin covers one mode only, so a person is not left thinking the other follows it.
-  def mode_note(variable)
-    mode = @changes.single_mode(variable)
-    " (#{mode} mode)" if mode
-  end
+  # "(light mode)" when the change covers one mode only, so a person is not left thinking the other follows it.
+  def mode_note(mode) = (" (#{mode} mode)" if mode)
 end

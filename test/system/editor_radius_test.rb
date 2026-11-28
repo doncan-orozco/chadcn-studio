@@ -128,6 +128,6 @@ class EditorRadiusTest < ApplicationSystemTestCase
     fill_in "Name", with: "Renamed"
     click_on "Save theme"
 
-    assert_text "Renamed saved"
+    assert_text "Renamed Zinc to Renamed"
   end
 end

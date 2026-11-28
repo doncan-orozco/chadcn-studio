@@ -168,7 +168,7 @@ class EditorTest < ApplicationSystemTestCase
     fill_in "Name", with: "Renamed"
     click_on "Save theme"
 
-    assert_text "Renamed saved"
+    assert_text "Renamed Zinc to Renamed"
     assert_selector :testid, "saved", text: "Saved"
     assert_equal "Renamed", @theme.reload.name
   end

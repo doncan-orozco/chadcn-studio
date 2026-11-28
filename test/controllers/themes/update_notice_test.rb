@@ -13,6 +13,6 @@ class Themes::UpdateNoticeTest < ActionDispatch::IntegrationTest
     patch theme_path(theme), params: { theme: { inputs: { overrides: { light: { border: "#9ca3af" } } } } }
     patch theme_path(theme), params: { theme: { inputs: { primary: "oklch(0.55 0.2 250)", overrides: { light: { border: "" } } } } }
 
-    assert_equal "Zinc saved: brand color changed, borders unpinned", flash[:notice]
+    assert_equal "Zinc saved: brand color changed, borders unpinned (light mode)", flash[:notice]
   end
 end

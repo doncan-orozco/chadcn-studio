@@ -31,7 +31,20 @@ class Themes::Presenter::SavedNoticeTest < ActiveSupport::TestCase
   end
 
   test "an unpin names the variable" do
-    assert_equal "Zinc saved: focus ring unpinned", notice(before: { "overrides" => { "light" => { "ring" => "#111111" } } })
+    assert_equal "Zinc saved: focus ring unpinned (light mode)", notice(before: { "overrides" => { "light" => { "ring" => "#111111" } } })
+  end
+
+  test "an unpin in one mode names that mode" do
+    before = { "overrides" => { "light" => { "border" => "#9ca3af" }, "dark" => { "border" => "#111111" } } }
+
+    assert_equal "Zinc saved: borders unpinned (light mode)", notice(before: before, after: { "overrides" => { "dark" => { "border" => "#111111" } } })
+  end
+
+  test "a re-pin in light and a release in dark name each mode" do
+    before = { "overrides" => { "light" => { "border" => "#9ca3af" }, "dark" => { "border" => "#111111" } } }
+    after = { "overrides" => { "light" => { "border" => "#222222" } } }
+
+    assert_equal "Zinc saved: borders pinned (light mode), borders unpinned (dark mode)", notice(before: before, after: after)
   end
 
   test "an input posted back at its default is not named" do
