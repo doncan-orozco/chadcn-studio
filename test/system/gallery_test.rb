@@ -4,7 +4,7 @@ class GalleryTest < ApplicationSystemTestCase
   %w[light dark].each do |scheme|
     test "the gallery renders in #{scheme} without JS errors" do
       visit gallery_path
-      click_on scheme.capitalize
+      choose_appearance scheme
 
       assert_selector "h1", text: "Components"
       assert_selector :testid, "gallery-entry", minimum: 1

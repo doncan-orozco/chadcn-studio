@@ -96,19 +96,4 @@ class ShellTest < ApplicationSystemTestCase
 
     assert_current_path gallery_path, wait: 15
   end
-
-  private
-
-  def open_appearance_menu
-    find(:testid, "theme-trigger").click
-
-    assert_selector "[role=menu]"
-  end
-
-  def choose_appearance(mode)
-    open_appearance_menu
-    find(:testid, "theme-#{mode}").click
-
-    assert_no_selector "[role=menu]"
-  end
 end

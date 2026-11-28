@@ -46,7 +46,7 @@ class ThemesTest < ApplicationSystemTestCase
   test "the list and the show page render without JS errors in light and dark" do
     %w[light dark].each do |scheme|
       visit themes_path
-      click_on scheme.capitalize
+      choose_appearance scheme
 
       assert_selector :testid, "theme-card", minimum: 1
       assert_selector(scheme == "dark" ? "html.dark" : "html:not(.dark)")
@@ -88,7 +88,7 @@ class ThemesTest < ApplicationSystemTestCase
 
   test "the Delete button keeps a destructive border in dark mode" do
     visit themes_path
-    click_on "Dark"
+    choose_appearance "dark"
     visit theme_path(themes(:zinc))
 
     assert_selector "html.dark"

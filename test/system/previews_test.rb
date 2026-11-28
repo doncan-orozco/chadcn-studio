@@ -5,7 +5,7 @@ class PreviewsTest < ApplicationSystemTestCase
     %w[light dark].each do |scheme|
       test "#{page} renders in #{scheme} without JS errors" do
         visit preview_path(page)
-        click_on scheme.capitalize
+        choose_appearance scheme
 
         assert_selector :testid, "preview-root"
         assert_selector "h1, h2"
