@@ -26,6 +26,34 @@ class Themes::PublicationsControllerTest < ActionDispatch::IntegrationTest
     end
   end
 
+  test "DELETE from the Export dialog unpublishes and answers with the dialog open on its draft body" do
+    delete theme_publication_path(themes(:slate)), params: { from: "export_dialog" }, as: :turbo_stream
+
+    assert_response :success
+    assert_not_predicate themes(:slate).reload, :published?
+    assert_select "turbo-stream[action=replace][target=?] [data-testid=export-draft]", "export-dialog-host-#{themes(:slate).id}"
+    assert_select "turbo-stream[action=replace][target=publish-toggle-form] [data-testid=publish-toggle]", /Publish/
+    assert_select "turbo-stream[action=replace][target=?] [data-testid=publication-state]", Components::Editor::PublicationState::ID, /Not published/
+  end
+
+  test "unpublishing from a row's dialog answers with the draft body and keeps the row's compact, named trigger" do
+    delete theme_publication_path(themes(:slate)), params: { from: "export_dialog", trigger: "row" }, as: :turbo_stream
+
+    assert_response :success
+    assert_not_predicate themes(:slate).reload, :published?
+    host = Components::Editor::ExportDialog.host_id(themes(:slate).id)
+
+    assert_select "turbo-stream[target=?] [data-testid=export-draft]", host
+    assert_select "turbo-stream[target=?] button[aria-label=?]", host, "Export #{themes(:slate).name}"
+  end
+
+  test "DELETE without the dialog still redirects to the editor" do
+    delete theme_publication_path(themes(:slate))
+
+    assert_redirected_to edit_theme_path(themes(:slate))
+    assert_not_predicate themes(:slate).reload, :published?
+  end
+
   test "publishing an invalid theme from the Export dialog answers 422 HTML with the errors" do
     themes(:zinc).update_column(:light, themes(:zinc).light.except("primary"))
 
