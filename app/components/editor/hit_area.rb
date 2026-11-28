@@ -15,5 +15,5 @@ module Components::Editor::HitArea
   # The 32 x 18.4 px switch becomes 32 x 24: the track is painted in the padding box, inside 2.8 px of transparent border
   # above and below; the 1 px side border becomes padding so the thumb keeps its travel. With that border no longer the focus
   # cue (`focus-visible:border-ring`), the focus ring is full strength instead of half.
-  SWITCH = "data-[size=default]:h-6 border-x-0 border-y-[0.175rem] px-px bg-clip-padding focus-visible:border-transparent shadow-none drop-shadow-xs"
+  SWITCH = "data-[size=default]:h-6 border-x-0 border-y-[0.175rem] px-px bg-clip-padding focus-visible:border-transparent focus-visible:ring-ring shadow-none drop-shadow-xs"
 end
