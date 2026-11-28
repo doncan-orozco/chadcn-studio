@@ -6,16 +6,17 @@ class ThemesControllerTest < ActionDispatch::IntegrationTest
 
     assert_response :success
     assert_select "[data-testid=theme-card]", Theme.count
-    assert_select "[data-testid=theme-card] a[href=?]", edit_theme_path(themes(:zinc)), text: "Zinc"
+    assert_select "[data-testid=theme-card] [data-slot=card-title]", text: "Zinc"
     assert_select "[data-testid=theme-card] [role=img] span", Theme.count * Themes::Presenter::Card::SWATCHES.size
   end
 
-  test "GET /themes gives each card one link to its editor and a button that says it can rename" do
+  test "GET /themes gives each card one control to its editor, a plain-text title and a link that says it can rename" do
     get themes_path
 
     Theme.find_each do |theme|
-      assert_select "[data-testid=theme-card] a[href=?]", edit_theme_path(theme), count: 1, text: theme.name
-      assert_select "[data-testid=theme-card] form[action=?][method=get] button[aria-label=?]", edit_theme_path(theme), "Edit or rename #{theme.name}", text: "Edit or rename"
+      assert_select "[data-testid=theme-card] a[href=?]", edit_theme_path(theme), count: 1
+      assert_select "[data-testid=theme-card] a[href=?][aria-label=?]", edit_theme_path(theme), "Edit or rename #{theme.name}", text: "Edit or rename"
+      assert_select "[data-testid=theme-card] [data-slot=card-title] a", 0
     end
   end
 
