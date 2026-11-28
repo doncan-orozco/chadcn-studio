@@ -30,6 +30,12 @@ class Themes::Presenter::Editor < Core::Presenter::Base
 
   def first_page = pages.first.key
 
+  # The "Describe a theme" panel of the sidebar; nil in a studio that cannot generate, where someone tuning a theme has no use for the setup line.
+  def generation_panel
+    panel = Generations::Presenter::Panel.for(__getobj__)
+    panel if panel.configured?
+  end
+
   # CSS custom properties of a mode, only values that parse as a color or a rem length: they end up in a `style` attribute.
   def variables(mode)
     palette = mode == "dark" ? dark : light

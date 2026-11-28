@@ -12,7 +12,7 @@ class Generations::Presenter::Status < Core::Presenter::Base
     "busy" => "A theme is already being generated. Wait for it to finish.",
     "throttled" => "Too many generations in a short time. Try again in a minute.",
     "capped" => "The studio has reached its hourly generation limit, try again later.",
-    "not_configured" => "Describing a theme needs an Anthropic API key: set ANTHROPIC_API_KEY and restart the studio.",
+    "not_configured" => "Describing a theme is not set up in this studio. Set ANTHROPIC_API_KEY and restart the studio to let Claude pick the colors from your words.",
     "prompt" => "Describe the theme in 1 to #{PROMPT_LIMIT} characters."
   }.freeze
   private_constant :MESSAGES

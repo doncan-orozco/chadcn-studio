@@ -91,11 +91,12 @@ class GenerationTest < ApplicationSystemTestCase
     Rails.configuration.x.generations.hourly_cap = original
   end
 
-  test "without a configured client the panel only says so: no field, no Generate" do
+  test "without a configured client the editor shows no setup line, no field, no Generate" do
     key = ENV.delete("ANTHROPIC_API_KEY")
     visit edit_theme_path(themes(:slate))
 
-    assert_selector :testid, "generation-status", text: "set ANTHROPIC_API_KEY and restart the studio"
+    assert_no_selector :testid, "generation-status"
+    assert_no_text "ANTHROPIC_API_KEY"
     assert_no_button "Generate", disabled: :all
     assert_no_field "Describe a theme", disabled: :all
   ensure
