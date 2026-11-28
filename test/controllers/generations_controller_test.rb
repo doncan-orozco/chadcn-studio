@@ -19,7 +19,7 @@ class GenerationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "warm sunset", theme.generations.first.prompt
   end
 
-  test "the editor opens with a toast naming the new theme, and its card says New until the editor is opened again" do
+  test "the editor opens with a toast naming the new theme, and its card says New until the editor is opened after the list" do
     post generations_path, params: { generation: { prompt: "warm sunset" } }
     theme = Theme.find_by!(name: "warm sunset")
 
@@ -27,9 +27,15 @@ class GenerationsControllerTest < ActionDispatch::IntegrationTest
 
     assert_equal "Created warm sunset from your description", flash[:notice]
 
+    get edit_theme_path(theme)
     get themes_path
 
     assert_select "[data-testid=theme-card]:has(a[href=?]) [data-testid=new-badge]", edit_theme_path(theme), text: "New"
+
+    get edit_theme_path(theme), headers: { "X-Sec-Purpose" => "prefetch" }
+    get themes_path
+
+    assert_select "[data-testid=new-badge]", count: 1
 
     get edit_theme_path(theme)
     get themes_path
