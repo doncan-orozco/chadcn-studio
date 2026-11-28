@@ -47,6 +47,14 @@ class Themes::ExportsControllerTest < ActionDispatch::IntegrationTest
     assert_response :not_found
   end
 
+  test "only draft=1 opens a draft, any other value keeps the public rules" do
+    %w[0 true false].each do |value|
+      get theme_export_path("zinc", format: "css", draft: value)
+
+      assert_response :not_found
+    end
+  end
+
   test "a draft download still 404s for an unknown slug and for a palette that no longer validates" do
     get theme_export_path("nope", format: "css", draft: 1)
 
