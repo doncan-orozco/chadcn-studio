@@ -22,10 +22,13 @@ class Themes::Presenter::Card < Core::Presenter::Base
   end
 
   # `base_url` is where the public export URLs point: the controller knows it, the card only carries it.
-  def initialize(theme, base_url:)
+  def initialize(theme, base_url:, fresh_ids: [])
     super(theme)
     @base_url = base_url
+    @fresh = fresh_ids.include?(id)
   end
+
+  def fresh? = @fresh
 
   # What the row's Export dialog shows: the same presenter the editor's dialog takes.
   def sharing = Exports::Presenter::Sharing.new(__getobj__, base_url: @base_url)

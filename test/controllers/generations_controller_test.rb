@@ -19,6 +19,24 @@ class GenerationsControllerTest < ActionDispatch::IntegrationTest
     assert_equal "warm sunset", theme.generations.first.prompt
   end
 
+  test "the editor opens with a toast naming the new theme, and its card says New until the editor is opened again" do
+    post generations_path, params: { generation: { prompt: "warm sunset" } }
+    theme = Theme.find_by!(name: "warm sunset")
+
+    follow_redirect!
+
+    assert_equal "Created warm sunset from your description", flash[:notice]
+
+    get themes_path
+
+    assert_select "[data-testid=theme-card]:has(a[href=?]) [data-testid=new-badge]", edit_theme_path(theme), text: "New"
+
+    get edit_theme_path(theme)
+    get themes_path
+
+    assert_select "[data-testid=new-badge]", count: 0
+  end
+
   test "a blank prompt re-renders New theme with a readable message and creates nothing" do
     assert_no_enqueued_jobs do
       assert_no_difference -> { Theme.count } do

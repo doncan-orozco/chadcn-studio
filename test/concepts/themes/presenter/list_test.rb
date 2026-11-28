@@ -16,6 +16,14 @@ class Themes::Presenter::ListTest < ActiveSupport::TestCase
     refute_predicate list, :empty?
   end
 
+  test "a card is new only for the theme ids it is told about" do
+    zinc = themes(:zinc)
+    list = Themes::Presenter::List.new(Theme.order(:slug), base_url: BASE, fresh_ids: [ zinc.id ])
+
+    assert_equal [ zinc.name ], list.cards.select(&:fresh?).map(&:name)
+    assert_empty Themes::Presenter::List.new(Theme.all, base_url: BASE).cards.select(&:fresh?)
+  end
+
   test "an empty list says so" do
     list = Themes::Presenter::List.new(Theme.none, base_url: BASE)
 

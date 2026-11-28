@@ -5,9 +5,10 @@ class Themes::Presenter::List
   attr_reader :cards
 
   # `configured` is whether the studio can generate a theme from a description: when it cannot, no page offers it.
+  # `fresh_ids` are the themes generated and not opened since: their cards say New.
   # `base_url` reaches every card, which builds its Export dialog from it.
-  def initialize(themes, base_url:, configured: Generations::Presenter::Panel.configured?)
-    @cards = Themes::Presenter::Card.wrap(themes, base_url:)
+  def initialize(themes, base_url:, fresh_ids: [], configured: Generations::Presenter::Panel.configured?)
+    @cards = Themes::Presenter::Card.wrap(themes, base_url:, fresh_ids: Array(fresh_ids))
     @configured = configured
   end
 
