@@ -11,9 +11,10 @@ class Views::Themes::Index::Card < Views::Base
   def view_template
     render Chadcn::Card.new(class: "relative", data: { testid: "theme-card" }) do |card|
       card.header do
-        card.title { a(href: @card.edit_path, class: TITLE_LINK) { @card.name } }
+        card.title { a(href: @card.edit_path, class: TITLE_LINK, data: @card.title_link_data) { @card.name } }
         card.description(class: "flex items-center gap-2") do
           span { @card.created_label }
+          render Chadcn::Badge.new(variant: "outline", data: { testid: "new-badge" }) { "New" } if @card.fresh?
           render Chadcn::Badge.new(variant: @card.badge_variant) { @card.status_label }
         end
       end

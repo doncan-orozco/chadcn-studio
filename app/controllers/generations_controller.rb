@@ -1,4 +1,6 @@
 class GenerationsController < ApplicationController
+  include NewThemeMarks
+
   FAILURES = %i[busy capped not_configured].freeze
   private_constant :FAILURES
 
@@ -8,7 +10,9 @@ class GenerationsController < ApplicationController
     result = Generations::Operation::Begin.new.call(prompt: prompt, configured: Generations::Presenter::Panel.configured?, hourly_cap: hourly_cap)
 
     if result.success?
-      redirect_to edit_theme_path(result.value![:model])
+      theme = result.value![:model]
+      mark_landed(theme)
+      redirect_to edit_theme_path(theme), notice: "Created #{theme.name} from your description"
     else
       code = result.failure[:code]
       failure = FAILURES.include?(code) ? code : :prompt
