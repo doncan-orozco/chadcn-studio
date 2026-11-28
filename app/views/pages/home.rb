@@ -45,7 +45,7 @@ class Views::Pages::Home < Views::Base
 
   # The row's link opens the editor: a swatch, the name, one cue (Edit or rename), a chevron. The name is plain so the cue is the only one. Export sits beside it, never inside it.
   def theme_row(card)
-    a(href: card.edit_path, class: ROW_LINK, aria: { label: card.edit_label }) do
+    a(href: card.edit_path, class: ROW_LINK) do
       span(class: "size-4 shrink-0 rounded-full border", style: card.swatches.find { |swatch| swatch.name == "primary" }&.style, aria: { hidden: "true" })
       span(class: "flex-1", data: { link_name: true }) { card.name }
       span(class: "text-sm text-foreground/70") { card.edit_text }
