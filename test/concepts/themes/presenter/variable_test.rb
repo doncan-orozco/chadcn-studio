@@ -29,4 +29,14 @@ class Themes::Presenter::VariableTest < ActiveSupport::TestCase
   test "rows keep the order they are asked for" do
     assert_equal %w[--ring --primary], Themes::Presenter::Variable.new(themes(:zinc)).rows(%w[ring primary]).map(&:name)
   end
+
+  test "a variable only light has is said to be the same in dark, not left blank" do
+    theme = themes(:zinc)
+    row = Themes::Presenter::Variable.new(theme).row("radius")
+
+    assert_equal theme.light["radius"], row.light
+    assert_equal "Same as light", row.dark
+    assert_nil row.dark_style
+    assert_nil row.dark_hex
+  end
 end

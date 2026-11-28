@@ -13,7 +13,10 @@ class Themes::Presenter::Variable < Core::Presenter::Base
   SURFACE_NAMES = { "card" => "Card", "popover" => "Popover", "secondary" => "Secondary", "muted" => "Muted", "accent" => "Accent", "sidebar" => "Sidebar",
                     "sidebar-primary" => "Sidebar brand", "sidebar-accent" => "Sidebar accent" }.freeze
 
-  private_constant :LABELS, :SURFACE_NAMES
+  # Said in the Dark row of a variable that only the light palette carries (the radius), so a blank is never mistaken for a failed load.
+  SAME_AS_LIGHT = "Same as light"
+
+  private_constant :LABELS, :SURFACE_NAMES, :SAME_AS_LIGHT
 
   Row = Data.define(:name, :label, :light, :light_style, :light_hex, :dark, :dark_style, :dark_hex)
 
@@ -44,7 +47,7 @@ class Themes::Presenter::Variable < Core::Presenter::Base
 
   def row(variable)
     Row.new(name: "--#{variable}", label: self.class.label(variable), light: light[variable], light_style: swatch(light[variable]), light_hex: self.class.hex(light[variable]),
-            dark: dark[variable], dark_style: swatch(dark[variable]), dark_hex: self.class.hex(dark[variable]))
+            dark: dark[variable] || SAME_AS_LIGHT, dark_style: swatch(dark[variable]), dark_hex: self.class.hex(dark[variable]))
   end
 
   private
