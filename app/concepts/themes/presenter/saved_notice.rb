@@ -1,9 +1,11 @@
 # frozen_string_literal: true
 
-# The toast after a save: "Ocean saved: primary changed, border pinned". Says what this save changed, not only whose theme it was.
+# The toast after a save: "Ocean saved: brand color changed, border pinned (light mode)". Says what this save changed, not only whose theme it was.
 # `changes` is the Update operation's account of the save (a Themes::Service::Changes).
 class Themes::Presenter::SavedNotice < Core::Presenter::Base
   MAX_NAMED_CHANGES = 3
+  # The tracked inputs in the words of the controls that move them, not the stored key.
+  INPUT_PHRASES = { "primary" => "brand color changed", "tint" => "backgrounds and cards tinted", "radius" => "corner radius changed" }.freeze
 
   def initialize(theme, changes:)
     super(theme)
@@ -11,7 +13,8 @@ class Themes::Presenter::SavedNotice < Core::Presenter::Base
   end
 
   def to_s
-    return "#{name} saved" if phrases.empty?
+    return "#{name} saved" if @changes.empty?
+    return "Renamed #{@changes.renamed_from} to #{name}" if @changes.only_renamed?
 
     named = phrases.first(MAX_NAMED_CHANGES)
     named << "#{phrases.size - MAX_NAMED_CHANGES} more" if phrases.size > MAX_NAMED_CHANGES
@@ -23,9 +26,14 @@ class Themes::Presenter::SavedNotice < Core::Presenter::Base
   def phrases
     @phrases ||= [
       (@changes.renamed_from && "renamed from #{@changes.renamed_from}"),
-      *@changes.moved_inputs.map { |key| "#{key} changed" },
-      *@changes.pinned.map { |variable| "#{variable} pinned" },
-      *@changes.unpinned.map { |variable| "#{variable} unpinned" }
+      *@changes.moved_inputs.map { |key| INPUT_PHRASES.fetch(key) },
+      *@changes.pinned.map { |variable| "#{variable_name(variable)} pinned#{mode_note(@changes.pinned_mode(variable))}" },
+      *@changes.unpinned.map { |variable| "#{variable_name(variable)} unpinned#{mode_note(@changes.unpinned_mode(variable))}" }
     ].compact
   end
+
+  def variable_name(variable) = Themes::Presenter::Variable.label(variable).downcase
+
+  # "(light mode)" when the change covers one mode only, so a person is not left thinking the other follows it.
+  def mode_note(mode) = (" (#{mode} mode)" if mode)
 end
