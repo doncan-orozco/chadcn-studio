@@ -32,15 +32,15 @@ class TargetSizeTest < ApplicationSystemTestCase
     assert_equal "Close toast", find("[data-close-button]", visible: :all)["aria-label"]
   end
 
-  # The box the audit measures is the element's own bounding rect, so an `::after` overlay does not count.
+  # The box the audit measures is the element's own, so an `::after` overlay does not count; the layout size is read, since
+  # a panel opening still scales (zoom-in-95) and its bounding rect with it.
   test "every small control measures at least 24 x 24 on its own box" do
     find(:testid, "group-radius").click
     undersized = page.evaluate_script(<<~JS)
       [...document.querySelectorAll("[role=slider], [role=switch], [data-slot=dialog-close]:has(.sr-only), [data-close-button]")]
         .filter((el) => el.checkVisibility())
-        .map((el) => [el.getAttribute("aria-label") || el.textContent.trim(), el.getBoundingClientRect()])
-        .filter(([, box]) => box.width < 24 || box.height < 24)
-        .map(([name, box]) => `${name} ${box.width}x${box.height}`)
+        .filter((el) => el.offsetWidth < 24 || el.offsetHeight < 24)
+        .map((el) => `${el.getAttribute("aria-label") || el.textContent.trim()} ${el.offsetWidth}x${el.offsetHeight}`)
     JS
 
     assert_empty undersized
@@ -48,10 +48,10 @@ class TargetSizeTest < ApplicationSystemTestCase
 
   test "the Close of a panel measures 24 x 24" do
     find(:testid, "group-radius").click
-    box = find(:testid, "group-radius-panel").find("[data-slot=dialog-close]", text: "Close").evaluate_script("this.getBoundingClientRect().toJSON()")
+    close = find(:testid, "group-radius-panel").find("[data-slot=dialog-close]", text: "Close")
 
-    assert_operator box["width"], :>=, 24
-    assert_operator box["height"], :>=, 24
+    assert_operator close.evaluate_script("this.offsetWidth"), :>=, 24
+    assert_operator close.evaluate_script("this.offsetHeight"), :>=, 24
   end
 
   test "the toast close measures 24 x 24" do
