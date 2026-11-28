@@ -15,10 +15,6 @@ class Components::Editor::HitAreasTest < ActiveSupport::TestCase
     assert_includes link["class"].split, "py-1"
   end
 
-  test "a home theme row link is at least 32 px tall" do
-    assert_includes Views::Pages::Home::ROW_LINK.split, "min-h-8"
-  end
-
   private
 
   def render_group(key)

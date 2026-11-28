@@ -1,8 +1,8 @@
 require "test_helper"
 require "application_system_test_case"
 
-# What the hit-area work (#181, #182, #226) does not assert on the tune pages: every slider thumb and the toast close are
-# named for a screen reader.
+# Target sizes and names on the tune pages: every slider thumb, the switch, the dialog Close and the toast close measure at
+# least 24 x 24 on their own box and are named for a screen reader.
 class TargetSizeTest < ApplicationSystemTestCase
   setup { visit edit_theme_path(themes(:zinc)) }
 
@@ -33,32 +33,26 @@ class TargetSizeTest < ApplicationSystemTestCase
   end
 
   # The box the audit measures is the element's own, so an `::after` overlay does not count; the layout size is read, since
-  # a panel opening still scales (zoom-in-95) and its bounding rect with it.
+  # a panel opening or a toast sliding in still scales and its bounding rect with it.
   test "every small control measures at least 24 x 24 on its own box" do
     find(:testid, "group-radius").click
-    undersized = page.evaluate_script(<<~JS)
-      [...document.querySelectorAll("[role=slider], [role=switch], [data-slot=dialog-close]:has(.sr-only), [data-close-button]")]
+
+    assert_selector :testid, "group-radius-panel"
+    controls = page.evaluate_script(<<~JS)
+      [...document.querySelectorAll("[role=slider], [role=switch], [data-slot=dialog-close]:has(.sr-only)")]
         .filter((el) => el.checkVisibility())
-        .filter((el) => el.offsetWidth < 24 || el.offsetHeight < 24)
-        .map((el) => `${el.getAttribute("aria-label") || el.textContent.trim()} ${el.offsetWidth}x${el.offsetHeight}`)
+        .map((el) => [el.getAttribute("aria-label") || el.textContent.trim(), el.offsetWidth, el.offsetHeight])
     JS
 
-    assert_empty undersized
-  end
-
-  test "the Close of a panel measures 24 x 24" do
-    find(:testid, "group-radius").click
-    close = find(:testid, "group-radius-panel").find("[data-slot=dialog-close]", text: "Close")
-
-    assert_operator close.evaluate_script("this.offsetWidth"), :>=, 24
-    assert_operator close.evaluate_script("this.offsetHeight"), :>=, 24
+    assert_operator controls.size, :>=, 5, "the brand thumbs, the radius thumb, the switch and a Close are on screen"
+    assert_empty controls.select { |_, width, height| width < 24 || height < 24 }
   end
 
   test "the toast close measures 24 x 24" do
     click_on "Save theme"
-    box = find("[data-close-button]", visible: :all).evaluate_script("this.getBoundingClientRect().toJSON()")
+    close = find("[data-close-button]", visible: :all)
 
-    assert_operator box["width"], :>=, 24
-    assert_operator box["height"], :>=, 24
+    assert_operator close.evaluate_script("this.offsetWidth"), :>=, 24
+    assert_operator close.evaluate_script("this.offsetHeight"), :>=, 24
   end
 end
