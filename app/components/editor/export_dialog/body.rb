@@ -27,8 +27,8 @@ class Components::Editor::ExportDialog::Body < Components::Base
   # A draft is downloaded right away; only the public URL and the import command wait for Publish.
   def draft_offer
     publication_form(class: "grid gap-3", data: { testid: "export-draft" }) do
-      p(class: "text-sm text-muted-foreground") { "This theme is a draft. Publishing makes it readable by anyone with its link, and you can unpublish it at any time." }
-      render Chadcn::Button.new(type: "submit", variant: "outline", data: { testid: "export-publish" }) { "Publish and show import command" }
+      p(class: "text-sm text-muted-foreground") { "This theme is a draft. Publishing makes it readable by anyone with its link and shows the command that imports it; you can unpublish it at any time." }
+      render Chadcn::Button.new(type: "submit", data: { testid: "export-publish" }) { "Publish and show import command" }
     end
   end
 
@@ -61,7 +61,8 @@ class Components::Editor::ExportDialog::Body < Components::Base
   end
 
   def download_buttons
-    render Chadcn::Button.new(as_child: :a, href: @presenter.css.download_path, download: @presenter.css.filename, data: { testid: "download-css", action: "editor--export#downloaded" }) { @presenter.css.download_label }
+    # One filled button per state: Publish on a draft (the way to the import command), the CSS download once published.
+    render Chadcn::Button.new(as_child: :a, href: @presenter.css.download_path, download: @presenter.css.filename, variant: (@presenter.published? ? "default" : "outline"), data: { testid: "download-css", action: "editor--export#downloaded" }) { @presenter.css.download_label }
     render Chadcn::Button.new(as_child: :a, href: @presenter.json.download_path, download: @presenter.json.filename, variant: "outline", data: { testid: "download-json" }) { "Download JSON" }
   end
 

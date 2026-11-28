@@ -65,6 +65,15 @@ class Components::Editor::ExportDialog::BodyTest < ActiveSupport::TestCase
     assert_nil html.at_css("[data-testid=import-command]")
   end
 
+  test "the dialog has one filled button per state: Publish on a draft, the CSS download once published" do
+    draft = render_body(themes(:zinc))
+    published = render_body(themes(:slate))
+
+    assert_includes draft.at_css("[data-testid=export-publish]")["class"], "bg-primary"
+    assert_not_includes draft.at_css("[data-testid=download-css]")["class"], "bg-primary"
+    assert_includes published.at_css("[data-testid=download-css]")["class"], "bg-primary"
+  end
+
   test "a draft is downloadable right away through the studio's draft export, a published theme through its public URL" do
     draft = render_body(themes(:zinc))
     published = render_body(themes(:slate))
