@@ -30,6 +30,26 @@ class EditorSaveQuietTest < ApplicationSystemTestCase
     assert_selector(:button, "Save theme") { |save| background_of(save) == primary }
   end
 
+  test "a rejected Save leaves Export outline, so Save stays the one primary" do
+    execute_script("const name = document.getElementById('theme-name'); name.removeAttribute('required'); name.value = ''")
+    click_on "Save theme"
+
+    assert_selector :testid, "unsaved", text: "Unsaved changes"
+    primary = token_background("bg-primary")
+    assert_selector(:button, "Export") { |export| export[:"data-dirty"] && background_of(export) != primary }
+  end
+
+  test "publishing from the Export dialog while dirty brings Export back outline" do
+    fill_in "Name", with: "Renamed"
+    click_on "Export"
+    click_on "Publish and show import command"
+
+    assert_selector :testid, "export-panel"
+    find("body").send_keys(:escape)
+    primary = token_background("bg-primary")
+    assert_selector(:button, "Export") { |export| export[:"data-dirty"] && background_of(export) != primary }
+  end
+
   test "a rejected Save comes back with the default Save" do
     # Blank the name without an input event: only the server's rejection can drop data-quiet and show Unsaved changes.
     execute_script("const name = document.getElementById('theme-name'); name.removeAttribute('required'); name.value = ''")
