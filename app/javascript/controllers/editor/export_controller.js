@@ -12,7 +12,7 @@ export default class extends Controller {
   #originalLabel = null
 
   connect() {
-    this.#originalLabel = this.buttonTarget.textContent
+    if (this.hasButtonTarget) this.#originalLabel = this.buttonTarget.textContent // a draft's body has downloads but no Copy button
   }
 
   disconnect() {

@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
-# The part of the dialog that depends on publication: the publish button on a draft, the links and command once public.
+# The body of the Export dialog: the downloads always (a draft's go through the studio's own `?draft=1` export), then the publish
+# offer on a draft, or the Published state, the public URL's import command and Unpublish once public.
 class Components::Editor::ExportDialog::Body < Components::Base
   include Phlex::Rails::Helpers::FormAuthenticityToken
 
@@ -14,26 +15,27 @@ class Components::Editor::ExportDialog::Body < Components::Base
   end
 
   def view_template
-    div { @presenter.published? ? download_links : draft_offer }
+    div(class: "grid gap-4", data: { controller: "editor--export", editor__export_downloaded_label_value: @presenter.css.downloaded_label, editor__export_copied_label_value: "Copied" }) do
+      published_row if @presenter.published?
+      downloads
+      @presenter.published? ? import_command : draft_offer
+    end
   end
 
   private
 
+  # A draft is downloaded right away; only the public URL and the import command wait for Publish.
   def draft_offer
     publication_form(class: "grid gap-3", data: { testid: "export-draft" }) do
-      p(class: "text-sm text-muted-foreground") { "This theme is a draft. Publishing makes it readable by anyone with its link, and you can unpublish it at any time." }
+      p(class: "text-sm text-muted-foreground") { "This theme is a draft. Publishing makes it readable by anyone with its link and shows the command that imports it; you can unpublish it at any time." }
       render Chadcn::Button.new(type: "submit", data: { testid: "export-publish" }) { "Publish and show import command" }
     end
   end
 
-  def download_links
-    div(class: "grid gap-4", data: { controller: "editor--export", editor__export_downloaded_label_value: @presenter.css.downloaded_label, editor__export_copied_label_value: "Copied" }) do
-      published_row
-      div(class: "grid gap-2") do
-        div(class: "flex gap-2") { download_buttons }
-        span(class: "text-sm text-muted-foreground", role: "status", data: { testid: "download-css-status", editor__export_target: "downloadStatus" })
-      end
-      import_command
+  def downloads
+    div(class: "grid gap-2") do
+      div(class: "flex gap-2") { download_buttons }
+      span(class: "text-sm text-muted-foreground", role: "status", data: { testid: "download-css-status", editor__export_target: "downloadStatus" })
     end
   end
 
@@ -59,8 +61,9 @@ class Components::Editor::ExportDialog::Body < Components::Base
   end
 
   def download_buttons
-    render Chadcn::Button.new(as_child: :a, href: @presenter.css.path, download: @presenter.css.filename, data: { testid: "download-css", action: "editor--export#downloaded" }) { @presenter.css.download_label }
-    render Chadcn::Button.new(as_child: :a, href: @presenter.json.path, download: @presenter.json.filename, variant: "outline", data: { testid: "download-json" }) { "Download JSON" }
+    # One filled button per state: Publish on a draft (the way to the import command), the CSS download once published.
+    render Chadcn::Button.new(as_child: :a, href: @presenter.css.download_path, download: @presenter.css.filename, variant: (@presenter.published? ? "default" : "outline"), data: { testid: "download-css", action: "editor--export#downloaded" }) { @presenter.css.download_label }
+    render Chadcn::Button.new(as_child: :a, href: @presenter.json.download_path, download: @presenter.json.filename, variant: "outline", data: { testid: "download-json" }) { "Download JSON" }
   end
 
   def import_command

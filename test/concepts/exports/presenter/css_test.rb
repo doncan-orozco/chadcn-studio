@@ -33,4 +33,12 @@ class Exports::Presenter::CssTest < ActiveSupport::TestCase
     assert_equal "text/css", export.content_type
     assert_equal "bin/rails theme:import[#{URL}]", export.import_command
   end
+
+  test "its download path is the public URL once published and the draft export before" do
+    published = Exports::Presenter::Css.new(themes(:slate), base_url: BASE)
+    draft = Exports::Presenter::Css.new(themes(:zinc), base_url: BASE)
+
+    assert_equal "/t/slate.css", published.download_path
+    assert_equal "/t/zinc.css?draft=1", draft.download_path
+  end
 end

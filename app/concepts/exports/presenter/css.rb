@@ -21,6 +21,8 @@ class Exports::Presenter::Css < Core::Presenter::Base
 
   def url = "#{@base_url}#{path}"
   def path = helpers.theme_export_path(slug, format: "css")
+  # What the studio's download link points at: the public URL once published, the draft export before.
+  def download_path = published? ? path : helpers.theme_export_path(slug, format: "css", draft: 1)
   # Always theme.css: the name `chadcn:theme:import` and shadcn use, whatever the theme is called.
   def filename = "theme.css"
   def download_label = "Download #{filename}"
