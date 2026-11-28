@@ -35,7 +35,7 @@ class Components::Editor::GenerationStatusTest < ActiveSupport::TestCase
   test "a studio without an API key says how to turn generation on as one muted line, not an alert" do
     html = render_status(Generations::Presenter::Status.new(Generation.new, failure: :not_configured))
 
-    assert_includes html, "set ANTHROPIC_API_KEY and restart the studio"
+    assert_includes html, "Set ANTHROPIC_API_KEY and restart the studio"
     assert_includes html, "text-muted-foreground"
     assert_not_includes html, 'role="alert"'
     assert_not_includes html, 'data-slot="alert"'

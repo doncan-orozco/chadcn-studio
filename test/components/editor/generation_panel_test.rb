@@ -17,7 +17,7 @@ class Components::Editor::GenerationPanelTest < ActiveSupport::TestCase
     assert_no_match(/turbo-cable-stream-source/, html)
     assert_no_match(/<input/, html)
     assert_no_match(/data-testid="generate"/, html)
-    assert_includes html, "set ANTHROPIC_API_KEY and restart the studio"
+    assert_includes html, "Set ANTHROPIC_API_KEY and restart the studio"
     assert_includes html, 'id="generation_status"'
   end
 

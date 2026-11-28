@@ -77,12 +77,13 @@ class Themes::GenerationsControllerTest < ActionDispatch::IntegrationTest
     GenerateThemeJob.client = nil
   end
 
-  test "the editor of a studio that cannot generate shows only the line that says so" do
+  test "the editor of a studio that cannot generate shows no generation panel and no setup line" do
     key = ENV.delete("ANTHROPIC_API_KEY")
     get edit_theme_path(themes(:zinc))
 
     assert_select "[data-testid=generation-form]", count: 0
-    assert_select "#generation_status", text: /ANTHROPIC_API_KEY/
+    assert_select "#generation_status", count: 0
+    assert_no_match(/ANTHROPIC_API_KEY/, response.body)
   ensure
     ENV["ANTHROPIC_API_KEY"] = key if key
   end
