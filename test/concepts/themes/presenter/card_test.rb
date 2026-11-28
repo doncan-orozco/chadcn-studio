@@ -35,6 +35,11 @@ class Themes::Presenter::CardTest < ActiveSupport::TestCase
     assert_match(/\ACreated \w+ \d+, \d{4}\z/, @card.created_label)
   end
 
+  test "only a fresh card's title link opts out of prefetch" do
+    assert_empty @card.title_link_data
+    assert_equal({ turbo_prefetch: "false" }, Themes::Presenter::Card.new(themes(:blue), base_url: "http://example.test", fresh_ids: [ themes(:blue).id ]).title_link_data)
+  end
+
   test "sharing is the editor's export presenter for this theme" do
     sharing = @card.sharing
 

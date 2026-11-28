@@ -1,8 +1,9 @@
 class ThemesController < ApplicationController
   include NewThemeMarks
 
+  before_action :leave_landing, only: %i[index show new]
+
   def index
-    leave_landing
     render Views::Themes::Index.new(Themes::Presenter::List.new(Themes::Query::Recent.call, base_url: request.base_url, fresh_ids: fresh_theme_ids), deleted: flash[:deleted])
   end
 

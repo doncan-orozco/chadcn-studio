@@ -30,6 +30,9 @@ class Themes::Presenter::Card < Core::Presenter::Base
 
   def fresh? = @fresh
 
+  # Turbo reuses a hover's prefetch for the click, so the server would never see the opening that clears New.
+  def title_link_data = fresh? ? { turbo_prefetch: "false" } : {}
+
   # What the row's Export dialog shows: the same presenter the editor's dialog takes.
   def sharing = Exports::Presenter::Sharing.new(__getobj__, base_url: @base_url)
 

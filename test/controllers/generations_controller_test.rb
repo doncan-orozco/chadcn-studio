@@ -43,6 +43,39 @@ class GenerationsControllerTest < ActionDispatch::IntegrationTest
     assert_select "[data-testid=new-badge]", count: 0
   end
 
+  test "a fresh card's title link opts out of prefetch" do
+    post generations_path, params: { generation: { prompt: "warm sunset" } }
+    theme = Theme.find_by!(name: "warm sunset")
+
+    get themes_path
+
+    assert_select "a[href=?][data-turbo-prefetch=false]", edit_theme_path(theme)
+  end
+
+  test "a prefetch of the list during the landing does not end it" do
+    post generations_path, params: { generation: { prompt: "warm sunset" } }
+    theme = Theme.find_by!(name: "warm sunset")
+    follow_redirect!
+
+    get themes_path, headers: { "X-Sec-Purpose" => "prefetch" }
+    get edit_theme_path(theme)
+    get themes_path
+
+    assert_select "[data-testid=new-badge]", count: 1
+  end
+
+  test "leaving the landing for the theme's page and opening the editor counts as the first open" do
+    post generations_path, params: { generation: { prompt: "warm sunset" } }
+    theme = Theme.find_by!(name: "warm sunset")
+    follow_redirect!
+
+    get theme_path(theme)
+    get edit_theme_path(theme)
+    get themes_path
+
+    assert_select "[data-testid=new-badge]", count: 0
+  end
+
   test "a blank prompt re-renders New theme with a readable message and creates nothing" do
     assert_no_enqueued_jobs do
       assert_no_difference -> { Theme.count } do

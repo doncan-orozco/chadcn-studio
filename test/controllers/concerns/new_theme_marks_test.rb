@@ -45,6 +45,24 @@ class NewThemeMarksTest < ActiveSupport::TestCase
     assert_equal [ 7 ], host.fresh_theme_ids
   end
 
+  test "a prefetch never ends the landing" do
+    host = Host.new(session: { new_theme_ids: [ 7 ], landing_theme_id: 7 }, headers: { "X-Sec-Purpose" => "prefetch" })
+
+    host.leave_landing
+    host.acknowledge_landing(Theme.new(8))
+
+    assert_equal 7, host.session[:landing_theme_id]
+  end
+
+  test "opening another theme's editor ends the landing" do
+    host = Host.new(session: { new_theme_ids: [ 7, 8 ], landing_theme_id: 7 })
+
+    host.acknowledge_landing(Theme.new(8))
+
+    assert_nil host.session[:landing_theme_id]
+    assert_equal [ 7 ], host.fresh_theme_ids
+  end
+
   test "no marks reads as an empty list and writes nothing to the session" do
     host = Host.new
 
