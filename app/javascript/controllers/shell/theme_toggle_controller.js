@@ -43,7 +43,11 @@ export default class extends Controller {
     return template ? template.content.querySelectorAll("[role=menuitemradio]") : []
   }
 
+  // Only this menu's own picks count: the item's value must be one of the items in this element's template.
   #ownsItem(item) {
-    return this.element.querySelector("template")?.content.querySelector(`[data-testid="${item.dataset.testid}"]`) !== null
+    const value = item?.getAttribute?.("data-chadcn--dropdown-menu-value")
+    if (!value) return false
+
+    return this.#items.length > 0 && [...this.#items].some((own) => own.getAttribute("data-chadcn--dropdown-menu-value") === value)
   }
 }
