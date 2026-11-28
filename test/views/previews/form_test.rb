@@ -13,4 +13,13 @@ class Views::Previews::FormTest < ActiveSupport::TestCase
     assert page.has_css?("#form-email-sample", text: "Sample validation state")
     assert_equal "form-email-sample form-email-error", page.find_by_id("form-email")["aria-describedby"]
   end
+
+  test "the primary action and a checked control come before the long fields" do
+    html = Views::Previews::Form.new(Previews::Presenter::Form.new).call
+    primary = html.index("Create account</button>")
+
+    assert primary
+    assert_operator primary, :<, html.index('id="form-bio"')
+    assert_operator html.index('id="form-terms"'), :<, html.index('id="form-bio"')
+  end
 end
